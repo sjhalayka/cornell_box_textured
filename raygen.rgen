@@ -1,0 +1,608 @@
+#version 460
+#extension GL_EXT_ray_tracing : require
+#extension GL_EXT_nonuniform_qualifier : enable
+
+
+struct ray
+{
+	vec4 direction;
+	vec4 origin;
+	
+	bool in_use;
+
+	vec3 normal;
+
+	int child_refract_id;
+	int child_reflect_id;
+	int parent_id;
+
+	float base_color;
+	float accumulated_color;
+
+	float reflection_constant;
+	float refraction_constant;
+
+	bool external_reflection_ray;
+	bool external_refraction_ray;
+
+	int level;
+};
+
+
+
+const int red_channel = 0;
+const int green_channel = 1;
+const int blue_channel = 2;
+const float red_eta = 0.85;
+const float green_eta = 0.90;
+const float blue_eta = 0.95;
+ivec2 pixel_pos = ivec2(gl_LaunchIDEXT.xy);
+ivec2 res = ivec2(gl_LaunchSizeEXT.xy);
+
+uint prng_state = res.x * pixel_pos.y + pixel_pos.x;
+
+
+const int max_lights = 2;
+
+//uint prng_state = 0;
+
+layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
+layout(binding = 1, set = 0, rgba8) uniform image2D color_image;
+layout(binding = 2, set = 0) uniform UBO 
+{
+	mat4 viewInverse;
+	mat4 projInverse;
+
+	mat4 transformation_matrix;
+
+	vec4 light_positions[max_lights];
+	vec4 light_colors[max_lights];
+
+	vec3 camera_pos;
+	int vertexSize;
+} ubo;
+
+
+
+struct RayPayload {
+	vec3 color;
+	vec3 pure_color;
+	float distance;
+	vec3 normal;
+	float reflector;
+	float opacity;
+	vec3 pos;
+	vec3 wro;
+	vec3 wrd;
+	float hitt;
+	bool recursive;
+};
+
+layout(location = 0) rayPayloadEXT RayPayload rayPayload;
+layout(location = 2) rayPayloadEXT bool shadowed;
+
+
+// See: https://github.com/nvpro-samples/vk_mini_path_tracer/blob/main/vk_mini_path_tracer/shaders/raytrace.comp.glsl#L26
+float stepAndOutputRNGFloat(inout uint rngState)
+{
+  // Condensed version of pcg_output_rxs_m_xs_32_32, with simple conversion to floating-point [0,1].
+  rngState  = rngState * 747796405 + 1;
+  uint word = ((rngState >> ((rngState >> 28) + 4)) ^ rngState) * 277803737;
+  word      = (word >> 22) ^ word;
+  return float(word) / 4294967295.0f;
+}
+
+
+bool get_shadow(vec3 wro, vec3 wrd, float hitt, const vec3 light_pos, const vec3 normal, float shadow_sharpness)
+{
+	vec3 lightVector = normalize(light_pos);
+
+	bool shadow = false;
+
+	// Shadow casting
+	float tmin = 0.001;
+	float tmax = 1000.0;
+
+	vec3 origin = wro + wrd * hitt;
+	vec3 biased_origin = origin + normal * 0.01;
+
+	shadowed = true; // Make sure to set this to the default before tracing the ray!
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 0, 0, 1, biased_origin, tmin, lightVector, tmax, 2);
+		
+	if(shadowed)
+		shadow = true;
+	else
+		shadow = false;
+
+	return shadow;
+}
+
+
+
+// Max. number of recursion is passed via a specialization constant
+layout (constant_id = 0) const int MAX_RECURSION = 0;
+const int buffer_size = 32;
+
+
+
+vec3 aabb_min = vec3(-2.5, -2.5, -2.5);
+vec3 aabb_max = vec3(2.5, 2.5, 2.5);
+
+const float opacity_factor = 0.025;
+
+
+ const vec4 C = vec4(0.3, 0.5, 0.4, 0.2);
+ const uint max_iterations = 8;
+ const float threshold = 4.0;
+ const float z_w = 0.0;
+
+// Perform the quaternion square operation
+vec4 qsquare(vec4 q)
+{
+	vec4 qout;
+
+	qout.x = q.x * q.x - dot(q.yzw, q.yzw);
+
+	// The cross product of a 3D vector and itself is (0, 0, 0), and so
+	// the yzw values are greatly simplified
+	qout.yzw = 2 * q.x * q.yzw;
+
+	return qout;
+}
+
+// Calculate magnitude of quaternion while underdoing iteration
+float iterate(vec4 z)
+{
+	const float threshold_sq = threshold * threshold;
+	float magnitude_sq = dot(z, z);
+
+	for (int i = 0; i < max_iterations; i++)
+	{
+		// Calculate the traditional quaternion Julia set
+		z = qsquare(z) + C;
+
+		// Assign value to magnitude_sq, and then check its value
+		// compared to threshold_sq
+		// 
+		// If the magnitude is greater than or equal to the threshold
+		// value, then this point on the grid is considered divergent, 
+		// or not in the quaternion Julia set
+		if ((magnitude_sq = dot(z, z)) >= threshold_sq)
+			break;
+	}
+
+	// Return magnitude
+	return sqrt(magnitude_sq);
+}
+
+vec4 get_pseudorandom_sample(vec3 pos)
+{
+	return vec4(stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state), 1.0);
+}
+
+vec4 get_fractal_sample(vec3 pos)
+{
+	float x = iterate(vec4(pos, z_w)) / threshold;
+
+	if(x < 1.0)
+		x = 0.0;
+	else
+		x = 1.0;
+
+	return vec4(x, x, x, x);
+}
+
+vec4 get_sample(vec3 pos)
+{
+// Get 3D texture coords from pos and aabb_min and aabb_max
+	//return get_fractal_sample(pos);
+
+	return vec4(1.0); // fog, for now.
+}
+
+
+
+bool in_aabb(vec3 pos, vec3 aabb_min, vec3 aabb_max)
+{
+	if((pos.x >= aabb_min.x && pos.x <= aabb_max.x) &&
+	(pos.y >= aabb_min.y && pos.y <= aabb_max.y) &&
+	(pos.z >= aabb_min.z && pos.z <= aabb_max.z))
+		return true;
+	else
+		return false;
+}
+
+bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, const vec3 dir, out float out_t0, out float out_t1)
+{
+	vec3 invdir = 1.0 / dir;	
+	
+	vec3 tbot = invdir * (boxMin - origin);
+	vec3 ttop = invdir * (boxMax - origin);
+	vec3 tmin = min(ttop, tbot);
+	vec3 tmax = max(ttop, tbot);
+	vec2 t = max(tmin.xx, tmin.yz);
+	float t0 = max(t.x, t.y);
+	t = min(tmax.xx, tmax.yz);
+	float t1 = min(t.x, t.y);
+	out_t0 = t0;
+	out_t1 = t1;
+
+	return t1 > max(t0, 0.0);
+}
+
+
+float get_ray0(const int channel, const float eta)
+{
+	// This algorithm stops when the buffer runs out of space,
+	// or when the rays miss everything,
+	// or when the level is too deep
+
+	ray rays[buffer_size];
+	int current_buffer_index = 0;
+
+	const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
+	const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
+	vec2 d = inUV * 2.0 - 1.0;
+
+	vec4 origin = ubo.viewInverse * vec4(0,0,0,1);
+	vec4 target = ubo.projInverse * vec4(d.x, d.y, 1, 1) ;
+	vec4 direction = ubo.viewInverse*vec4(normalize(target.xyz / target.w), 0);
+
+	uint rayFlags = gl_RayFlagsOpaqueEXT;
+	uint cullMask = 0xff;
+	float tmin = 0.001;
+	float tmax = 10000.0;
+
+	// Step one: make tree of ray segments
+	for(int i = 0; i < buffer_size; i++)
+	{
+		// Initialize buffer
+		rays[i].in_use = false;
+		rays[i].child_reflect_id = -1;
+		rays[i].child_refract_id = -1;
+		rays[i].parent_id = -1;
+		rays[i].external_reflection_ray = false;
+		rays[i].external_refraction_ray = false;
+	}
+
+	rays[0].direction = direction;
+	rays[0].origin = origin;
+	rays[0].in_use = true;
+	rays[0].level = 0;
+	rays[0].external_reflection_ray = true;
+	rays[0].external_refraction_ray = false;
+	current_buffer_index++;
+
+
+
+	while(true)
+	{
+		int used_count = 0;
+
+		for(int i = 0; i < buffer_size; i++)
+		{
+			if(rays[i].in_use)
+			{
+				used_count++;
+				
+				/*
+				// If partial reflection then do glossy	
+				float refl = 1.0;
+
+				if(rays[i].parent_id != -1)
+					refl = rays[rays[i].parent_id].reflection_constant;
+
+				if(rays[i].external_reflection_ray && refl != 1.0)
+				{
+					// Pseudorandomize the direction of the ray
+					// in order to get blurry (glossy) reflections
+					vec3 rdir = normalize(vec3(stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state)));
+
+					// Stick to the correct hemisphere
+					if(dot(rdir, normalize(rays[i].direction.xyz)) < 0.0)
+						rdir = -rdir;
+
+					rays[i].direction.xyz = mix(rdir, rays[i].direction.xyz, refl);
+				}
+				*/
+
+				
+
+
+				
+				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
+				
+				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
+
+
+
+
+				
+				// Do some fog in an AABB
+				float dist_color = 0.0;
+				float dist_opacity = 0.0;
+
+
+				/*
+				
+				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				{
+					float t0 = 0.0;
+					float t1 = 0.0;
+
+					if(BBoxIntersect(aabb_min, aabb_max, rays[i].origin.xyz, rays[i].direction.xyz, t0, t1))
+					{
+						const float target_step_length = 0.1;
+
+						vec3 start = rays[i].origin.xyz + rays[i].direction.xyz*t0;
+						vec3 end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
+
+						if(rayPayload.distance != -1)
+							end = hitPos.xyz;
+		
+						const float num_steps = floor(distance(start, end) / target_step_length);
+						const vec3 step = (end - start) / num_steps;
+
+						vec3 curr_step = start;
+
+						for(float j = 0; j < num_steps; j += 1.0, curr_step += step)
+						{
+							if(false == in_aabb(curr_step, aabb_min, aabb_max))
+								continue;
+
+							for(int k = 0; k < max_lights; k++)
+							{
+								float light_opacity = 0.0;
+
+								if(get_shadow(curr_step, rayPayload.wrd, rayPayload.hitt, ubo.light_positions[k].xyz, rayPayload.normal, 1.0))
+								{
+									light_opacity = -1.0;
+								}
+								else
+								{
+									light_opacity = 1.0;
+
+									const vec3 light_steps_start = curr_step;
+									const vec3 light_steps_end = ubo.light_positions[k].xyz;
+									const float light_num_steps = floor(distance(light_steps_start, light_steps_end) / target_step_length);
+									const vec3 light_step = (light_steps_end - light_steps_start)/float(light_num_steps);
+									
+									vec3 light_curr_step = light_steps_start;
+
+									for(float l = 0.0; l < light_num_steps; l += 1.0, light_curr_step += light_step)
+									{
+										// If stepped outside of the AABB then abort early
+										if(false == in_aabb(light_curr_step, aabb_min, aabb_max))
+											break;
+
+										light_opacity -= get_sample(light_curr_step).r*opacity_factor;
+									}
+								}
+
+								float light_color = 0.0;
+
+								// Apply lighting
+								if(channel == red_channel)
+									light_color = ubo.light_colors[k].r;
+								else if(channel == green_channel)
+									light_color = ubo.light_colors[k].g;
+								else
+									light_color = ubo.light_colors[k].b;
+
+								float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
+								dist_color += trans * light_color;
+								dist_opacity += trans * opacity_factor * light_opacity;
+							}
+						}
+					}
+				}
+
+				 // do fog
+
+				 */
+
+
+
+
+
+				rays[i].normal = rayPayload.normal;
+
+				// Mix in fog
+				if(channel == red_channel)
+					rays[i].base_color = mix(rayPayload.color.r, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
+				else if(channel == green_channel)
+					rays[i].base_color = mix(rayPayload.color.g, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
+				else
+					rays[i].base_color = mix(rayPayload.color.b, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
+
+				rays[i].reflection_constant = rayPayload.reflector;
+				rays[i].refraction_constant = rayPayload.opacity;
+
+				// this particular ray missed everything, or got too deep
+				if(rayPayload.distance == -1.0 || rays[i].level >= MAX_RECURSION)
+				{
+					rays[i].in_use = false;
+					continue;
+				}
+
+
+
+
+
+
+
+
+				// entering mesh
+				if(dot(rays[i].direction.xyz, rayPayload.normal) <= 0.0)
+				{
+					if(current_buffer_index < buffer_size && rays[i].reflection_constant != 0.0)
+					{
+						rays[i].child_reflect_id = current_buffer_index;
+
+						//generate new ray segment
+						rays[current_buffer_index].origin.xyz = hitPos.xyz + rayPayload.normal * 0.01f;
+						rays[current_buffer_index].direction.xyz = reflect(rays[i].direction.xyz, rayPayload.normal);
+						rays[current_buffer_index].in_use = true;
+						rays[current_buffer_index].level = rays[i].level + 1;
+						rays[current_buffer_index].external_reflection_ray = true;
+						rays[current_buffer_index].external_refraction_ray = false;
+						rays[current_buffer_index].parent_id = i;
+						current_buffer_index++;
+					}
+
+					if(current_buffer_index < buffer_size && rays[i].refraction_constant != 1.0)
+					{
+						rays[i].child_refract_id = current_buffer_index;
+
+						//generate new ray segment
+						rays[current_buffer_index].origin.xyz = hitPos.xyz - rayPayload.normal * 0.01f;
+						rays[current_buffer_index].direction.xyz = refract(rays[i].direction.xyz, rayPayload.normal, eta);
+						rays[current_buffer_index].in_use = true;
+						rays[current_buffer_index].level = rays[i].level + 1;
+						rays[current_buffer_index].external_reflection_ray = false;
+						rays[current_buffer_index].external_refraction_ray = false;
+						rays[current_buffer_index].parent_id = i;
+						current_buffer_index++;
+					}	
+				}
+				// exiting mesh
+				else
+				{
+					if(current_buffer_index < buffer_size)
+					{
+						rays[i].child_refract_id = current_buffer_index;
+
+						vec3 temp_dir = refract(rays[i].direction.xyz, -rayPayload.normal, 1.0/eta);
+
+						if(temp_dir != vec3(0.0))
+						{
+							//generate new ray segment
+							rays[current_buffer_index].origin.xyz = hitPos.xyz + rayPayload.normal * 0.01f;
+							rays[current_buffer_index].direction.xyz = temp_dir;
+							rays[current_buffer_index].in_use = true;
+							rays[current_buffer_index].level = rays[i].level + 1;
+							rays[current_buffer_index].external_reflection_ray = false;
+							rays[current_buffer_index].external_refraction_ray = true;
+							rays[current_buffer_index].parent_id = i;
+							current_buffer_index++;
+						}
+						else
+						{
+							// Total internal reflection
+
+							//generate new ray segment
+							rays[current_buffer_index].origin.xyz = hitPos.xyz - rayPayload.normal * 0.01f;
+							rays[current_buffer_index].direction.xyz = reflect(rays[i].direction.xyz, -rayPayload.normal);;
+							rays[current_buffer_index].in_use = true;
+							rays[current_buffer_index].level = rays[i].level + 1;
+							rays[current_buffer_index].external_reflection_ray = false;
+							rays[current_buffer_index].external_refraction_ray = false;
+							rays[current_buffer_index].parent_id = i;
+							current_buffer_index++;
+						}
+					}
+				}
+
+				// The processing of this ray segment is complete
+				rays[i].in_use = false;
+			}
+		}
+
+		if(used_count == 0)
+			break;
+	}
+
+	
+	
+	// Step two: this is the Fresnel reflection-refraction code
+	// Start at the tips of the branches, work backwards to the root
+	for(int i = current_buffer_index - 1; i >= 0; i--)
+	{
+		bool pure_refraction = false;
+		bool pure_reflection = false;
+		bool neither = false;
+		bool both = false;
+
+		if(rays[i].child_refract_id != -1 && rays[i].child_reflect_id == -1)
+			pure_refraction = true;
+
+		if(rays[i].child_refract_id == -1 && rays[i].child_reflect_id != -1)
+			pure_reflection = true;
+
+		if(rays[i].child_refract_id == -1 && rays[i].child_reflect_id == -1)
+			neither = true;
+
+		if(rays[i].child_refract_id != -1 && rays[i].child_reflect_id != -1)
+			both = true;
+
+		float accum = 0.0;
+
+		if(neither)
+		{
+			accum = rays[i].base_color;
+		}
+		else if(both)
+		{
+			// Fake the Fresnel refraction-reflection
+			const float ratio = 1.0 - dot(-normalize(rays[i].direction.xyz), rays[i].normal);
+
+			float reflect_accum = mix(rays[i].base_color, rays[rays[i].child_reflect_id].accumulated_color, rays[i].reflection_constant);
+			float refract_accum = mix(rays[i].base_color, rays[rays[i].child_refract_id].accumulated_color, 1.0 - rays[i].refraction_constant);
+		
+			accum = mix(refract_accum, reflect_accum, ratio);
+		}
+		else if(pure_refraction)
+		{
+			accum = mix(rays[i].base_color, rays[rays[i].child_refract_id].accumulated_color, 1.0 - rays[i].refraction_constant);	
+		}
+		else if(pure_reflection)
+		{
+			accum = mix(rays[i].base_color, rays[rays[i].child_reflect_id].accumulated_color, rays[i].reflection_constant);
+		}
+		
+		rays[i].accumulated_color = accum;
+	}
+	
+
+
+
+	// Show level depth as grayscale colour
+	//float s = 1.0 - float(rays[current_buffer_index - 1].level) / float(MAX_RECURSION);
+	// return s;
+
+
+	// Show buffer fullness as grayscale colour
+	//float s = 1.0 - float(current_buffer_index - 1) / float(buffer_size);
+	//return s;
+
+
+
+	// Return root ray segment colour
+	return rays[0].accumulated_color;
+}
+
+
+ 
+
+
+void main() 
+{
+	// Calculate chromatic aberration
+
+	// https://github.com/brunosegiu/vk-rt/blob/main/shaders/raytrace.rgen
+	rayPayload.recursive = false;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	const float red = get_ray0(red_channel, red_eta);
+
+	rayPayload.recursive = false;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	const float green = get_ray0(green_channel, green_eta);
+	
+	rayPayload.recursive = false;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	const float blue = get_ray0(blue_channel, blue_eta);
+
+	const vec3 color = vec3(red, green, blue);
+
+	imageStore(color_image, pixel_pos, vec4(color, 0.0));
+}
