@@ -271,14 +271,13 @@ void main()
 	const vec3 pos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
 	const vec2 uv = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 
-	vec4 n = ubo.transformation_matrix*vec4(normal, 0.0);
+	vec4 n = normalize(ubo.transformation_matrix*vec4(normal, 0.0));
 	
 	rayPayload.reflector = texture(normalSampler, uv).a;
-	rayPayload.opacity = texture(baseColorSampler, uv).a;//pow(length(texture(normalSampler, uv).rgb) / sqrt(3.0), 1.0);
-
+	rayPayload.opacity = texture(baseColorSampler, uv).a;
 	vec3 color = texture(baseColorSampler, uv).rgb;
-
 	rayPayload.pure_color = color;
+
 	rayPayload.distance = gl_RayTmaxEXT;
 	rayPayload.normal = n.xyz;
 	
