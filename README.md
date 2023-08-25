@@ -1,0 +1,1 @@
+# cornell_box_textured
