@@ -14,16 +14,14 @@ struct RayPayload {
 	vec3 wro;
 	vec3 wrd;
 	float hitt;
-	bool recursive;
+	int recursive;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
-
 layout(location = 2) rayPayloadEXT bool shadowed;
 
 layout(binding = 0, set = 1) uniform sampler2D baseColorSampler;
 layout(binding = 1, set = 1) uniform sampler2D normalSampler;
-layout(binding = 2, set = 1) uniform sampler2D occlusionSampler;
 
 hitAttributeEXT vec2 attribs;
 
@@ -124,132 +122,6 @@ float stepAndOutputRNGFloat(inout uint rngState)
 }
 
 
-/*
-float get_shadow_float(const vec3 light_pos, const vec3 normal)
-{
-	// Back up the payload before we trace some rays
-	RayPayload r = rayPayload;
-
-	vec3 lightVector = normalize(light_pos);
-
-	float shadow = 0.0;
-
-	vec3 first_origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	vec3 first_biased_origin = first_origin + normal * 0.01;
-
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	vec3 biased_origin = origin + normal * 0.01;
-
-	if(dot(normal, lightVector) < 0.0)
-	{
-		shadow = 0.0;
-	}
-	else
-	{
-		// Shadow casting
-		origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-		biased_origin = origin + normal * 0.01;
-
-		shadow = 0.0;
-
-		float tmin = 0.001;
-		float tmax = 1000.0;
-
-		shadowed = true; // Make sure to set this to the default before tracing the ray!
-		traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 0, 0, 1, biased_origin, tmin, lightVector, tmax, 2);
-		
-		if(shadowed)
-			shadow = 0;
-		else
-			shadow = 1;
-	}
-
-	// Restore the payload after we've traced some rays
-	rayPayload = r;
-
-	return shadow;
-}
-*/
-
-float get_shadow_float(const vec3 light_pos, const vec3 normal)
-{
-	// Back up the payload before we trace some rays
-	RayPayload r = rayPayload;
-
-	vec3 lightVector = normalize(light_pos);
-
-	// Pseudorandomize the direction of the light
-	// in order to get blurry shadows
-//	vec3 rdir = normalize(vec3(stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state)));
-
-	// Stick to the correct hemisphere
-//	if(dot(rdir, lightVector) < 0.0)
-//		rdir = -rdir;
-	
-	// Keep the shadows stay dynamic to some degree
-	// I mean, how blurry do you really need the edges to be?
-//	if(shadow_sharpness < 0.5)
-//		shadow_sharpness = 0.5;
-
-//	lightVector = mix(rdir, lightVector, shadow_sharpness);
-
-	float shadow = 0.0;
-
-	vec3 first_origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	vec3 first_biased_origin = first_origin + normal * 0.01;
-
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	vec3 biased_origin = origin + normal * 0.01;
-
-	if(dot(normal, lightVector) < 0.0)
-	{
-		shadow = 0.0;
-	}
-	else
-	{
-		// Shadow casting
-		origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-		biased_origin = origin + normal * 0.01;
-
-		shadow = 0.0;
-
-		bool first_assignment = true;
-
-		while(true)
-		{
-			rayPayload.recursive = true;
-
-			traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, biased_origin, 0.001, lightVector, 10000.0, 0);
-
-			if(rayPayload.distance == -1)
-				break;
-
-			biased_origin = biased_origin + lightVector*0.01;				
-
-			float first_dot = dot(normalize(lightVector), normalize(rayPayload.normal));
-			float first_opacity = rayPayload.opacity;
-
-			float rating = 1.0 - abs(first_dot);
-
-			rating = mix(rating, 1, first_opacity);
-
-			if(first_assignment || rating < shadow)
-			{
-				shadow = rating;
-				first_assignment = false;
-			}
-		}
-
-		shadow = 1 - shadow;
-	}
-
-	// Restore the payload after we've traced some rays
-	rayPayload = r;
-
-	return shadow;
-}
-
-
 
 
 
@@ -275,8 +147,16 @@ void main()
 	
 	rayPayload.reflector = texture(normalSampler, uv).a;
 	rayPayload.opacity = texture(baseColorSampler, uv).a;
+
+	if(rayPayload.opacity == 0.0)
+		rayPayload.reflector = 0.5;
+
 	vec3 color = texture(baseColorSampler, uv).rgb;
+	
 	rayPayload.pure_color = color;
+
+
+
 
 	rayPayload.distance = gl_RayTmaxEXT;
 	rayPayload.normal = n.xyz;
@@ -287,16 +167,11 @@ void main()
 
 	rayPayload.color = vec3(0, 0, 0);
 
-
-	if(true)//rayPayload.recursive == false)
+	if(rayPayload.recursive < 8)
 	{
-		rayPayload.recursive = true;
+		rayPayload.recursive++;
 
 		for (int i = 0; i < max_lights; i++)
-		{
-			//float s = get_shadow_float(ubo.light_positions[i].xyz, rayPayload.normal);
-
-			rayPayload.color += phongModelDiffAndSpec(false, rayPayload.reflector, color, ubo.light_colors[i].rgb, ubo.light_positions[i].xyz, pos, rayPayload.normal);
-		}
+			rayPayload.color += phongModelDiffAndSpec(false, 1.0, color, ubo.light_colors[i].rgb, ubo.light_positions[i].xyz, pos, rayPayload.normal);
 	}
 }

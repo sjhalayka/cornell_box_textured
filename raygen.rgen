@@ -39,6 +39,10 @@ const float blue_eta = 0.95;
 ivec2 pixel_pos = ivec2(gl_LaunchIDEXT.xy);
 ivec2 res = ivec2(gl_LaunchSizeEXT.xy);
 
+const float TWO_PI = 8.0 * atan(1.0);
+
+
+
 uint prng_state = res.x * pixel_pos.y + pixel_pos.x;
 
 
@@ -75,14 +79,12 @@ struct RayPayload {
 	vec3 wro;
 	vec3 wrd;
 	float hitt;
-	bool recursive;
+	int recursive;
 };
 
 layout(location = 0) rayPayloadEXT RayPayload rayPayload;
 layout(location = 2) rayPayloadEXT bool shadowed;
 
-
-// See: https://github.com/nvpro-samples/vk_mini_path_tracer/blob/main/vk_mini_path_tracer/shaders/raytrace.comp.glsl#L26
 float stepAndOutputRNGFloat(inout uint rngState)
 {
   // Condensed version of pcg_output_rxs_m_xs_32_32, with simple conversion to floating-point [0,1].
@@ -91,6 +93,19 @@ float stepAndOutputRNGFloat(inout uint rngState)
   word      = (word >> 22) ^ word;
   return float(word) / 4294967295.0f;
 }
+
+// See: https://github.com/nvpro-samples/vk_mini_path_tracer/blob/main/vk_mini_path_tracer/shaders/raytrace.comp.glsl#L26
+vec3 RandomUnitVector(inout uint state)
+{
+    float z = stepAndOutputRNGFloat(state) * 2.0f - 1.0f;
+    float a = stepAndOutputRNGFloat(state) * TWO_PI;
+    float r = sqrt(1.0f - z * z);
+    float x = r * cos(a);
+    float y = r * sin(a);
+    return vec3(x, y, z);
+}
+
+
 
 
 bool get_shadow(vec3 wro, vec3 wrd, float hitt, const vec3 light_pos, const vec3 normal, float shadow_sharpness)
@@ -180,6 +195,7 @@ vec4 get_pseudorandom_sample(vec3 pos)
 	return vec4(stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state), 1.0);
 }
 
+
 vec4 get_fractal_sample(vec3 pos)
 {
 	float x = iterate(vec4(pos, z_w)) / threshold;
@@ -229,6 +245,48 @@ bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, cons
 
 	return t1 > max(t0, 0.0);
 }
+
+
+
+
+float trace_path(const int iterations, vec3 origin, vec3 direction, out vec3 hitPos, const int channel)
+{
+	float ret_colour = 0;
+
+	for(int i = 0; i < iterations; i++)
+	{
+		float tmin = 0.001;
+		float tmax = 1000.0;
+		traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+
+		if(channel == red_channel)
+			ret_colour += rayPayload.color.r;
+		else if(channel == green_channel)
+			ret_colour += rayPayload.color.g;
+		else
+			ret_colour += rayPayload.color.b;
+
+		if(rayPayload.distance == -1)
+			return ret_colour;
+
+		hitPos = origin + direction * rayPayload.distance;
+
+		origin = hitPos + direction*0.01;
+
+		vec3 rdir = RandomUnitVector(prng_state);
+
+		// Stick to the correct hemisphere
+
+		//if(dot(rdir, normalize(rayPayload.normal)) < 0.0)
+		//	rdir = -rdir;
+
+		direction = rdir;
+	}
+
+	return ret_colour;
+}
+
+
 
 
 float get_ray0(const int channel, const float eta)
@@ -310,17 +368,25 @@ float get_ray0(const int channel, const float eta)
 
 
 				
-				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
+				//traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 				
-				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
+				//vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
 
+				vec3 hitPos = vec3(0);
 
+				//float trace_colour = trace_path(1, rays[i].origin.xyz, rays[i].direction.xyz, hitPos, channel);
+				
+			//	hitPos = vec3(0);
+				
+				float colour = trace_path(2, rays[i].origin.xyz, rays[i].direction.xyz, hitPos, channel);
 
 
 				
 				// Do some fog in an AABB
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
+
+				dist_color = (colour);
 
 
 				/*
@@ -590,15 +656,15 @@ void main()
 	// Calculate chromatic aberration
 
 	// https://github.com/brunosegiu/vk-rt/blob/main/shaders/raytrace.rgen
-	rayPayload.recursive = false;
+	rayPayload.recursive = 0;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
 	const float red = get_ray0(red_channel, red_eta);
 
-	rayPayload.recursive = false;
+	rayPayload.recursive = 0;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
 	const float green = get_ray0(green_channel, green_eta);
 	
-	rayPayload.recursive = false;
+	rayPayload.recursive = 0;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
 	const float blue = get_ray0(blue_channel, blue_eta);
 

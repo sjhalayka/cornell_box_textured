@@ -12,7 +12,7 @@ struct RayPayload {
 	vec3 wro;
 	vec3 wrd;
 	float hitt;
-	bool depth;
+	int recursive;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
@@ -25,7 +25,7 @@ void main()
 	const vec3 gradientEnd = vec3(0, 0.5, 1.0);
 	vec3 unitDir = normalize(gl_WorldRayDirectionEXT);
 	float t = 0.5 * (unitDir.y + 1.0);
-	rayPayload.color = (1.0-t) * gradientStart + t * gradientEnd;
+	rayPayload.color = vec3(0);//(1.0-t) * gradientStart + t * gradientEnd;
 	rayPayload.pure_color = rayPayload.color;
 	rayPayload.distance = -1;
 	rayPayload.normal = vec3(0.0f);
