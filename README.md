@@ -1,1 +1,3 @@
-# cornell_box_textured
+Cornell box done in glTF format.
+
+Model by Rob Rau.
