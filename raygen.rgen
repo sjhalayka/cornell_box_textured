@@ -253,12 +253,14 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 {
 	float ret_colour = 0;
 
-
 	vec3 o = origin;
 	vec3 d = direction;
 
-		for(int s = 0; s < 10; s++)
+	const int samples = 100;
+
+		for(int s = 0; s < samples; s++)
 	{
+		float local_colour = 1;
 
 		for(int i = 0; i < iterations; i++)
 		{
@@ -271,11 +273,11 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o.xyz, tmin, d.xyz, tmax, 0);
 
 			if(channel == red_channel)
-				ret_colour += rayPayload.color.r;
+				local_colour *= rayPayload.color.r;
 			else if(channel == green_channel)
-				ret_colour += rayPayload.color.g;
+				local_colour *= rayPayload.color.g;
 			else
-				ret_colour += rayPayload.color.b;
+				local_colour *= rayPayload.color.b;
 
 			if(rayPayload.distance == -1)
 				return ret_colour;
@@ -293,6 +295,8 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 
 			d = rdir;
 		}
+
+		ret_colour += local_colour / samples;
 	}
 
 	return ret_colour;
@@ -380,17 +384,19 @@ float get_ray0(const int channel, const float eta)
 
 
 				
-				//traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
-				
-				//vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
 
-				vec3 hitPos = vec3(0);
+				vec3 hitPos3 = vec3(0);
+				float colour = trace_path(2, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel);
 
-				//float trace_colour = trace_path(1, rays[i].origin.xyz, rays[i].direction.xyz, hitPos, channel);
+
+
+
+
+				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 				
-			//	hitPos = vec3(0);
-				
-				float colour = trace_path(3, rays[i].origin.xyz, rays[i].direction.xyz, hitPos, channel);
+				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
+
+
 
 
 				
@@ -400,98 +406,17 @@ float get_ray0(const int channel, const float eta)
 
 				dist_color = (colour);
 
-
-				/*
-				
-				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
-				{
-					float t0 = 0.0;
-					float t1 = 0.0;
-
-					if(BBoxIntersect(aabb_min, aabb_max, rays[i].origin.xyz, rays[i].direction.xyz, t0, t1))
-					{
-						const float target_step_length = 0.1;
-
-						vec3 start = rays[i].origin.xyz + rays[i].direction.xyz*t0;
-						vec3 end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
-
-						if(rayPayload.distance != -1)
-							end = hitPos.xyz;
-		
-						const float num_steps = floor(distance(start, end) / target_step_length);
-						const vec3 step = (end - start) / num_steps;
-
-						vec3 curr_step = start;
-
-						for(float j = 0; j < num_steps; j += 1.0, curr_step += step)
-						{
-							if(false == in_aabb(curr_step, aabb_min, aabb_max))
-								continue;
-
-							for(int k = 0; k < max_lights; k++)
-							{
-								float light_opacity = 0.0;
-
-								if(get_shadow(curr_step, rayPayload.wrd, rayPayload.hitt, ubo.light_positions[k].xyz, rayPayload.normal, 1.0))
-								{
-									light_opacity = -1.0;
-								}
-								else
-								{
-									light_opacity = 1.0;
-
-									const vec3 light_steps_start = curr_step;
-									const vec3 light_steps_end = ubo.light_positions[k].xyz;
-									const float light_num_steps = floor(distance(light_steps_start, light_steps_end) / target_step_length);
-									const vec3 light_step = (light_steps_end - light_steps_start)/float(light_num_steps);
-									
-									vec3 light_curr_step = light_steps_start;
-
-									for(float l = 0.0; l < light_num_steps; l += 1.0, light_curr_step += light_step)
-									{
-										// If stepped outside of the AABB then abort early
-										if(false == in_aabb(light_curr_step, aabb_min, aabb_max))
-											break;
-
-										light_opacity -= get_sample(light_curr_step).r*opacity_factor;
-									}
-								}
-
-								float light_color = 0.0;
-
-								// Apply lighting
-								if(channel == red_channel)
-									light_color = ubo.light_colors[k].r;
-								else if(channel == green_channel)
-									light_color = ubo.light_colors[k].g;
-								else
-									light_color = ubo.light_colors[k].b;
-
-								float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
-								dist_color += trans * light_color;
-								dist_opacity += trans * opacity_factor * light_opacity;
-							}
-						}
-					}
-				}
-
-				 // do fog
-
-				 */
-
-
+								// Mix in fog
+				if(channel == red_channel)
+					rays[i].base_color = dist_color;//mix(rayPayload.color.r, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
+				else if(channel == green_channel)
+					rays[i].base_color = dist_color;//mix(rayPayload.color.g, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
+				else
+					rays[i].base_color = dist_color;//mix(rayPayload.color.b, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
 
 
 
 				rays[i].normal = rayPayload.normal;
-
-				// Mix in fog
-				if(channel == red_channel)
-					rays[i].base_color = mix(rayPayload.color.r, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
-				else if(channel == green_channel)
-					rays[i].base_color = mix(rayPayload.color.g, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
-				else
-					rays[i].base_color = mix(rayPayload.color.b, clamp(dist_color, 0.0, 1.0), clamp(dist_opacity, 0.0, 1.0));
 
 				rays[i].reflection_constant = rayPayload.reflector;
 				rays[i].refraction_constant = rayPayload.opacity;
