@@ -256,7 +256,7 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 	vec3 o = origin;
 	vec3 d = direction;
 
-	const int samples = 10;
+	const int samples = 100;
 
 		for(int s = 0; s < samples; s++)
 	{
@@ -306,7 +306,7 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 		ret_colour += local_colour;
 	}
 
-	return sqrt(ret_colour);// samples;
+	return ret_colour / samples;
 }
 
 
