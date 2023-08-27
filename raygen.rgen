@@ -277,18 +277,21 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 
 			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 			{
-				ret_colour = 1;
-				return ret_colour;
+				local_colour = 1;
+				ret_colour += local_colour;
+	
+				continue;//return ret_colour;
 			}
 
 			if(rayPayload.distance == -1)
 			{
 				ret_colour += local_colour;
-				return ret_colour;
+				break;
 			}
+
 			hitPos = o + d * rayPayload.distance;
 
-			o = hitPos + direction*0.01;
+			o = hitPos + rayPayload.normal*0.01;
 
 			vec3 rdir = RandomUnitVector(prng_state);
 
