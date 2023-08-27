@@ -249,38 +249,50 @@ bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, cons
 
 
 
-float trace_path(const int iterations, vec3 origin, vec3 direction, out vec3 hitPos, const int channel)
+float trace_path(const int iterations, const vec3 origin, const vec3 direction, out vec3 hitPos, const int channel)
 {
 	float ret_colour = 0;
 
-	for(int i = 0; i < iterations; i++)
+
+	vec3 o = origin;
+	vec3 d = direction;
+
+		for(int s = 0; s < 10; s++)
 	{
-		float tmin = 0.001;
-		float tmax = 1000.0;
-		traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 
-		if(channel == red_channel)
-			ret_colour += rayPayload.color.r;
-		else if(channel == green_channel)
-			ret_colour += rayPayload.color.g;
-		else
-			ret_colour += rayPayload.color.b;
+		for(int i = 0; i < iterations; i++)
+		{
 
-		if(rayPayload.distance == -1)
-			return ret_colour;
 
-		hitPos = origin + direction * rayPayload.distance;
 
-		origin = hitPos + direction*0.01;
 
-		vec3 rdir = RandomUnitVector(prng_state);
+			float tmin = 0.001;
+			float tmax = 1000.0;
+			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o.xyz, tmin, d.xyz, tmax, 0);
 
-		// Stick to the correct hemisphere
+			if(channel == red_channel)
+				ret_colour += rayPayload.color.r;
+			else if(channel == green_channel)
+				ret_colour += rayPayload.color.g;
+			else
+				ret_colour += rayPayload.color.b;
 
-		//if(dot(rdir, normalize(rayPayload.normal)) < 0.0)
-		//	rdir = -rdir;
+			if(rayPayload.distance == -1)
+				return ret_colour;
 
-		direction = rdir;
+			hitPos = o + d * rayPayload.distance;
+
+			o = hitPos + direction*0.01;
+
+			vec3 rdir = RandomUnitVector(prng_state);
+
+			// Stick to the correct hemisphere
+
+			if(dot(rdir, normalize(rayPayload.normal)) < 0.0)
+				rdir = -rdir;
+
+			d = rdir;
+		}
 	}
 
 	return ret_colour;
@@ -378,7 +390,7 @@ float get_ray0(const int channel, const float eta)
 				
 			//	hitPos = vec3(0);
 				
-				float colour = trace_path(2, rays[i].origin.xyz, rays[i].direction.xyz, hitPos, channel);
+				float colour = trace_path(3, rays[i].origin.xyz, rays[i].direction.xyz, hitPos, channel);
 
 
 				

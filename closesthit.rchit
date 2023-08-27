@@ -167,11 +167,19 @@ void main()
 
 	rayPayload.color = vec3(0, 0, 0);
 
-	if(rayPayload.recursive < 8)
-	{
-		rayPayload.recursive++;
+	rayPayload.color = color;
 
-		for (int i = 0; i < max_lights; i++)
-			rayPayload.color += phongModelDiffAndSpec(false, 1.0, color, ubo.light_colors[i].rgb, ubo.light_positions[i].xyz, pos, rayPayload.normal);
-	}
+
+
+
+//	if(true)//rayPayload.recursive < 8)
+//	{
+//		rayPayload.recursive++;
+//
+//		for (int i = 0; i < 1; i++)
+//			rayPayload.color += color;//phongModelDiffAndSpec(false, 1.0, color, ubo.light_colors[i].rgb, ubo.light_positions[i].xyz, pos, rayPayload.normal);
+//	}
+
+
+
 }
