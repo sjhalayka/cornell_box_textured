@@ -256,7 +256,7 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 	vec3 o = origin;
 	vec3 d = direction;
 
-	const int samples = 100;
+	const int samples = 10;
 
 		for(int s = 0; s < samples; s++)
 	{
@@ -264,10 +264,6 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 
 		for(int i = 0; i < iterations; i++)
 		{
-
-
-
-
 			float tmin = 0.001;
 			float tmax = 1000.0;
 			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o.xyz, tmin, d.xyz, tmax, 0);
@@ -279,9 +275,17 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 			else
 				local_colour *= rayPayload.color.b;
 
-			if(rayPayload.distance == -1)
+			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
+			{
+				ret_colour = 1;
 				return ret_colour;
+			}
 
+			if(rayPayload.distance == -1)
+			{
+				ret_colour += local_colour;
+				return ret_colour;
+			}
 			hitPos = o + d * rayPayload.distance;
 
 			o = hitPos + direction*0.01;
@@ -296,10 +300,13 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 			d = rdir;
 		}
 
-		ret_colour += local_colour / samples;
+		o = origin;
+		d = direction;
+
+		ret_colour += local_colour;
 	}
 
-	return ret_colour;
+	return sqrt(ret_colour);// samples;
 }
 
 
@@ -386,7 +393,7 @@ float get_ray0(const int channel, const float eta)
 				
 
 				vec3 hitPos3 = vec3(0);
-				float colour = trace_path(2, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel);
+				float colour = trace_path(10, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel);
 
 
 
