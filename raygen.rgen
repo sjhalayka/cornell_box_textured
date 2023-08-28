@@ -249,12 +249,17 @@ bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, cons
 
 
 
-float trace_path(const int iterations, const vec3 origin, const vec3 direction, out vec3 hitPos, const int channel)
+float trace_path(const int iterations, const vec3 origin, const vec3 direction, out vec3 hitPos, const int channel, const float eta)
 {
 	float ret_colour = 0;
 
-	vec3 o = origin;
-	vec3 d = direction;
+	vec3 o_reflect = origin;
+	vec3 d_reflect = direction;
+
+	vec3 o_refract = origin;
+	vec3 d_refract = direction;
+
+
 
 	const int samples = 100;
 
@@ -266,7 +271,7 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 		{
 			float tmin = 0.001;
 			float tmax = 1000.0;
-			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o.xyz, tmin, d.xyz, tmax, 0);
+			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o_reflect.xyz, tmin, d_reflect.xyz, tmax, 0);
 
 			if(channel == red_channel)
 				local_colour += rayPayload.color.r;
@@ -289,9 +294,9 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 				break;
 			}
 
-			hitPos = o + d * rayPayload.distance;
+			hitPos = o_reflect + d_reflect * rayPayload.distance;
 
-			o = hitPos + rayPayload.normal*0.01;
+			o_reflect = hitPos + rayPayload.normal*0.01;
 
 			vec3 rdir = RandomUnitVector(prng_state);
 
@@ -300,11 +305,15 @@ float trace_path(const int iterations, const vec3 origin, const vec3 direction, 
 			if(dot(rdir, normalize(rayPayload.normal)) < 0.0)
 				rdir = -rdir;
 
-			d = rdir;
+			d_reflect = rdir;
+
+
+			//vec3 d_refract = refract(d, rayPayload.normal, eta);
+
 		}
 
-		o = origin;
-		d = direction;
+		o_reflect = origin;
+		d_reflect = direction;
 
 		ret_colour += local_colour;
 	}
@@ -396,7 +405,7 @@ float get_ray0(const int channel, const float eta)
 				
 
 				vec3 hitPos3 = vec3(0);
-				float colour = trace_path(10, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel);
+				float colour = trace_path(10, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel, eta);
 
 
 
