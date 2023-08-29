@@ -141,126 +141,11 @@ const int buffer_size = 32;
 vec3 aabb_min = vec3(-2.5, -2.5, -2.5);
 vec3 aabb_max = vec3(2.5, 2.5, 2.5);
 
-const float opacity_factor = 0.025;
 
-
- const vec4 C = vec4(0.3, 0.5, 0.4, 0.2);
- const uint max_iterations = 8;
- const float threshold = 4.0;
- const float z_w = 0.0;
-
-// Perform the quaternion square operation
-vec4 qsquare(vec4 q)
+vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
 {
-	vec4 qout;
+  	vec2 r = vec2(stepAndOutputRNGFloat(state), stepAndOutputRNGFloat(state));
 
-	qout.x = q.x * q.x - dot(q.yzw, q.yzw);
-
-	// The cross product of a 3D vector and itself is (0, 0, 0), and so
-	// the yzw values are greatly simplified
-	qout.yzw = 2 * q.x * q.yzw;
-
-	return qout;
-}
-
-// Calculate magnitude of quaternion while underdoing iteration
-float iterate(vec4 z)
-{
-	const float threshold_sq = threshold * threshold;
-	float magnitude_sq = dot(z, z);
-
-	for (int i = 0; i < max_iterations; i++)
-	{
-		// Calculate the traditional quaternion Julia set
-		z = qsquare(z) + C;
-
-		// Assign value to magnitude_sq, and then check its value
-		// compared to threshold_sq
-		// 
-		// If the magnitude is greater than or equal to the threshold
-		// value, then this point on the grid is considered divergent, 
-		// or not in the quaternion Julia set
-		if ((magnitude_sq = dot(z, z)) >= threshold_sq)
-			break;
-	}
-
-	// Return magnitude
-	return sqrt(magnitude_sq);
-}
-
-vec4 get_pseudorandom_sample(vec3 pos)
-{
-	return vec4(stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state), stepAndOutputRNGFloat(prng_state), 1.0);
-}
-
-
-vec4 get_fractal_sample(vec3 pos)
-{
-	float x = iterate(vec4(pos, z_w)) / threshold;
-
-	if(x < 1.0)
-		x = 0.0;
-	else
-		x = 1.0;
-
-	return vec4(x, x, x, x);
-}
-
-vec4 get_sample(vec3 pos)
-{
-// Get 3D texture coords from pos and aabb_min and aabb_max
-	//return get_fractal_sample(pos);
-
-	return vec4(1.0); // fog, for now.
-}
-
-
-
-bool in_aabb(vec3 pos, vec3 aabb_min, vec3 aabb_max)
-{
-	if((pos.x >= aabb_min.x && pos.x <= aabb_max.x) &&
-	(pos.y >= aabb_min.y && pos.y <= aabb_max.y) &&
-	(pos.z >= aabb_min.z && pos.z <= aabb_max.z))
-		return true;
-	else
-		return false;
-}
-
-bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, const vec3 dir, out float out_t0, out float out_t1)
-{
-	vec3 invdir = 1.0 / dir;	
-	
-	vec3 tbot = invdir * (boxMin - origin);
-	vec3 ttop = invdir * (boxMax - origin);
-	vec3 tmin = min(ttop, tbot);
-	vec3 tmax = max(ttop, tbot);
-	vec2 t = max(tmin.xx, tmin.yz);
-	float t0 = max(t.x, t.y);
-	t = min(tmax.xx, tmax.yz);
-	float t1 = min(t.x, t.y);
-	out_t0 = t0;
-	out_t1 = t1;
-
-	return t1 > max(t0, 0.0);
-}
-
-float hash1(inout float seed) {
-    return fract(sin(seed += 0.1)*43758.5453123);
-}
-
-vec2 hash2(inout float seed) {
-    return fract(sin(vec2(seed+=0.1,seed+=0.1))*vec2(43758.5453123,22578.1459123));
-}
-
-vec3 hash3(inout float seed) {
-    return fract(sin(vec3(seed+=0.1,seed+=0.1,seed+=0.1))*vec3(43758.5453123,22578.1459123,19642.3490423));
-}
-
-
-vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout float seed )
-{
-  	vec2 r = hash2(seed);
-    
 	vec3  uu = normalize( cross( n, vec3(0.0,1.0,1.0) ) );
 	vec3  vv = cross( uu, n );
 	
@@ -272,18 +157,6 @@ vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout float seed )
     
     return normalize( rr );
 }
-
-vec3 randomSphereDirection(inout float seed) {
-    vec2 h = hash2(seed) * vec2(2.,6.28318530718)-vec2(1,0);
-    float phi = h.y;
-	return vec3(sqrt(1.-h.x*h.x)*vec2(sin(phi),cos(phi)),h.x);
-}
-
-vec3 randomHemisphereDirection( const vec3 n, inout float seed ) {
-	vec3 dr = randomSphereDirection(seed);
-	return dot(dr,n) * dr;
-}
-
 
 
 float trace_path(const int steps, const vec3 origin, const vec3 direction, out vec3 hitPos, const int channel)
@@ -329,24 +202,7 @@ float trace_path(const int steps, const vec3 origin, const vec3 direction, out v
 			hitPos = o + d * rayPayload.distance;
 
 			o = hitPos + normalize(rayPayload.normal)*0.01;
-
-			vec3 rdir = RandomUnitVector(prng_state);
-
-			//vec3 rdir = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state_float);
-			//vec3 rdir = randomSphereDirection(prng_state_float);
-
-			// Stick to the correct hemisphere
-
-			if(dot(rdir, normalize(rayPayload.normal)) < 0.0)
-				rdir = -rdir;
-			
-			d = rdir;
-
-			
-
-
-
-
+			d = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
 		}
 
 		o = origin;
@@ -366,9 +222,6 @@ float trace_caustics(const int iterations, const vec3 origin, const vec3 directi
 
 	const int steps = 100;
 
-
-
-
 	for(int s = 0; s < steps; s++)
 	{
 		float tmin = 0.001;
@@ -382,6 +235,12 @@ float trace_caustics(const int iterations, const vec3 origin, const vec3 directi
 			
 			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 			{
+				vec3 light_pos = o + d * rayPayload.distance;
+				vec3 light_dir = -d;
+
+				if(s < 2)
+				continue;
+				else
 				return 1.0;
 			}
 
