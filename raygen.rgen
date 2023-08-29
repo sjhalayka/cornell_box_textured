@@ -678,7 +678,7 @@ void main()
 
 	const float red = get_ray0(red_channel, red_eta);
 
-
+		
 
 	rayPayload.recursive = 0;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
