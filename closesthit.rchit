@@ -80,56 +80,11 @@ Vertex unpack(uint index)
 
 
 
-// https://github.com/daw42/glslcookbook/blob/master/chapter07/shader/shadowmap.fs
-vec3 phongModelDiffAndSpec(bool do_specular, float reflectivity, vec3 color, vec3 light_color, vec3 light_pos, vec3 frag_pos, vec3 frag_normal)
-{
-	const vec3 MaterialKs = vec3(1.0, 0.5, 0.0);
-	const vec3 MaterialKa = vec3(0.0, 0.025, 0.075);
-	const float MaterialShininess = 10.0;
-
-	const vec3 n = normalize(frag_normal);
-	const vec3 s = normalize(light_pos - frag_pos);
-	const vec3 v = normalize(frag_pos);
-	const vec3 r = reflect( -s, n );
-	const float sDotN = max( dot(s,n), 0.0 ); // This second parameter affects the visibility of shadow edges
-	const vec3 diffuse = light_color * color * sDotN;
-	vec3 spec = vec3(0.0);
-
-	if(sDotN > 0.0)
-		spec = MaterialKs * pow( max( dot(r,v), 0.0 ), MaterialShininess );
-
-	vec3 ret = diffuse + MaterialKa;
-
-	if(do_specular)
-		ret = ret + spec;
-    
-	return ret;
-
-}
-
-
-
-uint prng_state = 0;
-
-// See: https://github.com/nvpro-samples/vk_mini_path_tracer/blob/main/vk_mini_path_tracer/shaders/raytrace.comp.glsl#L26
-float stepAndOutputRNGFloat(inout uint rngState)
-{
-  // Condensed version of pcg_output_rxs_m_xs_32_32, with simple conversion to floating-point [0,1].
-  rngState  = rngState * 747796405 + 1;
-  uint word = ((rngState >> ((rngState >> 28) + 4)) ^ rngState) * 277803737;
-  word      = (word >> 22) ^ word;
-  return float(word) / 4294967295.0f;
-}
-
-
-
-
 
 void main()
 {
 	const ivec2 pixel_pos = ivec2(gl_LaunchIDEXT.xy);
 	const ivec2 res = ivec2(gl_LaunchSizeEXT.xy);
-	prng_state = res.x * pixel_pos.y + pixel_pos.x; // Each pixel gets its own unique seed
 
 	ivec3 index = ivec3(indices.i[3 * gl_PrimitiveID], indices.i[3 * gl_PrimitiveID + 1], indices.i[3 * gl_PrimitiveID + 2]);
 
@@ -143,20 +98,18 @@ void main()
 	const vec3 pos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
 	const vec2 uv = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 
-	vec4 n = normalize(ubo.transformation_matrix*vec4(normal, 0.0));
+	const vec4 n = normalize(ubo.transformation_matrix*vec4(normal, 0.0));
 	
-	rayPayload.reflector = texture(normalSampler, uv).a;
-	rayPayload.opacity = texture(baseColorSampler, uv).a;
 
 	if(rayPayload.opacity == 0.0)
 		rayPayload.reflector = 0.5;
 
-	vec3 color = texture(baseColorSampler, uv).rgb;
+	const vec3 color = texture(baseColorSampler, uv).rgb;
 	
 	rayPayload.pure_color = color;
-
-
-
+	rayPayload.color = color;
+	rayPayload.reflector = texture(normalSampler, uv).a;
+	rayPayload.opacity = texture(baseColorSampler, uv).a;
 
 	rayPayload.distance = gl_RayTmaxEXT;
 	rayPayload.normal = n.xyz;
@@ -164,22 +117,4 @@ void main()
 	rayPayload.wro = gl_WorldRayOriginEXT;
 	rayPayload.wrd = gl_WorldRayDirectionEXT;
 	rayPayload.hitt = gl_HitTEXT;
-
-	rayPayload.color = vec3(0, 0, 0);
-
-	rayPayload.color = color;
-
-
-
-
-//	if(true)//rayPayload.recursive < 8)
-//	{
-//		rayPayload.recursive++;
-//
-//		for (int i = 0; i < 1; i++)
-//			rayPayload.color += color;//phongModelDiffAndSpec(false, 1.0, color, ubo.light_colors[i].rgb, ubo.light_positions[i].xyz, pos, rayPayload.normal);
-//	}
-
-
-
 }
