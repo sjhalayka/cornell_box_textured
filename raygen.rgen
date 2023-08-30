@@ -228,10 +228,9 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, out 
 		d = direction;
 
 		ret_colour += local_colour;
-		local_colour = energy;
 	}
 
-	return (ret_colour / samples / steps + direct_colour) / 2.0;
+	return ret_colour / samples / steps * direct_colour;
 }
 
 
