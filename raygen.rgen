@@ -140,7 +140,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, out 
 	vec3 o = origin;
 	vec3 d = direction;
 
-	const int samples = 100;
+	const int samples = 16;
 
 	for(int s = 0; s < samples; s++)
 	{
