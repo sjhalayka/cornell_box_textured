@@ -168,23 +168,22 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, out 
 			else
 				local_colour += rayPayload.color.b;
 
+			
+			
+
 			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 			{
-//				local_colour += 1;
 				ret_colour += local_colour;
-	
-				continue;//return ret_colour;
+				continue;
 			}
 
 			if(rayPayload.distance == -1)
-			{
-//				ret_colour += local_colour;
 				break;
-			}
+
 
 			hitPos = o + d * rayPayload.distance;
 
-			o = hitPos + normalize(rayPayload.normal)*0.01;
+			
 
 
 
@@ -213,22 +212,15 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, out 
 				}
 					else
 					{
-
+						o = hitPos + normalize(rayPayload.normal)*0.01;
 						d = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
 		
 					}		
-		
-		
-		
-		
-		
 		
 		}
 
 		o = origin;
 		d = direction;
-
-		ret_colour += local_colour;
 	}
 
 	return ret_colour / samples / steps * direct_colour;
@@ -322,7 +314,7 @@ float get_ray0(const int channel, const float eta)
 				
 
 				vec3 hitPos3 = vec3(0);
-				float colour = trace_path2(10, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel, eta);
+				float colour = trace_path2(25, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel, eta);
 
 
 
@@ -540,7 +532,7 @@ void main()
 	const float blue = get_ray0(blue_channel, blue_eta);
 
 	vec3 color = vec3(red, green, blue);
-//	const float gamma = 0.2;
+//	const float gamma = 3.0;
 //	color = pow(color, vec3(1.0 / gamma));
   
 	imageStore(color_image, pixel_pos, vec4(color, 1.0));
