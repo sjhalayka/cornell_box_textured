@@ -175,7 +175,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, out 
 
 	for(int s = 0; s < samples; s++)
 	{
-		float local_colour = 0;
+		float local_colour = 1;
 
 		for(int i = 0; i < steps; i++)
 		{
