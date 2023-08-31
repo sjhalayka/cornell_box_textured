@@ -581,6 +581,10 @@ void main()
 
 
 
-	const vec3 color = vec3(red, green, blue);
+	vec3 color = vec3(red, green, blue);
+
+	color = pow(color, vec3(2.2));
+
+
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
