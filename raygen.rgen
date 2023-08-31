@@ -171,7 +171,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, out 
 	vec3 o = origin;
 	vec3 d = direction;
 
-	const int samples = 100;
+	const int samples = 1000;
 
 	for(int s = 0; s < samples; s++)
 	{
@@ -209,7 +209,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, out 
 
 			if(rayPayload.distance == -1)
 			{
-				ret_colour += local_colour;
+				//ret_colour += local_colour;
 				break;
 			}
 
@@ -352,7 +352,7 @@ float get_ray0(const int channel, const float eta)
 				
 
 				vec3 hitPos3 = vec3(0);
-				float colour = trace_path2(10, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel, eta);
+				float colour = trace_path2(20, rays[i].origin.xyz, rays[i].direction.xyz, hitPos3, channel, eta);
 
 	
 
@@ -583,7 +583,7 @@ void main()
 
 	vec3 color = vec3(red, green, blue);
 
-	color = pow(color, vec3(2.2));
+	color = pow(color, vec3(5.0));
 
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
