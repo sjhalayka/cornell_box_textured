@@ -651,6 +651,9 @@ public:
 		//	scene.loadFromFile("C:/temp/hires/fractal_500.gltf", vulkanDevice, queue, glTFLoadingFlags);
 		scene.loadFromFile("C:/temp/rob_rau_cornell/gltf/cornell.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/prism/cornell_prism.gltf", vulkanDevice, queue, glTFLoadingFlags);
+
+	
 
 
 		//scene.loadFromFile("C:/temp/cyl_tex/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);

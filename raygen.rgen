@@ -171,45 +171,49 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			else
 				local_colour += rayPayload.color.b;
 
-			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
-			{
-				ret_colour += local_colour;	
-				continue;
-			}
 
 			if(rayPayload.distance == -1)
 				break;
 
+
 			vec3 hitPos = o + d * rayPayload.distance;
 
-			if(rayPayload.opacity != 1.0)
-			{
-				if(dot(d, rayPayload.normal) <= 0.0)
-				{
-					o = hitPos.xyz - rayPayload.normal * 0.01f;
-					d = refract(d, rayPayload.normal, eta);
-				}
-				else
-				{
-					vec3 temp_dir = refract(d, -rayPayload.normal, 1.0/eta);
 
-					if(temp_dir != vec3(0.0))
-					{
-						o = hitPos.xyz + rayPayload.normal * 0.01f;
-						d = temp_dir;
-					}
-					else
-					{
-						o = hitPos.xyz - rayPayload.normal * 0.01f;
-						d = reflect(d, -rayPayload.normal);
-					}
-				}
+			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
+			{
+				ret_colour += local_colour;
 			}
 			else
 			{
-				o = hitPos + normalize(rayPayload.normal)*0.01;
-				d = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
-				d = mix(d, reflect(d, rayPayload.normal), rayPayload.reflector);
+				if(rayPayload.opacity != 1.0)
+				{
+					if(dot(d, rayPayload.normal) <= 0.0)
+					{
+						o = hitPos.xyz - rayPayload.normal * 0.01f;
+						d = refract(d, rayPayload.normal, eta);
+					}
+					else
+					{
+						vec3 temp_dir = refract(d, -rayPayload.normal, 1.0/eta);
+
+						if(temp_dir != vec3(0.0))
+						{
+							o = hitPos.xyz + rayPayload.normal * 0.01f;
+							d = temp_dir;
+						}
+						else
+						{
+							o = hitPos.xyz - rayPayload.normal * 0.01f;
+							d = reflect(d, -rayPayload.normal);
+						}
+					}
+				}
+				else
+				{
+					o = hitPos + normalize(rayPayload.normal)*0.01;
+					d = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
+					d = mix(d, reflect(d, rayPayload.normal), rayPayload.reflector);
+				}
 			}
 		}
 
