@@ -281,7 +281,7 @@ float get_ray0(const int channel, const float eta)
 			{
 				used_count++;
 		
-				rays[i].base_color = trace_path2(10, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
+				rays[i].base_color = trace_path2(20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
@@ -455,7 +455,6 @@ void main()
 {
 	// Calculate chromatic aberration
 
-	// https://github.com/brunosegiu/vk-rt/blob/main/shaders/raytrace.rgen
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
 	const float red = get_ray0(red_channel, red_eta);
 
