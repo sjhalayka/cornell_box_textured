@@ -44,7 +44,7 @@ const float TWO_PI = 8.0 * atan(1.0);
 
 
 uint prng_state = res.x * pixel_pos.y + pixel_pos.x;
-float prng_state_float = 0.0;//float(prng_state);
+
 
 const int max_lights = 2;
 
@@ -173,8 +173,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 
 			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 			{
-				ret_colour += local_colour;
-	
+				ret_colour += local_colour;	
 				continue;
 			}
 
@@ -282,7 +281,7 @@ float get_ray0(const int channel, const float eta)
 			{
 				used_count++;
 		
-				rays[i].base_color = trace_path2(20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
+				rays[i].base_color = trace_path2(10, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
@@ -457,34 +456,17 @@ void main()
 	// Calculate chromatic aberration
 
 	// https://github.com/brunosegiu/vk-rt/blob/main/shaders/raytrace.rgen
-	rayPayload.recursive = 0;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	//prng_state_float = float(prng_state);
-
 	const float red = get_ray0(red_channel, red_eta);
 
-		
-
-	rayPayload.recursive = 0;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	//prng_state_float = float(prng_state);
-
 	const float green = get_ray0(green_channel, green_eta);
 	
-
-
-	rayPayload.recursive = 0;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	//prng_state_float = float(prng_state);
-
 	const float blue = get_ray0(blue_channel, blue_eta);
 
-
-
 	vec3 color = vec3(red, green, blue);
-
-	color = pow(color, vec3(5.0));
-
+	color = pow(color, vec3(2.0));
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
