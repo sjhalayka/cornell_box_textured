@@ -143,11 +143,13 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	vec3 o = origin;
 	vec3 d = direction;
 
+	const int samples = 1000;
 
-	
+	float count = 0;
+
+	for(int s = 0; s < samples; s++)
+	{
 		float local_colour = 0;
-
-		int count = 0;
 
 		for(int i = 0; i < steps; i++)
 		{
@@ -158,17 +160,18 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			if(channel == red_channel)
 			{
 				local_colour += rayPayload.color.r;
+				count += 1.0 - rayPayload.color.r;
 			}
 			else if(channel == green_channel)
 			{
 				local_colour += rayPayload.color.g;
+				count += 1.0 - rayPayload.color.g;
 			}
 			else
 			{
 				local_colour += rayPayload.color.b;
+				count += 1.0 - rayPayload.color.b;
 			}
-
-			count++;
 
 			if(rayPayload.distance == -1)
 				break;
@@ -213,28 +216,15 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			}
 		}
 
-
-
-	return ret_colour / count;
-}
-
-float get_radiance(const int steps, const int samples, const vec3 origin, const vec3 normal, const int channel, const float eta)
-{
-	float ret_colour = 0.0;
-	
-	for(int s = 0; s < samples; s++)
-	{
-//		vec3 direction = RandomUnitVector(prng_state);
-
-		vec3 direction = cosWeightedRandomHemisphereDirection(normal, prng_state);
-
-		ret_colour += trace_path2(steps, origin, direction, channel, eta);
+		o = origin;
+		d = direction;
 	}
 
-	ret_colour /= samples;
-
-	return ret_colour;
+	return ret_colour / count / 4;
 }
+
+
+
 
 
 
@@ -293,16 +283,10 @@ float get_ray0(const int channel, const float eta)
 			{
 				used_count++;
 		
-
+				rays[i].base_color = trace_path2(20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
-
-				//				rays[i].base_color = trace_path2(20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
-
-rays[i].base_color = get_radiance(20, 100, hitPos.xyz, rayPayload.normal, channel, eta);
-
-
 
 				rays[i].normal = rayPayload.normal;
 
