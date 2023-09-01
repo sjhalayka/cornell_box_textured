@@ -33,9 +33,9 @@ struct ray
 const int red_channel = 0;
 const int green_channel = 1;
 const int blue_channel = 2;
-const float red_eta = 0.85;
+const float red_eta = 0.89;
 const float green_eta = 0.90;
-const float blue_eta = 0.95;
+const float blue_eta = 0.91;
 ivec2 pixel_pos = ivec2(gl_LaunchIDEXT.xy);
 ivec2 res = ivec2(gl_LaunchSizeEXT.xy);
 
@@ -146,6 +146,9 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 
 	const int samples = 100;
 
+	float count = 0;
+
+
 	for(int s = 0; s < samples; s++)
 	{
 		float local_colour = 0;
@@ -166,12 +169,23 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 					direct_colour = rayPayload.color.b;			
 			}
 
+
+
 			if(channel == red_channel)
+			{
 				local_colour += rayPayload.color.r;
+				count += 1.0 - rayPayload.color.r;
+			}
 			else if(channel == green_channel)
+			{
 				local_colour += rayPayload.color.g;
+				count += 1.0 - rayPayload.color.g;
+			}
 			else
+			{
 				local_colour += rayPayload.color.b;
+				count += 1.0 - rayPayload.color.b;
+			}
 
 			if(rayPayload.distance == -1)
 				break;
@@ -220,7 +234,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		d = direction;
 	}
 
-	return ret_colour / samples / steps;
+	return ret_colour / count / 4;
 }
 
 
