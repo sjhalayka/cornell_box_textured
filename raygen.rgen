@@ -142,7 +142,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	vec3 o = origin;
 	vec3 d = direction;
 
-	const int samples = 1000;
+	const int samples = 100;
 
 	for(int s = 0; s < samples; s++)
 	{
@@ -209,6 +209,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			{
 				o = hitPos + normalize(rayPayload.normal)*0.01;
 				d = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
+				d = mix(d, reflect(d, rayPayload.normal), rayPayload.reflector);
 			}
 		}
 
@@ -465,7 +466,7 @@ void main()
 	const float blue = get_ray0(blue_channel, blue_eta);
 
 	vec3 color = vec3(red, green, blue);
-	color = pow(color, vec3(2.0));
+	color = pow(color, vec3(3.0));
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
