@@ -376,7 +376,7 @@ float get_ray0(const int channel, const float eta)
 						{
 							if(rayPayload.opacity == 1)
 							{
-								float colour = get_omni_radiance(10, 10, curr_step, channel, eta);
+								float colour = get_omni_radiance(10, 2, curr_step, channel, eta);
 								
 								float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 								dist_color += trans * colour;
