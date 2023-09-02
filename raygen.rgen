@@ -209,9 +209,6 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			}
 		}
 
-		o = origin;
-		d = direction;
-
 
 	return ret_colour / count;
 }
@@ -230,7 +227,21 @@ float get_radiance(const int samples, const int steps, const vec3 origin, vec3 s
 }
 
 
+float get_omni_radiance(const int samples, const int steps, const vec3 origin, const int channel, const float eta)
+{
+	float ret_colour = 0.0;
 
+	for(int s = 0; s < samples; s++)
+	{
+		vec3 seed_direction = RandomUnitVector(prng_state);
+
+		ret_colour += trace_path2(steps, origin.xyz, seed_direction.xyz, channel, eta);
+	}
+
+	ret_colour /= samples;
+
+	return ret_colour;
+}
 
 float get_ray0(const int channel, const float eta)
 {
@@ -287,6 +298,9 @@ float get_ray0(const int channel, const float eta)
 				used_count++;
 		
 				rays[i].base_color = get_radiance(1000, 20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
+
+				
+
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
