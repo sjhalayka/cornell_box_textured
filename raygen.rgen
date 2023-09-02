@@ -136,7 +136,7 @@ vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
 
 
 
-float trace_path2(const int steps, const int samples, const vec3 origin, const vec3 direction, const int channel, const float eta)
+float trace_path2(const int steps, const vec3 origin, const vec3 direction, const int channel, const float eta)
 {
 	float ret_colour = 0;
 
@@ -145,8 +145,7 @@ float trace_path2(const int steps, const int samples, const vec3 origin, const v
 
 	int count = 0;
 
-	for(int s = 0; s < samples; s++)
-	{
+
 		float local_colour = 0;
 
 		for(int i = 0; i < steps; i++)
@@ -217,13 +216,25 @@ float trace_path2(const int steps, const int samples, const vec3 origin, const v
 
 		o = origin;
 		d = direction;
-	}
 
-	return ret_colour / max(count, 1.0);
+
+	return ret_colour / count;
 }
 
 
+float get_radiance(const int samples, const int steps, const vec3 origin, vec3 seed_direction, const int channel, const float eta)
+{
+	float ret_colour = 0.0;
 
+	for(int s = 0; s < samples; s++)
+	{
+		ret_colour += trace_path2(20, origin.xyz, seed_direction.xyz, channel, eta);
+	}
+
+	ret_colour /= samples;
+
+	return ret_colour;
+}
 
 
 
@@ -282,12 +293,14 @@ float get_ray0(const int channel, const float eta)
 			{
 				used_count++;
 		
-				rays[i].base_color = 0;
+				rays[i].base_color = get_radiance(1000, 20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
 
-				for(int s = 0; s < 1000; s++)
-				rays[i].base_color += trace_path2(20, 1, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
 
-				rays[i].base_color /= 1000.0;
+
+//				for(int s = 0; s < 1000; s++)
+//				rays[i].base_color += trace_path2(20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
+
+//				rays[i].base_color /= 1000.0;
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
