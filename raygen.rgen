@@ -376,11 +376,11 @@ float get_ray0(const int channel, const float eta)
 							if(false == in_aabb(curr_step, aabb_min, aabb_max))
 								continue;
 
-							float colour = get_omni_radiance(20, 5, curr_step, channel, eta);
+							float colour = 1.0;//;get_omni_radiance(20, 5, curr_step, channel, eta);
 
 							float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 							dist_color += trans * colour;
-							dist_opacity += trans * opacity_factor;
+							dist_opacity += trans * 0.1;
 
 
 						}
