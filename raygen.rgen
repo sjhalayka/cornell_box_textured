@@ -399,11 +399,11 @@ float get_ray0(const int channel, const float eta)
 						{
 							float colour = get_omni_radiance(20, 10, curr_step, channel, eta);
 
-							colour = pow(colour, 1.0/15.0);
+							colour = pow(colour, 1.0/1.0);
 
 							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 							dist_color += colour*trans;
-							dist_opacity += colour*trans*0.005;
+							dist_opacity += colour*trans*0.01;
 						}
 					}
 				}
@@ -419,8 +419,7 @@ float get_ray0(const int channel, const float eta)
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
 
 
-	
-	//			dist_opacity = pow(dist_opacity, 1.0/2.0);
+		
 
 
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
@@ -596,7 +595,7 @@ void main()
 	const float blue = get_ray0(blue_channel, blue_eta);
 
 	vec3 color = vec3(red, green, blue);
-	color = pow(color, vec3(1.0));
+	color = pow(color, vec3(1.0/2.2));
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
