@@ -33,9 +33,9 @@ struct ray
 const int red_channel = 0;
 const int green_channel = 1;
 const int blue_channel = 2;
-const float red_eta = 0.89;
+const float red_eta = 0.85;
 const float green_eta = 0.90;
-const float blue_eta = 0.91;
+const float blue_eta = 0.95;
 ivec2 pixel_pos = ivec2(gl_LaunchIDEXT.xy);
 ivec2 res = ivec2(gl_LaunchSizeEXT.xy);
 
@@ -414,15 +414,9 @@ float get_ray0(const int channel, const float eta)
 				else
 					dist_color *= fog_colour.b;
 
-				//dist_color = clamp(dist_color, 0.0, 1.0);
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
-
-
-	
-	//			dist_opacity = pow(dist_opacity, 1.0/2.0);
-
-
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
+
 
 
 
