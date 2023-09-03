@@ -226,8 +226,6 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 float get_radiance(const int samples, const int steps, const vec3 origin, vec3 seed_direction, const int channel, const float eta)
 {
-	RayPayload r = rayPayload;
-
 	float ret_colour = 0.0;
 
 	vec3 final_pos = vec3(0.0);
@@ -237,16 +235,12 @@ float get_radiance(const int samples, const int steps, const vec3 origin, vec3 s
 
 	ret_colour /= samples;
 
-	rayPayload = r;
-
 	return ret_colour;
 }
 
 
 float get_omni_radiance(const int samples, const int steps, const vec3 origin, const int channel, const float eta)
 {
-	RayPayload r = rayPayload;
-
 	float ret_colour = 0.0;
 
 	vec3 final_pos = vec3(0.0);
@@ -258,9 +252,7 @@ float get_omni_radiance(const int samples, const int steps, const vec3 origin, c
 		ret_colour += c;
 	}
 
-	//ret_colour /= samples;
-
-	rayPayload = r;
+	ret_colour /= samples;
 
 	return ret_colour;
 }
@@ -405,7 +397,7 @@ float get_ray0(const int channel, const float eta)
 
 								const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 								dist_color += colour*trans;
-								dist_opacity += colour*trans*0.00005;
+								dist_opacity += colour*trans*0.001;
 							}
 						}
 
