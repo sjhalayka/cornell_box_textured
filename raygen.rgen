@@ -213,7 +213,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 				{
 					o = hitPos + normalize(rayPayload.normal)*0.01;
 					vec3 d2 = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
-					//d = mix(d2, reflect(d, rayPayload.normal), rayPayload.reflector);
+					d = d2;//mix(d2, reflect(d, rayPayload.normal), rayPayload.reflector);
 				}
 			}
 		}
@@ -258,7 +258,7 @@ float get_omni_radiance(const int samples, const int steps, const vec3 origin, c
 		ret_colour += c;
 	}
 
-	ret_colour /= samples;
+	//ret_colour /= samples;
 
 	rayPayload = r;
 
@@ -351,11 +351,7 @@ float get_ray0(const int channel, const float eta)
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
 
-				rays[i].base_color = get_radiance(100, 10, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
-
-				//if(rays[i].base_color < 0.5)
-				//	rays[i].base_color = 0.0;
-
+				rays[i].base_color = get_radiance(100, 20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
 
 				rays[i].normal = rayPayload.normal;
 				rays[i].reflection_constant = rayPayload.reflector;
@@ -375,20 +371,21 @@ float get_ray0(const int channel, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					float t0 = 0.0;
 					float t1 = 0.0;
 
 					if(BBoxIntersect(aabb_min, aabb_max, rays[i].origin.xyz, rays[i].direction.xyz, t0, t1))
 					{
-						const float target_step_length = 0.05;
+						const float target_step_length = 0.1;
 
 						vec3 start = rays[i].origin.xyz + rays[i].direction.xyz*t0;
 						vec3 end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
 
 						if(rayPayload.distance != -1)
 							end = hitPos.xyz;
+
 		
 						const int num_steps = int(floor(distance(start, end) / target_step_length));
 						const vec3 step = (end - start) / num_steps;
@@ -397,14 +394,21 @@ float get_ray0(const int channel, const float eta)
 
 						for(int j = 0; j < num_steps; j++, curr_step += step)
 						{
-							float colour = get_omni_radiance(20, 10, curr_step, channel, eta);
+							if(false)// rayPayload.reflector == 1.0)// && rayPayload.opacity != 0.0)
+							{	
+								dist_color = 1.0;
+								dist_opacity = 1.0;
+							}
+							else
+							{
+								float colour = get_omni_radiance(20, 10, curr_step, channel, eta);
 
-							colour = pow(colour, 1.0/1.0);
-
-							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
-							dist_color += colour*trans;
-							dist_opacity += colour*trans*0.01;
+								const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
+								dist_color += colour*trans;
+								dist_opacity += colour*trans*0.00005;
+							}
 						}
+
 					}
 				}
 
@@ -419,7 +423,8 @@ float get_ray0(const int channel, const float eta)
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
 
 
-		
+	
+	//			dist_opacity = pow(dist_opacity, 1.0/2.0);
 
 
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
@@ -595,7 +600,7 @@ void main()
 	const float blue = get_ray0(blue_channel, blue_eta);
 
 	vec3 color = vec3(red, green, blue);
-	color = pow(color, vec3(1.0/2.2));
+	color = pow(color, vec3(3.0));
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
