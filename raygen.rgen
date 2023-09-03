@@ -213,7 +213,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 				{
 					o = hitPos + normalize(rayPayload.normal)*0.01;
 					vec3 d2 = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
-					d = d2;//mix(d2, reflect(d, rayPayload.normal), rayPayload.reflector);
+					d = mix(d2, reflect(d, rayPayload.normal), rayPayload.reflector);
 				}
 			}
 		}
