@@ -340,21 +340,24 @@ float get_ray0(const int channel, const float eta)
 			{
 				used_count++;
 
+				rays[i].base_color = get_radiance(1000, 20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
+
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
-				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
-
-				rays[i].base_color = get_radiance(100, 20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
-
-				rays[i].normal = rayPayload.normal;
-				rays[i].reflection_constant = rayPayload.reflector;
-				rays[i].refraction_constant = rayPayload.opacity;
-
+				
 				// this particular ray missed everything, or got too deep
 				if(rayPayload.distance == -1.0 || rays[i].level >= MAX_RECURSION)
 				{
 					rays[i].in_use = false;
 					continue;
 				}
+				
+				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
+
+				rays[i].normal = rayPayload.normal;
+				rays[i].reflection_constant = rayPayload.reflector;
+				rays[i].refraction_constant = rayPayload.opacity;
+
+
 
 
 
