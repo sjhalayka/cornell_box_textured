@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 
-\title{Refraction caustics in forward path tracing}
+\title{Caustics in backward path tracing}
 \author{
 Shawn Halayka\footnote{sjhalayka@gmail.com}
 }
@@ -36,16 +36,16 @@ Shawn Halayka\footnote{sjhalayka@gmail.com}
 
 
 \begin{abstract}
-In this paper we introduce a method for producting refraction and reflection caustics in forward path tracing.
-These caustics do not rely on a light location, and as such, do not rely on bidirectional or backward path tracing.
-Thus, these caustics allow for as many light sources as one would care for; the shapes and positions of the lights are completely arbitrary (can be bunny shaped, etc).
-We use the standard Cornell box for testing the path tracer.
+In this paper we introduce a natural method for producing both refraction and reflection caustics in backward path tracing (e.g. bouncing around an eye ray in the scene until a light is found).
+These caustics do not rely on a light location, and as such, do not rely on bidirectional or forward path tracing.
+As such, these caustics allow for as many light sources as one would care for; the shapes and positions of the lights are completely arbitrary (can be bunny shaped, etc).
+We use the standard Cornell box for testing the backward path tracer.
 \end{abstract}
 
-\section{Rasterizer versus ray tracing versus path tracing}
+\section{Rasterizer versus ray tracing versus backward path tracing}
 
 Here we rate the three main visualization algorithms.
-We rate them in terms of what is relatively easy, or naturally occurring, in each of the visualization algorithm.
+We rate them in terms of what is relatively easy, or naturally occurring, in each of the visualization algorithms.
 \begin{center}
 \begin{tabular}{| l | r | r | r | r |}
   \hline
@@ -53,14 +53,19 @@ We rate them in terms of what is relatively easy, or naturally occurring, in eac
 \hline
 \hline
 Rasterizer & No & No & No &  No \\
-Ray tracer & Yes & Hard & No & No  \\
-Forward path tracer & Yes & Hard / soft & Yes & Yes \\
+Ray tracer & Yes & Sharp & No & No  \\
+Backward path tracer & Yes & Sharp / soft & Yes & Yes \\
   \hline  
 \end{tabular}
 \end{center}
-Clearly, the most suitable visualization algorithm for now (and in the future) is the forward path tracer.
+Clearly, the most suitable visualization algorithm for now (and in the future) is the backward path tracer.
 This not to say that, for instance in the case of the rasterizer, there is no such thing as shadows.
-It's just that the implementation of shadows is a kludge, or not naturally occurring.
+It's just that the implementation of shadows is a kludgy affair, or not naturally occurring.
+
+Although caustics can be produced using forward or bidirectional path tracing, they suffer from convergence (or lack thereof) problems.
+These issues do not plague the backward path tracer.
+
+
 
 
 
@@ -76,10 +81,29 @@ This code is based off of Sascha Willems' work \cite{willems1, willems2}.
 The Cornell boxes used in this paper were developed by Rob Rau.
 
 
+
+
+
+
+\begin{thebibliography}{9}
+
+\bibitem{halayka} Halayka. Vulkan code. \url{https://github.com/sjhalayka/cornell_box_textured}
+\bibitem{willems1} Willems. Path tracer code. \url{https://github.com/SaschaWillems/VulkanPathTracer}
+\bibitem{willems2} Willems. Vulkan demo codes. \url{https://github.com/SaschaWillems/Vulkan}
+
+
+\end{thebibliography}
+
+
+\pagebreak
+
+
+
+
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{rasterizer.png}
-  \caption{ Standard rasterizer.
+  \caption{ Rasterizer.
 The surface is lit using Phong shading and omnidirectional shadow maps.
 The reflections are faked -- the camera is flipped upside down, and reflected things masked and drawn.
 In other words, reflections and shadows are not naturally occurring.
@@ -95,7 +119,7 @@ This knight model, as well as MagicaVoxel, were made by the Twitter user @ephtra
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect.png}
-  \caption{ Standard ray tracer, taking into account transparency.
+  \caption{ Ray tracer, taking into account transparency.
 The surface is lit using Phong shading and sharp shadows.
 In other words, reflections and shadows are naturally occurring.
 Global illumination is not taken into account.
@@ -114,10 +138,10 @@ In essence, instead of always producing a pseudorandom cosine-weighted reflectio
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect_no_chromatic_aberration_low_res.png}
-  \caption{  Standard path tracer, taking transparent objects into consideration. 
+  \caption{  Backward path tracer, taking transparent objects into consideration. 
 Note the naturally occurring refraction caustic, without chromatic aberration.
 Note the soft shadows.
-Global illumination is taken into account.
+Global illumination (e.g. colour bleeding / indirect lighting) is taken into account.
 }
 \end{figure}
 
@@ -136,16 +160,7 @@ Global illumination is taken into account.
 }
 \end{figure}
 
-\pagebreak
 
-\begin{thebibliography}{9}
-
-\bibitem{halayka} Halayka. Vulkan code. \url{https://github.com/sjhalayka/cornell_box_textured}
-\bibitem{willems1} Willems. Path tracer code. \url{https://github.com/SaschaWillems/VulkanPathTracer}
-\bibitem{willems2} Willems. Vulkan demo codes. \url{https://github.com/SaschaWillems/Vulkan}
-
-
-\end{thebibliography}
 
 
 
