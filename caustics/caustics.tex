@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 
-\title{Caustics in backward path tracing}
+\title{Natural caustics in backward path tracing}
 \author{
 Shawn Halayka\footnote{sjhalayka@gmail.com}
 }
@@ -87,6 +87,7 @@ The Cornell boxes used in this paper were developed by Rob Rau.
 
 \begin{thebibliography}{9}
 
+\bibitem{kajiya} Kajiya. The rendering equation.
 \bibitem{halayka} Halayka. Vulkan code. \url{https://github.com/sjhalayka/cornell_box_textured}
 \bibitem{willems1} Willems. Path tracer code. \url{https://github.com/SaschaWillems/VulkanPathTracer}
 \bibitem{willems2} Willems. Vulkan demo codes. \url{https://github.com/SaschaWillems/Vulkan}
@@ -139,7 +140,7 @@ In essence, instead of always producing a pseudorandom cosine-weighted reflectio
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect_no_chromatic_aberration_low_res.png}
   \caption{  Backward path tracer, taking transparent objects into consideration. 
-Note the naturally occurring refraction caustic, without chromatic aberration.
+Note the naturally occurring refraction caustic.
 Note the soft shadows.
 Global illumination (e.g. colour bleeding / indirect lighting) is taken into account.
 }
@@ -149,20 +150,24 @@ Global illumination (e.g. colour bleeding / indirect lighting) is taken into acc
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect_chromatic_aberration_low_res.png}
-  \caption{ Note the refraction caustic, with chromatic aberration.
+  \caption{ Note the refraction caustic, with 3-channel chromatic aberration.
 }
 \end{figure}
 
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect_prism.png}
-  \caption{ Note the refraction caustic, with chromatic aberration.
+  \caption{ Note the refraction caustic, with 3-channel chromatic aberration.
 }
 \end{figure}
 
 
-
-
+\begin{figure} 
+\centering
+  \includegraphics[width = 6 in]{v_rt_reflection_caustic.png}
+  \caption{ Note the reflection caustic.
+}
+\end{figure}
 
 
 
