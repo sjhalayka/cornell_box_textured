@@ -38,7 +38,7 @@ Shawn Halayka\footnote{sjhalayka@gmail.com}
 \begin{abstract}
 In this paper we introduce a method for producting refraction caustics in forward path tracing.
 These caustics do not rely on a light location, and as such, do not rely on bidirectional or backward path tracing.
-Thus, these caustics allow for as many light sources as one would care for.
+Thus, these caustics allow for as many light sources as one would care for; the shapes and positions of the lights are completely arbitrary (can be bunny shaped, etc).
 \end{abstract}
 
 \section{Introduction}
@@ -67,7 +67,7 @@ The Cornell boxes used in this paper were developed by Rob Rau.
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{code.png}
-  \caption{ Taking into consideration transparent objects.
+  \caption{ Taking transparent objects into consideration.
 In essence, instead of always producing a pseudorandom cos-weighted reflection vector, refraction occurs for transparent objects.
 }
 \end{figure}
