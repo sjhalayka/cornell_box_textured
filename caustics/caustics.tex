@@ -39,19 +39,20 @@ Shawn Halayka\footnote{sjhalayka@gmail.com}
 In this paper we introduce a method for producting refraction caustics in forward path tracing.
 These caustics do not rely on a light location, and as such, do not rely on bidirectional or backward path tracing.
 Thus, these caustics allow for as many light sources as one would care for; the shapes and positions of the lights are completely arbitrary (can be bunny shaped, etc).
+We use the standard Cornell box for testing the path tracer.
 \end{abstract}
 
-\section{Introduction}
+\section{Rasterizer versus ray tracing versus path tracing}
 
 
 
 
 
 
-\section{Code}
+\section{Path tracer code}
 A full Vulkan code exists \cite{halayka}, using a very simple (e.g. not physically accurate) light transport algorithm.
 The results given here can only get better with the improvement of the light transport algorithm.
-This code is based off of Sacha Willems' work \cite{willems1, willems2}.
+This code is based off of Sascha Willems' work \cite{willems1, willems2}.
 
 
 
@@ -60,22 +61,47 @@ This code is based off of Sacha Willems' work \cite{willems1, willems2}.
 The Cornell boxes used in this paper were developed by Rob Rau.
 
 
+\begin{figure} 
+\centering
+  \includegraphics[width = 6 in]{rasterizer.png}
+  \caption{ Standard rasterizer.
+The surface is lit using Phong shading and omnidirectional shadow maps.
+The reflections are faked -- the camera is flipped upside down, and reflected things masked and drawn.
+In other words, reflections and shadows are not naturally occurring.
+Global illumination is not taken into account.
+}
+
+\end{figure}
 
 
+
+
+\begin{figure} 
+\centering
+  \includegraphics[width = 6 in]{v_rt_reflect.png}
+  \caption{ Standard ray tracer, taking into account transparency.
+The surface is lit using Phong shading and sharp shadows.
+In other words, reflections and shadows are naturally occurring.
+Global illumination is not taken into account.
+}
+\end{figure}
 
 
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{code.png}
   \caption{ Taking transparent objects into consideration.
-In essence, instead of always producing a pseudorandom cos-weighted reflection vector, refraction occurs for transparent objects.
+In essence, instead of always producing a pseudorandom cosine-weighted reflection vector, refraction occurs for transparent objects.
 }
 \end{figure}
 
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect_no_chromatic_aberration_low_res.png}
-  \caption{ Refraction caustic, without chromatic aberration.
+  \caption{  Standard path tracer, taking transparent objects into consideration. 
+Note the naturally occurring refraction caustic, without chromatic aberration.
+Note the soft shadows.
+Global illumination is taken into account.
 }
 \end{figure}
 
@@ -83,14 +109,14 @@ In essence, instead of always producing a pseudorandom cos-weighted reflection v
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect_chromatic_aberration_low_res.png}
-  \caption{ Refraction caustic, with chromatic aberration.
+  \caption{ Note the refraction caustic, with chromatic aberration.
 }
 \end{figure}
 
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect_prism.png}
-  \caption{ Refraction caustic, with chromatic aberration.
+  \caption{ Note the refraction caustic, with chromatic aberration.
 }
 \end{figure}
 
