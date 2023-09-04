@@ -36,7 +36,7 @@ Shawn Halayka\footnote{sjhalayka@gmail.com}
 
 
 \begin{abstract}
-In this paper we introduce a method for producting refraction caustics in forward path tracing.
+In this paper we introduce a method for producting refraction and reflection caustics in forward path tracing.
 These caustics do not rely on a light location, and as such, do not rely on bidirectional or backward path tracing.
 Thus, these caustics allow for as many light sources as one would care for; the shapes and positions of the lights are completely arbitrary (can be bunny shaped, etc).
 We use the standard Cornell box for testing the path tracer.
@@ -44,8 +44,23 @@ We use the standard Cornell box for testing the path tracer.
 
 \section{Rasterizer versus ray tracing versus path tracing}
 
-
-
+Here we rate the three main visualization algorithms.
+We rate them in terms of what is relatively easy, or naturally occurring, in each of the visualization algorithm.
+\begin{center}
+\begin{tabular}{| l | r | r | r | r |}
+  \hline
+ Algorithm &  Reflections & Shadows & Refraction caustics & Reflection caustics \\
+\hline
+\hline
+Rasterizer & No & No & No &  No \\
+Ray tracer & Yes & Hard & No & No  \\
+Forward path tracer & Yes & Hard / soft & Yes & Yes \\
+  \hline  
+\end{tabular}
+\end{center}
+Clearly, the most suitable visualization algorithm for now (and in the future) is the forward path tracer.
+This not to say that, for instance in the case of the rasterizer, there is no such thing as shadows.
+It's just that the implementation of shadows is a kludge, or not naturally occurring.
 
 
 
@@ -69,6 +84,7 @@ The surface is lit using Phong shading and omnidirectional shadow maps.
 The reflections are faked -- the camera is flipped upside down, and reflected things masked and drawn.
 In other words, reflections and shadows are not naturally occurring.
 Global illumination is not taken into account.
+This knight model, as well as MagicaVoxel, were made by the Twitter user @ephtracy.
 }
 
 \end{figure}
