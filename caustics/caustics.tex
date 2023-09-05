@@ -62,7 +62,7 @@ Clearly, the most suitable visualization algorithm for now (and in the future) i
 This not to say that, for instance in the case of the rasterizer, there is no such thing as shadows.
 It's just that the implementation of shadows is a kludgy affair, or not naturally occurring.
 
-Although caustics can be produced using forward or bidirectional path tracing, they suffer from convergence (or lack thereof) problems.
+Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
 These issues do not plague the backward path tracer.
 
 
@@ -133,6 +133,7 @@ Global illumination is not taken into account.
   \includegraphics[width = 6 in]{code.png}
   \caption{ Taking transparent objects into consideration.
 In essence, instead of always producing a pseudorandom cosine-weighted reflection vector, refraction occurs for transparent objects.
+Note that reflection caustics are created by reflective surfaces.
 }
 \end{figure}
 
