@@ -200,14 +200,22 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 			}
 			else
 			{
+				bool do_transparent = false;
+
 				if(rayPayload.opacity != 1.0)
+				{
+					if(stepAndOutputRNGFloat(prng_state) > 0.5)
+					do_transparent = true;
+				}
+
+				if(do_transparent)//rayPayload.opacity != 1.0)
 				{
 					float offset = stepAndOutputRNGFloat(prng_state)*0.1;
 
 					if(stepAndOutputRNGFloat(prng_state) > 0.5)
 						offset = -offset;
 
-					float new_eta = blue_eta - (offset + (blue_eta - eta));
+					float new_eta = eta;//blue_eta - (offset + (blue_eta - eta));
 
 					if(dot(d, rayPayload.normal) <= 0.0)
 					{
@@ -360,6 +368,10 @@ float get_ray0(const int channel, const float eta)
 			if(rays[i].in_use)
 			{
 				used_count++;
+
+
+
+
 
 				if(ubo.screenshot_mode)
 				rays[i].base_color = get_radiance(1000, 20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
