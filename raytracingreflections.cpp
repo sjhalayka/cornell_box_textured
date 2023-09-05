@@ -74,7 +74,7 @@ public:
 };
 
 
-
+bool taking_screenshot = false;
 
 class VulkanExample : public VulkanRaytracingSample
 {
@@ -95,9 +95,9 @@ public:
 		case KEY_SPACE:
 		{
 			paused = true;
-
+			taking_screenshot = true;
 			screenshot(4, "v_rt_reflect.png");
-
+			taking_screenshot = false;
 			paused = false;
 
 			break;
@@ -583,12 +583,14 @@ public:
 		glm::mat4 viewInverse;
 		glm::mat4 projInverse;
 		glm::mat4 transformation_matrix;
-		glm::vec4 light_positions[max_lights];
-		glm::vec4 light_colors[max_lights];
+		//glm::vec4 light_positions[max_lights];
+		//glm::vec4 light_colors[max_lights];
 
 		glm::vec3 camera_pos;
 
 		int32_t vertexSize;
+
+		bool screenshot_mode;
 
 	} uniformData;
 	vks::Buffer ubo;
@@ -648,13 +650,12 @@ public:
 		// This fractal_500.gltf file can be downloaded from:
 		// https://drive.google.com/file/d/1BJJSC_K8NwaH8kP4tQpxlAmc6h6N3Ii1/view
 		if (do_init)
-		//	scene.loadFromFile("C:/temp/hires/fractal_500.gltf", vulkanDevice, queue, glTFLoadingFlags);
-		scene.loadFromFile("C:/temp/rob_rau_cornell/gltf/cornell.gltf", vulkanDevice, queue, glTFLoadingFlags);
-
-		//scene.loadFromFile("C:/temp/rob_rau_cornell/prism/cornell_prism.gltf", vulkanDevice, queue, glTFLoadingFlags);
-
-	
-
+			//	scene.loadFromFile("C:/temp/hires/fractal_500.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			scene.loadFromFile("C:/temp/rob_rau_cornell/gltf/cornell.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism/cornell_prism.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring/ring.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring2/ring2.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring3/ring3.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
 		//scene.loadFromFile("C:/temp/cyl_tex/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
@@ -995,13 +996,7 @@ public:
 
 	void updateUniformBuffers()
 	{
-		//if (taking_screenshot)
-		//	uniformData.projInverse = glm::inverse(frustum_matrix);
-		//else
 		uniformData.projInverse = glm::inverse(camera.matrices.perspective);
-
-		//	uniformData.projInverse = glm::inverse(m);
-			//uniformData.projInverse = glm::inverse(camera.matrices.perspective);
 		uniformData.viewInverse = glm::inverse(camera.matrices.view);
 
 		// For rendering the normals correctly in the closest hit shader
@@ -1011,32 +1006,12 @@ public:
 			for (size_t j = 0; j < 4; j++)
 				uniformData.transformation_matrix[j][i] = transformMatrix.matrix[i][j];
 
-
-		const float speed = 0.125f;
-
-		//timer = 0;
-
-		//uniformData.light_positions[0] = glm::vec4(
-		//	cos(glm::radians(timer * 360.0f)) * 40.0f * speed,
-		//	-50.0f + sin(glm::radians(timer * 360.0f)) * 20.0f * speed,
-		//	25.0f + sin(glm::radians(timer * 360.0f)) * 5.0f * speed,
-		//	0.0f);
-
-		uniformData.light_positions[0] = glm::vec4(0, 0, 50, 0);
-		uniformData.light_positions[1] = uniformData.light_positions[0];// glm::vec4(-10, -5, 0, 0);
-
-
-		//uniformData.light_positions[1] = uniformData.light_positions[0];
-		//uniformData.light_positions[1].x = -uniformData.light_positions[1].x;
-		//uniformData.light_positions[1].z = -uniformData.light_positions[1].z;
-
-		uniformData.light_colors[0] = glm::vec4(1, 1, 1, 1);
-		uniformData.light_colors[1] = glm::vec4(1, 1, 1, 1);
-
 		uniformData.camera_pos = camera.position;
 
 		// Pass the vertex size to the shader for unpacking vertices
 		uniformData.vertexSize = sizeof(vkglTF::Vertex);
+
+		uniformData.screenshot_mode = taking_screenshot;
 
 		memcpy(ubo.mapped, &uniformData, sizeof(uniformData));
 	}
