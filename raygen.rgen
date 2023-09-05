@@ -208,7 +208,9 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 					do_transparent = true;
 				}
 
-				if(do_transparent)//rayPayload.opacity != 1.0)
+				//if(do_transparent)
+				
+				if(rayPayload.opacity != 1.0)
 				{
 					float offset = stepAndOutputRNGFloat(prng_state)*0.1;
 
