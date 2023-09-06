@@ -42,7 +42,20 @@ As such, these caustics allow for as many light sources as one would care for; t
 We use the standard Cornell box for testing the backward path tracer.
 \end{abstract}
 
-\section{Rasterizer versus ray tracing versus backward path tracing}
+\section{Rasterizer versus ray tracer versus backward path tracer}
+
+The three main visualization algorithms in contemporary graphics programming are the rasterizer, ray tracing, and path tracing.
+
+The rasterizer literally converts vector graphics (generally, triangles) into raster graphics (pixels).
+Generally, a depth buffer is used to discern which triangles to draw, and which to discard, depending on distance to the eye.
+This depth testing algorithm does the job, but it is just simply not as programmable as a ray tracer or path tracer.
+
+The ray tracer does a similar job, insomuch that it converts triangles into pixels.
+Rather than using a depth buffer though, one generally uses a bounding volume hierarchy to determine eye ray / triangle intersection.
+
+The path tracer is identical to the ray tracer, except that it also takes global illumination into account.
+The path tracer uses the exact same bounding volume hierarchy setup as the ray tracer.
+As we will soon see, caustics occur naturally in the case of the backward path tracer in particular.
 
 Here we rate the three main visualization algorithms.
 We rate them in terms of what is relatively easy, or naturally occurring, in each of the visualization algorithms.
@@ -134,6 +147,7 @@ Global illumination is not taken into account.
   \caption{ Taking transparent objects into consideration.
 In essence, instead of always producing a pseudorandom cosine-weighted reflection vector, refraction occurs for transparent objects.
 Note that reflection caustics are created by reflective surfaces.
+In the case where the surface is both transparent and reflective, a pseudorandom number should be generated to see which path to take.
 }
 \end{figure}
 
@@ -165,8 +179,9 @@ Global illumination (e.g. colour bleeding / indirect lighting) is taken into acc
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{v_rt_reflection_caustic2.png}
-  \caption{ Note the Nephroid reflection caustic at the bottom of a hollow cylinder.
+  \includegraphics[width = 6 in]{sharp_caustic.png}
+  \caption{ Note the sharp nephroid reflection caustic at the bottom of a hollow cylinder.
+Note that caustic sharpness is related to the size of the light -- smaller light sources produce sharper caustics.
 }
 \end{figure}
 
