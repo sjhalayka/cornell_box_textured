@@ -3,7 +3,21 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 
 
+struct seven_channel
+{
+	float red;
+	float orange;
+	float yellow;
+	float green;
+	float blue;
+	float indigo;
+	float violet;
+};
+
+
+
 struct RayPayload {
+	seven_channel s;
 	vec3 color;
 	vec3 pure_color;
 	float distance;
@@ -104,6 +118,20 @@ void main()
 
 	vec3 color = texture(baseColorSampler, uv).rgb;
 	
+
+	rayPayload.s.red = color.r;
+	rayPayload.s.orange = 0.0;
+	rayPayload.s.yellow = 0.0;
+	rayPayload.s.green = color.g;
+	rayPayload.s.blue = color.b;
+	rayPayload.s.indigo = 0.0;
+	rayPayload.s.violet = 0.0;
+
+
+
+	//if(color.r == 1.0 && color.g == 1.0 && color.b == 1.0)
+	//	color.r = color.g = color.b = 10.0;
+
 	rayPayload.pure_color = color;
 		
 	rayPayload.distance = gl_RayTmaxEXT;

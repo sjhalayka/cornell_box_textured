@@ -1,7 +1,22 @@
 #version 460
 #extension GL_EXT_ray_tracing : require
 
-struct RayPayload {
+
+struct seven_channel
+{
+	float red;
+	float orange;
+	float yellow;
+	float green;
+	float blue;
+	float indigo;
+	float violet;
+};
+
+
+struct RayPayload 
+{
+	seven_channel s;
 	vec3 color;
 	vec3 pure_color;
 	float distance;
@@ -26,6 +41,15 @@ void main()
 	vec3 unitDir = normalize(gl_WorldRayDirectionEXT);
 	float t = 0.5 * (unitDir.y + 1.0);
 	rayPayload.color = vec3(0);//(1.0-t) * gradientStart + t * gradientEnd;
+
+	rayPayload.s.red = 0.0;
+	rayPayload.s.orange = 0.0;
+	rayPayload.s.yellow = 0.0;
+	rayPayload.s.green = 0.0;
+	rayPayload.s.blue = 0.0;
+	rayPayload.s.indigo = 0.0;
+	rayPayload.s.violet = 0.0;
+
 	rayPayload.pure_color = rayPayload.color;
 	rayPayload.distance = -1;
 	rayPayload.normal = vec3(0.0f);
