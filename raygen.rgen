@@ -698,22 +698,6 @@ void main()
 	
 
 
-/*
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float red = get_ray0(min_eta);
-
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float green = get_ray0((max_eta + min_eta) * 0.5);
-	
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float blue = get_ray0(max_eta);
-
-	vec3 color = vec3(red, green, blue);
-	color = pow(color, vec3(3.0));
-*/
-
-
-
 
 
 
@@ -757,92 +741,6 @@ void main()
 
 
 
-
-/*
-
-	seven_channel ret_colour;
-
-	float eta_diff = max_eta - min_eta;
-	const float eta_step_size = eta_diff / (7 - 1);
-
-	float eta = min_eta;
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	ret_colour.red = get_ray0(red_channel, eta);
-
-	eta = min_eta + eta_step_size;
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	ret_colour.orange = get_ray0(orange_channel, eta);
-	
-	eta = min_eta + eta_step_size*2;
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	ret_colour.yellow = get_ray0(yellow_channel, eta);
-
-	eta = min_eta + eta_step_size*3;
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	ret_colour.green = get_ray0(green_channel, eta);
-
-	eta = min_eta + eta_step_size*4;
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	ret_colour.blue = get_ray0(blue_channel, eta);
-
-	eta = min_eta + eta_step_size*5;
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	ret_colour.indigo = get_ray0(indigo_channel, eta);
-
-	eta = min_eta + eta_step_size*6;
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	ret_colour.violet = get_ray0(violet_channel, eta);
-
-	vec3 color = seven_to_rgb(ret_colour);
-
-	//color = pow(color, vec3(3.0));
-
-	*/
-
-
-
-	/*
-
-	float pure_red_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x;
-	float pure_violet_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x;
-
-	float pure_diff = pure_violet_hue - pure_red_hue;
-	const int num_hue_steps = 3;
-	const float hue_step_size = pure_diff / steps;
-
-	float eta_diff = violet_eta - red_eta;
-	const float eta_step_size = pure_diff / steps;
-
-	float curr_hue = pure_red_hue;
-	float curr_eta = red_eta;
-
-	vec3 color = vec3(0.0, 0.0, 0.0);
-
-	
-	for(int i = 0; i < steps; i++, curr_hue += hue_step_size, curr_eta += eta_step_size)
-	{
-		prng_state = res.x * pixel_pos.y + pixel_pos.x;
-
-		vec3 result;
-
-		result.r = get_ray0(red_channel, curr_eta);
-		result.g = get_ray0(red_channel, curr_eta);
-		result.b = get_ray0(red_channel, curr_eta);
-	
-		vec3 hsv = rgb2hsv(result);
-
-		float results_sat = hsv.y;
-		float results_bri = hsv.z;
-		float results_hue = curr_hue;
-
-		vec3 rgb_again = hsv2rgb(vec3(results_hue, results_sat, results_bri));
-
-		color += rgb_again;
-	}
-	
-	color /= steps;
-
-	*/
 
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
