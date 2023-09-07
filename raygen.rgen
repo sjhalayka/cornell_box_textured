@@ -33,9 +33,16 @@ struct ray
 const int red_channel = 0;
 const int green_channel = 1;
 const int blue_channel = 2;
-const float red_eta = 0.85;
-const float green_eta = 0.90;
-const float blue_eta = 0.95;
+//const float red_eta = 0.85;
+//const float green_eta = 0.90;
+//const float blue_eta = 0.95;
+//const float violet_eta = 0.98;
+
+const float max_eta = 0.95;
+const float min_eta = 0.85;
+
+
+
 ivec2 pixel_pos = ivec2(gl_LaunchIDEXT.xy);
 ivec2 res = ivec2(gl_LaunchSizeEXT.xy);
 
@@ -157,7 +164,7 @@ vec3 hsv2rgb(vec3 c)
 
 
 
-float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const vec3 direction, const int channel, float eta)
+float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const vec3 direction, float eta)
 {
 	const RayPayload r = rayPayload;
 
@@ -179,9 +186,13 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 			float tmax = 1000.0;
 			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o.xyz, tmin, d.xyz, tmax, 0);
 
-			if(channel == red_channel)
+			const int num_channels = 3;
+			float uv_y = (eta - min_eta)/(max_eta - min_eta);
+			const int new_channel = (num_channels - 1) - int(((1.0 - uv_y) * num_channels) - 0.5);
+
+			if(new_channel == red_channel)
 				local_colour += rayPayload.color.r;
-			else if(channel == green_channel)
+			else if(new_channel == green_channel)
 				local_colour += rayPayload.color.g;
 			else
 				local_colour += rayPayload.color.b;
@@ -255,14 +266,14 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 }
 
 
-float get_radiance(const int samples, const int steps, const vec3 origin, vec3 seed_direction, const int channel, const float eta)
+float get_radiance(const int samples, const int steps, const vec3 origin, vec3 seed_direction, const float eta)
 {
 	float ret_colour = 0.0;
 
 	vec3 final_pos = vec3(0.0);
 
 	for(int s = 0; s < samples; s++)
-		ret_colour += trace_path2(final_pos, steps, origin, seed_direction, channel, eta);
+		ret_colour += trace_path2(final_pos, steps, origin, seed_direction, eta);
 
 	ret_colour /= samples;
 
@@ -270,7 +281,7 @@ float get_radiance(const int samples, const int steps, const vec3 origin, vec3 s
 }
 
 
-float get_omni_radiance(const int samples, const int steps, const vec3 origin, const int channel, const float eta)
+float get_omni_radiance(const int samples, const int steps, const vec3 origin, const float eta)
 {
 	float ret_colour = 0.0;
 
@@ -278,7 +289,7 @@ float get_omni_radiance(const int samples, const int steps, const vec3 origin, c
 
 	for(int s = 0; s < samples; s++)
 	{
-		float c = trace_path2(final_pos, steps, origin, RandomUnitVector(prng_state), channel, eta);
+		float c = trace_path2(final_pos, steps, origin, RandomUnitVector(prng_state), eta);
 		
 		ret_colour += c;
 	}
@@ -317,7 +328,7 @@ bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, cons
 }
 
 
-float get_ray0(const int channel, const float eta)
+float get_ray0(const float eta)
 {
 	// This algorithm stops when the buffer runs out of space,
 	// or when the rays miss everything,
@@ -372,22 +383,17 @@ float get_ray0(const int channel, const float eta)
 				used_count++;
 
 
+				const RayPayload r = rayPayload;
+
+
+				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 
 
 
 				if(ubo.screenshot_mode)
-				rays[i].base_color = get_radiance(1000, 20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
+				rays[i].base_color = get_radiance(1000, 20, rays[i].origin.xyz, rays[i].direction.xyz, eta);
 				else
-				rays[i].base_color = get_radiance(50, 20, rays[i].origin.xyz, rays[i].direction.xyz, channel, eta);
-
-				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
-				
-				// this particular ray missed everything, or got too deep
-				if(rayPayload.distance == -1.0 || rays[i].level >= MAX_RECURSION)
-				{
-					rays[i].in_use = false;
-					continue;
-				}
+				rays[i].base_color = get_radiance(50, 20, rays[i].origin.xyz, rays[i].direction.xyz, eta);
 				
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
 
@@ -434,7 +440,7 @@ float get_ray0(const int channel, const float eta)
 							}
 							else
 							{
-								float colour = get_omni_radiance(20, 10, curr_step, channel, eta);
+								float colour = get_omni_radiance(20, 10, curr_step, eta);
 
 								const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 								dist_color += colour*trans;
@@ -445,17 +451,30 @@ float get_ray0(const int channel, const float eta)
 					}
 				}
 
+
+				/*
 				if(channel == red_channel)
 					dist_color *= fog_colour.r;
 				else if(channel == green_channel)
 					dist_color *= fog_colour.g;
 				else
 					dist_color *= fog_colour.b;
+					*/
+
 
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
 
+								
+				// this particular ray missed everything, or got too deep
+				if(rayPayload.distance == -1.0 || rays[i].level >= MAX_RECURSION)
+				{
+					rayPayload = r;
+					rays[i].base_color = 0.0;
 
+					rays[i].in_use = false;
+					continue;
+				}
 
 
 
@@ -533,6 +552,8 @@ float get_ray0(const int channel, const float eta)
 
 				// The processing of this ray segment is complete
 				rays[i].in_use = false;
+
+				rayPayload = r;
 			}
 		}
 
@@ -617,14 +638,17 @@ void main()
 {
 	// Calculate chromatic aberration
 	
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float red = get_ray0(red_channel, red_eta);
+
+
 
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float green = get_ray0(green_channel, green_eta);
+	const float red = get_ray0(min_eta);
+
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	const float green = get_ray0((max_eta + min_eta) * 0.5);
 	
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float blue = get_ray0(blue_channel, blue_eta);
+	const float blue = get_ray0(max_eta);
 
 	vec3 color = vec3(red, green, blue);
 	color = pow(color, vec3(3.0));
@@ -633,30 +657,32 @@ void main()
 	/*
 
 	float pure_red_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x;
-	float pure_blue_hue = rgb2hsv(vec3(0.0, 0.0, 1.0)).x;
+	float pure_violet_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x;
 
-	float pure_diff = pure_blue_hue - pure_red_hue;
-	const int steps = 3;
+	float pure_diff = pure_violet_hue - pure_red_hue;
+	const int num_hue_steps = 3;
 	const float hue_step_size = pure_diff / steps;
 
-	float eta_diff = blue_eta - red_eta;
+	float eta_diff = violet_eta - red_eta;
 	const float eta_step_size = pure_diff / steps;
 
 	float curr_hue = pure_red_hue;
 	float curr_eta = red_eta;
 
-	vec3 color = vec3(0.0);
+	vec3 color = vec3(0.0, 0.0, 0.0);
 
-
+	
 	for(int i = 0; i < steps; i++, curr_hue += hue_step_size, curr_eta += eta_step_size)
 	{
 		prng_state = res.x * pixel_pos.y + pixel_pos.x;
 
-		results[i].r = get_ray0(red_channel, curr_eta);
-		results[i].g = get_ray0(red_channel, curr_eta);
-		results[i].b = get_ray0(red_channel, curr_eta);
+		vec3 result;
+
+		result.r = get_ray0(red_channel, curr_eta);
+		result.g = get_ray0(red_channel, curr_eta);
+		result.b = get_ray0(red_channel, curr_eta);
 	
-		vec3 hsv = rgb2hsv(results[i]);
+		vec3 hsv = rgb2hsv(result);
 
 		float results_sat = hsv.y;
 		float results_bri = hsv.z;
