@@ -209,22 +209,17 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 			float tmax = 1000.0;
 			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o.xyz, tmin, d.xyz, tmax, 0);
 
-const int num_channels = 3;
-			float uv_y = (eta - min_eta)/(max_eta - min_eta);
-			const int new_channel = channel;// (num_channels - 1) - int(((1.0 - uv_y) * num_channels) - 0.5);
-
-
-			if(new_channel == red_channel)
+			if(channel == red_channel)
 				local_colour += rayPayload.s.red;
-			else if(new_channel == orange_channel)
+			else if(channel == orange_channel)
 				local_colour += rayPayload.s.orange;
-			else if(new_channel == yellow_channel)
+			else if(channel == yellow_channel)
 				local_colour += rayPayload.s.yellow;
-			else if(new_channel == green_channel)
+			else if(channel == green_channel)
 				local_colour += rayPayload.s.green;
-			else if(new_channel == blue_channel)
+			else if(channel == blue_channel)
 				local_colour += rayPayload.s.blue;
-			else if(new_channel == indigo_channel)
+			else if(channel == indigo_channel)
 				local_colour += rayPayload.s.indigo;
 			else
 				local_colour += rayPayload.s.violet;
@@ -664,6 +659,32 @@ float get_ray0(const int channel, const float eta)
 }
 
 
+vec3 seven_to_rgb(seven_channel in_s)
+{
+	vec3 ret_val = vec3(0.0, 0.0, 0.0);
+
+	const vec3 red_colour =    in_s.red*vec3(1.0, 0.0, 0.0);
+	const vec3 orange_colour = in_s.orange*vec3(1.0, 0.5, 0.0);
+	const vec3 yellow_colour = in_s.yellow*vec3(1.0, 1.0, 0.0);
+	const vec3 green_colour =  in_s.green*vec3(0.0, 1.0, 0.0);
+	const vec3 blue_colour =   in_s.blue*vec3(0.0, 0.0, 1.0);
+	const vec3 indigo_colour = in_s.indigo*vec3(0.5, 0.0, 1.0);
+	const vec3 violet_colour = in_s.violet*vec3(1.0, 0.0, 1.0);
+
+	ret_val += red_colour;
+	ret_val += orange_colour;
+	ret_val += yellow_colour;
+	ret_val += green_colour;
+	ret_val += blue_colour;
+	ret_val += indigo_colour;
+	ret_val += violet_colour;
+
+	ret_val = clamp(ret_val, 0.0, 1.0);
+
+	return ret_val;
+}
+
+
  
 
 
@@ -687,39 +708,46 @@ void main()
 	color = pow(color, vec3(3.0));
 */
 
+
+
+
+
+
+	seven_channel ret_colour;
+
 	float eta_diff = max_eta - min_eta;
-	const float eta_step_size = eta_diff / 7;
+	const float eta_step_size = eta_diff / (7 - 1);
 
 	float eta = min_eta;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float red = get_ray0(red_channel, eta);
+	ret_colour.red = get_ray0(red_channel, eta);
 
 	eta = min_eta + eta_step_size;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float orange = get_ray0(orange_channel, eta);
+	ret_colour.orange = get_ray0(orange_channel, eta);
 	
 	eta = min_eta + eta_step_size*2;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float yellow = get_ray0(yellow_channel, eta);
+	ret_colour.yellow = get_ray0(yellow_channel, eta);
 
 	eta = min_eta + eta_step_size*3;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float green = get_ray0(green_channel, eta);
+	ret_colour.green = get_ray0(green_channel, eta);
 
 	eta = min_eta + eta_step_size*4;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float blue = get_ray0(blue_channel, eta);
+	ret_colour.blue = get_ray0(blue_channel, eta);
 
 	eta = min_eta + eta_step_size*5;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float indigo = get_ray0(indigo_channel, eta);
+	ret_colour.indigo = get_ray0(indigo_channel, eta);
 
 	eta = min_eta + eta_step_size*6;
 	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float violet = get_ray0(violet_channel, eta);
+	ret_colour.violet = get_ray0(violet_channel, eta);
 
+	vec3 color = seven_to_rgb(ret_colour);
 
-	vec3 color = vec3(red, green, blue);
 	color = pow(color, vec3(3.0));
 
 
