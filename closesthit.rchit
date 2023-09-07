@@ -3,21 +3,20 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 
 
-struct seven_channel
+struct six_channel
 {
 	float red;
-	float orange;
 	float yellow;
 	float green;
+	float cyan;
 	float blue;
-	float indigo;
-	float violet;
+	float magenta;
 };
 
 
 
 struct RayPayload {
-	seven_channel s;
+	six_channel s;
 	vec3 color;
 	vec3 pure_color;
 	float distance;
@@ -113,19 +112,19 @@ void main()
 	rayPayload.opacity = texture(baseColorSampler, uv).a;
 
 	// Make the transparent sphere partially reflective
-	if(rayPayload.opacity == 0.0)
-		rayPayload.reflector = 0.5;
+	//if(rayPayload.opacity == 0.0)
+	//	rayPayload.reflector = 0.5;
 
 	vec3 color = texture(baseColorSampler, uv).rgb;
 	
 
 	rayPayload.s.red = color.r;
-	rayPayload.s.orange = 0.0;
-	rayPayload.s.yellow = 0.0;
+	rayPayload.s.yellow = 0;
 	rayPayload.s.green = color.g;
+	rayPayload.s.cyan = 0;
 	rayPayload.s.blue = color.b;
-	rayPayload.s.indigo = 0.0;
-	rayPayload.s.violet = 0.0;
+	rayPayload.s.magenta = 0;
+
 
 
 

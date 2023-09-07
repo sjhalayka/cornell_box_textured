@@ -2,21 +2,20 @@
 #extension GL_EXT_ray_tracing : require
 
 
-struct seven_channel
+struct six_channel
 {
 	float red;
-	float orange;
 	float yellow;
 	float green;
+	float cyan;
 	float blue;
-	float indigo;
-	float violet;
+	float magenta;
 };
 
 
 struct RayPayload 
 {
-	seven_channel s;
+	six_channel s;
 	vec3 color;
 	vec3 pure_color;
 	float distance;
@@ -43,12 +42,11 @@ void main()
 	rayPayload.color = vec3(0);//(1.0-t) * gradientStart + t * gradientEnd;
 
 	rayPayload.s.red = 0.0;
-	rayPayload.s.orange = 0.0;
 	rayPayload.s.yellow = 0.0;
 	rayPayload.s.green = 0.0;
+	rayPayload.s.cyan = 0.0;
 	rayPayload.s.blue = 0.0;
-	rayPayload.s.indigo = 0.0;
-	rayPayload.s.violet = 0.0;
+	rayPayload.s.magenta = 0.0;
 
 	rayPayload.pure_color = rayPayload.color;
 	rayPayload.distance = -1;

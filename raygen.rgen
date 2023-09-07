@@ -34,6 +34,7 @@ struct ray
 //const int green_channel = 1;
 //const int blue_channel = 2;
 
+/*
 const int red_channel = 0;
 const int orange_channel = 1;
 const int yellow_channel = 2;
@@ -41,20 +42,26 @@ const int green_channel = 3;
 const int blue_channel = 4;
 const int indigo_channel = 5;
 const int violet_channel = 6;
+*/
+
+const int red_channel = 0;
+const int yellow_channel = 1;
+const int green_channel = 2;
+const int cyan_channel = 3;
+const int blue_channel = 4;
+const int magenta_channel = 5;
 
 
-
-
-struct seven_channel
+struct six_channel
 {
 	float red;
-	float orange;
 	float yellow;
 	float green;
+	float cyan;
 	float blue;
-	float indigo;
-	float violet;
+	float magenta;
 };
+
 
 
 
@@ -101,7 +108,7 @@ layout(binding = 2, set = 0) uniform UBO
 
 
 struct RayPayload {
-	seven_channel s;
+	six_channel s;
 	vec3 color;
 	vec3 pure_color;
 	float distance;
@@ -211,18 +218,17 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 			if(channel == red_channel)
 				local_colour += rayPayload.s.red;
-			else if(channel == orange_channel)
-				local_colour += rayPayload.s.orange;
 			else if(channel == yellow_channel)
 				local_colour += rayPayload.s.yellow;
 			else if(channel == green_channel)
 				local_colour += rayPayload.s.green;
+			else if(channel == cyan_channel)
+				local_colour += rayPayload.s.cyan;
 			else if(channel == blue_channel)
 				local_colour += rayPayload.s.blue;
-			else if(channel == indigo_channel)
-				local_colour += rayPayload.s.indigo;
-			else
-				local_colour += rayPayload.s.violet;
+			else// if(channel == magenta_channel)
+				local_colour += rayPayload.s.magenta;
+
 
 
 			count++;
@@ -659,25 +665,23 @@ float get_ray0(const int channel, const float eta)
 }
 
 
-vec3 seven_to_rgb(seven_channel in_s)
+vec3 six_to_rgb(six_channel in_s)
 {
 	vec3 ret_val = vec3(0.0, 0.0, 0.0);
 
-	const vec3 red_colour =    in_s.red*vec3(1.0, 0.0, 0.0);
-	const vec3 orange_colour = in_s.orange*vec3(1.0, 0.5, 0.0);
-	const vec3 yellow_colour = in_s.yellow*vec3(1.0, 1.0, 0.0);
-	const vec3 green_colour =  in_s.green*vec3(0.0, 1.0, 0.0);
-	const vec3 blue_colour =   in_s.blue*vec3(0.0, 0.0, 1.0);
-	const vec3 indigo_colour = in_s.indigo*vec3(0.5, 0.0, 1.0);
-	const vec3 violet_colour = in_s.violet*vec3(1.0, 0.0, 1.0);
+	const vec3 red_colour =     in_s.red*vec3(1.0, 0.0, 0.0);
+	const vec3 yellow_colour =  in_s.yellow*vec3(1.0, 1.0, 0.0);
+	const vec3 green_colour =   in_s.green*vec3(0.0, 1.0, 0.0);
+	const vec3 cyan_colour =    in_s.cyan*vec3(0.0, 1.0, 1.0);
+	const vec3 blue_colour =    in_s.blue*vec3(0.0, 0.0, 1.0);
+	const vec3 magenta_colour = in_s.magenta*vec3(1.0, 0.0, 1.0);
 
 	ret_val += red_colour;
-	ret_val += orange_colour;
 	ret_val += yellow_colour;
 	ret_val += green_colour;
+	ret_val += cyan_colour;
 	ret_val += blue_colour;
-	ret_val += indigo_colour;
-	ret_val += violet_colour;
+	ret_val += magenta_colour;
 
 	ret_val = clamp(ret_val, 0.0, 1.0);
 
@@ -712,6 +716,49 @@ void main()
 
 
 
+
+
+	six_channel ret_colour;
+
+	float eta_diff = max_eta - min_eta;
+	const float eta_step_size = eta_diff / (6 - 1);
+
+	float eta = min_eta;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	ret_colour.red = get_ray0(red_channel, eta);
+
+	eta = min_eta + eta_step_size;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	ret_colour.yellow = get_ray0(yellow_channel, eta);
+	
+	eta = min_eta + eta_step_size*2;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	ret_colour.green = get_ray0(green_channel, eta);
+
+	eta = min_eta + eta_step_size*3;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	ret_colour.cyan = get_ray0(cyan_channel, eta);
+
+	eta = min_eta + eta_step_size*4;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	ret_colour.blue = get_ray0(blue_channel, eta);
+
+	eta = min_eta + eta_step_size*5;
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+	ret_colour.magenta = get_ray0(magenta_channel, eta);
+
+	vec3 color = six_to_rgb(ret_colour);
+
+	color = pow(color, vec3(3.0));
+
+
+
+
+
+
+
+
+/*
 
 	seven_channel ret_colour;
 
@@ -748,9 +795,9 @@ void main()
 
 	vec3 color = seven_to_rgb(ret_colour);
 
-	color = pow(color, vec3(3.0));
+	//color = pow(color, vec3(3.0));
 
-
+	*/
 
 
 
