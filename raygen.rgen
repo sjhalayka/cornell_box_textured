@@ -67,8 +67,8 @@ struct six_channel
 
 
 
-const float max_eta = 0.95;
-const float min_eta = 0.85;
+const float max_eta = 0.99999;
+const float min_eta = 0.65;
 
 
 
@@ -239,7 +239,14 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 			hitPos = o + d * rayPayload.distance;
 
-			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
+
+				// If found a light
+				if(	rayPayload.s.red == 1.0 &&
+					rayPayload.s.yellow == 0.25 &&
+					rayPayload.s.green == 1.0 &&
+					rayPayload.s.cyan == 0.25 &&
+					rayPayload.s.blue == 1.0 &&
+					rayPayload.s.magenta == 0.25)
 			{
 				ret_colour += local_colour;
 			}
@@ -257,21 +264,15 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 				
 				if(rayPayload.opacity != 1.0)
 				{
-					float offset = stepAndOutputRNGFloat(prng_state)*0.1;
-
-					if(stepAndOutputRNGFloat(prng_state) > 0.5)
-						offset = -offset;
-
-					float new_eta = eta;//blue_eta - (offset + (blue_eta - eta));
 
 					if(dot(d, rayPayload.normal) <= 0.0)
 					{
 						o = hitPos.xyz - rayPayload.normal * 0.01f;
-						d = refract(d, rayPayload.normal, new_eta);
+						d = refract(d, rayPayload.normal, eta);
 					}
 					else
 					{
-						vec3 temp_dir = refract(d, -rayPayload.normal, 1.0/new_eta);
+						vec3 temp_dir = refract(d, -rayPayload.normal, 1.0/eta);
 
 						if(temp_dir != vec3(0.0))
 						{

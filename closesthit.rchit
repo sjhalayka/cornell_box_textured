@@ -119,11 +119,11 @@ void main()
 	
 
 	rayPayload.s.red = color.r;
-	rayPayload.s.yellow = 0;
+	rayPayload.s.yellow = 0.25;
 	rayPayload.s.green = color.g;
-	rayPayload.s.cyan = 0;
+	rayPayload.s.cyan = 0.25;
 	rayPayload.s.blue = color.b;
-	rayPayload.s.magenta = 0;
+	rayPayload.s.magenta = 0.25;
 
 
 
