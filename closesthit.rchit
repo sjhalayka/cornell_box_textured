@@ -104,6 +104,9 @@ void main()
 
 	vec3 color = texture(baseColorSampler, uv).rgb;
 	
+	if(color.r == 1.0 && color.g == 1.0 && color.b == 1.0)
+		color = vec3(0.5, 0.5, 0.5);
+
 	rayPayload.pure_color = color;
 		
 	rayPayload.distance = gl_RayTmaxEXT;
