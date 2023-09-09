@@ -183,18 +183,15 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 		for(int i = 0; i < steps; i++)
 		{
-			float tmin = 0.001;
-			float tmax = 1000.0;
+			const float tmin = 0.001;
+			const float tmax = 1000.0;
 			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o.xyz, tmin, d.xyz, tmax, 0);
 
-			vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
+			const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
 
-
-				local_colour += rayPayload.color.r*mask.r;
-
-				local_colour += rayPayload.color.g*mask.g;
-
-				local_colour += rayPayload.color.b*mask.b;
+			local_colour += rayPayload.color.r*mask.r;
+			local_colour += rayPayload.color.g*mask.g;
+			local_colour += rayPayload.color.b*mask.b;
 
 			count++;
 
@@ -204,7 +201,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 			hitPos = o + d * rayPayload.distance;
 
-			if(rayPayload.color.r == 0.5 && rayPayload.color.g == 0.5 && rayPayload.color.b == 0.5)
+			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 			{
 				ret_colour += local_colour;
 			}
@@ -565,36 +562,10 @@ float get_ray0(const float hue, const float eta)
 
 void main() 
 {
-	// Calculate chromatic aberration
-	/*
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float red = get_ray0(red_channel, red_eta);
-
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float green = get_ray0(green_channel, green_eta);
-	
-	prng_state = res.x * pixel_pos.y + pixel_pos.x;
-	const float blue = get_ray0(blue_channel, blue_eta);
-
-	vec3 color = vec3(red, green, blue);
-	color = pow(color, vec3(3.0));
-	*/
-
-
-
-	
 	const int steps = 10;
 
 	float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x;
 	float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x;
-
-	if(max_hue < min_hue)
-	{
-		float temp = max_hue;
-		max_hue = min_hue;
-		min_hue = temp;
-	}
-
 
 	const float max_eta = 0.9;
 	const float min_eta = 0.6;
@@ -616,56 +587,12 @@ void main()
 	
 		vec3 mask = hsv2rgb(vec3(curr_hue, 1.0, 1.0));
 
-
-				color.r += f*mask.r;
-				color.g += f*mask.g;
-				color.b += f*mask.b;
-	
+		color.r += f*mask.r;
+		color.g += f*mask.g;
+		color.b += f*mask.b;	
 	}
 
 	color /= steps;
-
-	/*
-
-	float pure_red_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x;
-	float pure_blue_hue = rgb2hsv(vec3(0.0, 0.0, 1.0)).x;
-
-	float pure_diff = pure_blue_hue - pure_red_hue;
-	const int steps = 3;
-	const float hue_step_size = pure_diff / steps;
-
-	float eta_diff = blue_eta - red_eta;
-	const float eta_step_size = pure_diff / steps;
-
-	float curr_hue = pure_red_hue;
-	float curr_eta = red_eta;
-
-	vec3 color = vec3(0.0);
-
-
-	for(int i = 0; i < steps; i++, curr_hue += hue_step_size, curr_eta += eta_step_size)
-	{
-		prng_state = res.x * pixel_pos.y + pixel_pos.x;
-
-		results[i].r = get_ray0(red_channel, curr_eta);
-		results[i].g = get_ray0(red_channel, curr_eta);
-		results[i].b = get_ray0(red_channel, curr_eta);
-	
-		vec3 hsv = rgb2hsv(results[i]);
-
-		float results_sat = hsv.y;
-		float results_bri = hsv.z;
-		float results_hue = curr_hue;
-
-		vec3 rgb_again = hsv2rgb(vec3(results_hue, results_sat, results_bri));
-
-		color += rgb_again;
-	}
-	
-	color /= steps;
-
-	*/
-
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
