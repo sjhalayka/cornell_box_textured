@@ -202,29 +202,16 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 			const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
 
-			int channel = get_closest_channel(hue);
+			total += mask.r;
+			total += mask.g;
+			total += mask.b;
 
-			if(channel == red_channel)
-			{
-				total += mask.r;
-				local_colour += rayPayload.color.r*mask.r;
-			}
-
-			else if(channel == green_channel)
-			{
-				total += mask.g;
-				local_colour += rayPayload.color.g*mask.g;
-			}
-			else if(channel == blue_channel)
-			{
-				total += mask.b;
-				local_colour += rayPayload.color.b*mask.b;
-			}
-
+			local_colour += rayPayload.color.r*mask.r;
+			local_colour += rayPayload.color.g*mask.g;
+			local_colour += rayPayload.color.b*mask.b;
 
 			if(rayPayload.distance == -1)
 				break;
-
 
 			hitPos = o + d * rayPayload.distance;
 
@@ -580,12 +567,12 @@ float get_ray0(const float hue, const float eta)
 
 void main() 
 {
-	const int steps = 20;
+	const int steps = 3;
 
-	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x;
+	const float max_hue = rgb2hsv(vec3(0.0, 0.0, 1.0)).x;
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x;
 
-	const float max_eta = 0.9;
+	const float max_eta = 0.95;
 	const float min_eta = 0.7;
 
 	const float hue_diff = distance(max_hue, min_hue);
@@ -603,32 +590,20 @@ void main()
 
 	for(int i = 0; i < steps; i++, curr_hue += hue_step_size, curr_eta += eta_step_size)
 	{
+		prng_state = res.x * pixel_pos.y + pixel_pos.x;
+
 		const float f = get_ray0(curr_hue, curr_eta);
 	
 		const vec3 mask = hsv2rgb(vec3(curr_hue, 1.0, 1.0));
 
-		int channel = get_closest_channel(curr_hue);
-
-		if(channel == red_channel)
-		{
-			total.r += mask.r;
-			color.r += f*mask.r;
-		}
-
-		else if(channel == green_channel)
-		{
-			total.g += mask.g;
-			color.g += f*mask.g;
-		}
-
-		else//if(channel == blue_channel)
-		{
-			total.b += mask.b;
-			color.b += f*mask.b;
-		}
+		total += mask;
+		color += f*mask;
 	}
 
 	color /= total;
+
+	color = pow(color, vec3(2.2));
+
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
