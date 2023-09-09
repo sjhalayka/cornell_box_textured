@@ -204,7 +204,6 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 			int channel = get_closest_channel(hue);
 
-
 			if(channel == red_channel)
 			{
 				total += mask.r;
@@ -216,29 +215,12 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 				total += mask.g;
 				local_colour += rayPayload.color.g*mask.g;
 			}
-
-			else//if(channel == blue_channel)
+			else if(channel == blue_channel)
 			{
 				total += mask.b;
 				local_colour += rayPayload.color.b*mask.b;
 			}
 
-
-
-
-
-
-
-
-			total += mask.r;
-			total += mask.g;
-			total += mask.b;
-
-			local_colour += rayPayload.color.r*mask.r;
-			local_colour += rayPayload.color.g*mask.g;
-			local_colour += rayPayload.color.b*mask.b;
-
-			count++;
 
 			if(rayPayload.distance == -1)
 				break;
@@ -249,7 +231,6 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 			if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 			{
 				ret_colour += local_colour;
-				//local_colour = 0;
 			}
 			else
 			{
@@ -599,7 +580,7 @@ float get_ray0(const float hue, const float eta)
 
 void main() 
 {
-	const int steps = 100;
+	const int steps = 20;
 
 	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x;
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x;
