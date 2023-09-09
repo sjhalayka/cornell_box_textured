@@ -30,10 +30,6 @@ struct ray
 
 
 
-const int red_channel = 0;
-const int green_channel = 1;
-const int blue_channel = 2;
-
 
 vec3 rgb2hsv(vec3 c)
 {
@@ -158,22 +154,6 @@ vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
     return normalize( rr );
 }
 
-
-int get_closest_channel(const float hue)
-{
-	int channel = 0;
-
-	const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
-
-	if(mask.r >= mask.g && mask.r >= mask.b)
-		channel = red_channel;
-	else if(mask.g >= mask.r && mask.g >= mask.b)
-		channel = green_channel;
-	else//if(mask.b >= mask.g && mask.b >= mask.r)
-		channel = blue_channel;
-
-	return channel;
-}
 
 
 
@@ -567,13 +547,13 @@ float get_ray0(const float hue, const float eta)
 
 void main() 
 {
-	const int steps = 3;
+	const int steps = 20;
 
-	const float max_hue = rgb2hsv(vec3(0.0, 0.0, 1.0)).x;
+	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x;
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x;
 
 	const float max_eta = 0.95;
-	const float min_eta = 0.7;
+	const float min_eta = 0.75;
 
 	const float hue_diff = distance(max_hue, min_hue);
 	const float hue_step_size = hue_diff / (steps - 1);
