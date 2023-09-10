@@ -183,7 +183,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 		for(int i = 0; i < steps; i++)
 		{
 			const float tmin = 0.001;
-			const float tmax = 1000.0;
+			const float tmax = 10000.0;
 			traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o.xyz, tmin, d.xyz, tmax, 0);
 
 			const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
@@ -410,7 +410,7 @@ float get_ray0(const float hue, const float eta)
 						vec3 end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
 	
 						if(rayPayload.distance != -1.0)
-							end = hitPos.xyz;
+							end = hitPos.xyz;// - rayPayload.normal * 0.01f;
 		
 						const int num_steps = int(floor(distance(start, end) / target_step_length));
 						const vec3 step = (end - start) / (num_steps - 1);
@@ -419,10 +419,10 @@ float get_ray0(const float hue, const float eta)
 
 						for(int j = 0; j < num_steps; j++, curr_step += step)
 						{
-							float colour = pow(get_omni_radiance(10, 5, curr_step, hue, eta), 2.0);
+							float colour = get_omni_radiance(10, 5, curr_step, hue, eta);
 							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 							dist_color += colour*trans;
-							dist_opacity += colour*trans*0.01;
+							dist_opacity += colour*trans*0.25;
 						}
 					}
 				}
@@ -601,8 +601,8 @@ void main()
 {
 	const int channels = 10;
 
-	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x;
-	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x;
+	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x; // violet
+	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x; // red
 
 	const float max_eta = 0.95;
 	const float min_eta = 0.7;
