@@ -39,8 +39,8 @@ ivec2 res = ivec2(gl_LaunchSizeEXT.xy);
 
 const float TWO_PI = 8.0 * atan(1.0);
 
-vec3 aabb_min = vec3(-5, -5, -5);
-vec3 aabb_max = vec3(5, 5, 5);
+vec3 aabb_min = vec3(-2.5, -2.5, -2.5);
+vec3 aabb_max = vec3(2.5, 2.5, 2.5);
 
 const float opacity_factor = 0.01;
 
@@ -409,8 +409,8 @@ float get_ray0(const float hue, const float eta)
 						vec3 start = rays[i].origin.xyz + rays[i].direction.xyz*t0;
 						vec3 end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
 	
-						if(rayPayload.distance != -1.0)
-							end = hitPos.xyz;// - rayPayload.normal * 0.01f;
+						if(rayPayload.distance != -1.0 && t1 > rayPayload.distance)
+							end = hitPos.xyz;
 		
 						const int num_steps = int(floor(distance(start, end) / target_step_length));
 						const vec3 step = (end - start) / (num_steps - 1);
@@ -422,7 +422,7 @@ float get_ray0(const float hue, const float eta)
 							float colour = get_omni_radiance(10, 5, curr_step, hue, eta);
 							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 							dist_color += colour*trans;
-							dist_opacity += colour*trans*0.25;
+							dist_opacity += colour*trans*0.1;
 						}
 					}
 				}
