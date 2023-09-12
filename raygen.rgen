@@ -404,41 +404,52 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
+					vec3 start = vec3(0.0);
+					vec3 end = vec3(0.0);
+
 					float t0 = 0.0;
 					float t1 = 0.0;
+					const float target_step_length = 0.1;
 
-					if(BBoxIntersect(aabb_min, aabb_max, rays[i].origin.xyz, rays[i].direction.xyz, t0, t1))
+					if(in_aabb(rays[i].origin.xyz, aabb_min, aabb_max))
 					{
-						const float target_step_length = 0.1;
+						vec3 backout_pos = rays[i].origin.xyz - rays[i].direction.xyz*100.0;
 
-						vec3 start = rays[i].origin.xyz;
-						
-						if(false == in_aabb(rays[i].origin.xyz, aabb_min, aabb_max))
-							start = rays[i].origin.xyz + rays[i].direction.xyz*t0;
-
-						vec3 end = hitPos.xyz;
-
-						if(rayPayload.distance == -1.0)// && t1 < rayPayload.distance)
-							end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
-
-						
-		
-						const int num_steps = int((distance(start, end) / target_step_length));
-						const vec3 step = (end - start) / (num_steps - 1);
-
-						vec3 curr_step = start;
-
-						for(int j = 0; j < num_steps; j++, curr_step += step)
+						if(BBoxIntersect(aabb_min, aabb_max, backout_pos, rays[i].direction.xyz, t0, t1))
 						{
-							float colour = get_omni_radiance(10, 5, curr_step, hue, eta);
-							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
-							dist_color += colour*trans;
-							dist_opacity += colour*trans;
+							start = rays[i].origin.xyz;
+							end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
 						}
 					}
+					else
+					{
+						if(BBoxIntersect(aabb_min, aabb_max, rays[i].origin.xyz, rays[i].direction.xyz, t0, t1))
+						{
+							start = rays[i].origin.xyz + rays[i].direction.xyz*t0;
+							end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
+						}
+					}
+
+					if(rayPayload.distance != 1)
+						end = hitPos.xyz;
+
+					const int num_steps = int((distance(start, end) / target_step_length));
+					const vec3 step = (end - start) / (num_steps - 1);
+
+					vec3 curr_step = start;
+
+					for(int j = 0; j < num_steps; j++, curr_step += step)
+					{
+						float colour = get_omni_radiance(10, 5, curr_step, hue, eta);
+						const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
+						dist_color += colour*trans;
+						dist_opacity += colour*trans;
+					}
+
 				}
+
 
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
