@@ -406,8 +406,8 @@ float get_ray0(const float hue, const float eta)
 
 				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
-					vec3 start = vec3(0.0);
-					vec3 end = vec3(0.0);
+					vec3 start = rays[i].origin.xyz;
+					vec3 end = rays[i].origin.xyz;
 
 					float t0 = 0.0;
 					float t1 = 0.0;
@@ -432,7 +432,9 @@ float get_ray0(const float hue, const float eta)
 						}
 					}
 
-					if(rayPayload.distance != 1)
+					if(distance(rays[i].origin.xyz, start) > distance(rays[i].origin.xyz, hitPos.xyz))
+						start = hitPos.xyz;
+					else if(distance(rays[i].origin.xyz, end) < distance(rays[i].origin.xyz, hitPos.xyz))
 						end = hitPos.xyz;
 
 					const int num_steps = int((distance(start, end) / target_step_length));
