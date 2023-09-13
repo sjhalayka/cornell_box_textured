@@ -219,21 +219,14 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 				
 				if(rayPayload.opacity != 1.0)
 				{
-					float offset = stepAndOutputRNGFloat(prng_state)*0.1;
-
-					if(stepAndOutputRNGFloat(prng_state) > 0.5)
-						offset = -offset;
-
-					float new_eta = eta;//blue_eta - (offset + (blue_eta - eta));
-
 					if(dot(d, rayPayload.normal) <= 0.0)
 					{
 						o = hitPos.xyz - rayPayload.normal * 0.01f;
-						d = refract(d, rayPayload.normal, new_eta);
+						d = refract(d, rayPayload.normal, eta);
 					}
 					else
 					{
-						vec3 temp_dir = refract(d, -rayPayload.normal, 1.0/new_eta);
+						vec3 temp_dir = refract(d, -rayPayload.normal, 1.0/eta);
 
 						if(temp_dir != vec3(0.0))
 						{
@@ -307,7 +300,7 @@ bool in_aabb(vec3 pos, vec3 aabb_min, vec3 aabb_max)
 
 bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, const vec3 dir, out float out_t0, out float out_t1)
 {
-	vec3 invdir = 1.0 / dir;	
+	vec3 invdir = 1.0 / dir;
 	
 	vec3 tbot = invdir * (boxMin - origin);
 	vec3 ttop = invdir * (boxMax - origin);
@@ -320,14 +313,7 @@ bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, cons
 	out_t0 = t0;
 	out_t1 = t1;
 
-	if(in_aabb(origin, aabb_min, aabb_max))
-	{
-		return true;
-	}
-	else
-	{
-		return t1 > max(t0, 0.0);
-	}
+	return t1 > max(t0, 0.0);
 }
 
 
