@@ -420,7 +420,7 @@ float get_ray0(const float hue, const float eta)
 						if(BBoxIntersect(aabb_min, aabb_max, backout_pos, rays[i].direction.xyz, t0, t1))
 						{
 							start = rays[i].origin.xyz;
-							end = rays[i].origin.xyz + rays[i].direction.xyz*t1;
+							end = backout_pos + rays[i].direction.xyz*t1;
 						}
 					}
 					else
