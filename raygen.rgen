@@ -418,10 +418,14 @@ float get_ray0(const float hue, const float eta)
 						}
 					}
 
-					if(distance(rays[i].origin.xyz, start) > distance(rays[i].origin.xyz, hitPos.xyz))
-						start = hitPos.xyz;
-					else if(distance(rays[i].origin.xyz, end) < distance(rays[i].origin.xyz, hitPos.xyz))
-						end = hitPos.xyz;
+					if(rayPayload.distance != -1.0)
+					{
+						if(distance(rays[i].origin.xyz, start) > distance(rays[i].origin.xyz, hitPos.xyz))
+							start = hitPos.xyz;
+					
+						if(distance(rays[i].origin.xyz, end) > distance(rays[i].origin.xyz, hitPos.xyz))
+							end = hitPos.xyz;
+					}
 
 					const int num_steps = int((distance(start, end) / target_step_length));
 					const vec3 step = (end - start) / (num_steps - 1);
