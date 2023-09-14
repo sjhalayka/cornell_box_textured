@@ -207,7 +207,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 		}
 		else
 		{
-			vec3 o_reflect = hitPos + normalize(rayPayload.normal)*0.01;
+			vec3 o_reflect = hitPos + normalize(rayPayload.normal) * 0.01;
 			vec3 d_reflect = reflect(d, rayPayload.normal);
 
 			vec3 temp_o = o_reflect;
@@ -215,7 +215,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 			if(rayPayload.reflector < 1.0) // if less than fully reflective, do scattering
 			{
-				vec3 o_scatter = hitPos + normalize(rayPayload.normal)*0.01;
+				vec3 o_scatter = hitPos + normalize(rayPayload.normal) * 0.01;
 				vec3 d_scatter = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
 
 				temp_o = mix(temp_o, o_scatter, 1.0 - rayPayload.reflector);
@@ -254,8 +254,6 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 			
 			o = temp_o;
 			d = temp_d;
-			
-		
 		}
 	}
 
