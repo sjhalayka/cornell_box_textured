@@ -207,7 +207,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 		}
 		else
 		{
-			vec3 o_reflect = hitPos + normalize(rayPayload.normal) * 0.01;
+			vec3 o_reflect = hitPos + rayPayload.normal * 0.01;
 			vec3 d_reflect = reflect(d, rayPayload.normal);
 
 			vec3 temp_o = o_reflect;
@@ -215,8 +215,8 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 			if(rayPayload.reflector < 1.0) // if less than fully reflective, do scattering
 			{
-				vec3 o_scatter = hitPos + normalize(rayPayload.normal) * 0.01;
-				vec3 d_scatter = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
+				vec3 o_scatter = hitPos + rayPayload.normal * 0.01;
+				vec3 d_scatter = cosWeightedRandomHemisphereDirection(rayPayload.normal, prng_state);
 
 				temp_o = mix(temp_o, o_scatter, 1.0 - rayPayload.reflector);
 				temp_d = mix(temp_d, d_scatter, 1.0 - rayPayload.reflector);
@@ -234,7 +234,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 				}
 				else
 				{
-					vec3 temp_dir = refract(d, -rayPayload.normal, 1.0/eta);
+					vec3 temp_dir = refract(d, -rayPayload.normal, 1.0 / eta);
 
 					if(temp_dir != vec3(0.0))
 					{
@@ -398,7 +398,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
@@ -453,9 +453,6 @@ float get_ray0(const float hue, const float eta)
 					}
 				}
 
-
-
-
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
 
@@ -465,9 +462,6 @@ float get_ray0(const float hue, const float eta)
 					rays[i].in_use = false;
 					continue;
 				}
-
-
-				
 
 				rays[i].normal = rayPayload.normal;
 				rays[i].reflection_constant = rayPayload.reflector;
@@ -630,6 +624,8 @@ float get_ray0(const float hue, const float eta)
 
 void main() 
 {
+	// Do chromatic aberration (good for making rainbows via prisms)
+
 	const int channels = 10;
 
 	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x; // violet
