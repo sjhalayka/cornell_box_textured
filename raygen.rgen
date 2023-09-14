@@ -91,7 +91,7 @@ layout(location = 2) rayPayloadEXT bool shadowed;
 
 // Max. number of recursion is passed via a specialization constant
 layout (constant_id = 0) const int MAX_RECURSION = 0;
-const int buffer_size = 32;
+const int buffer_size = 8;
 
 
 
@@ -398,7 +398,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
