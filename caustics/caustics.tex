@@ -78,6 +78,7 @@ It's just that the implementation of shadows is a kludgy affair, or not naturall
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
 These issues do not plague the backward path tracer.
 
+I've spoken with some experts, and they believe that Henrik Wann Jensen is the progenitor of this algorithm.
 
 
 
@@ -145,10 +146,9 @@ Global illumination is not taken into account.
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{code.png}
-  \caption{ Taking transparent objects into consideration.
-In essence, instead of always producing a pseudorandom cosine-weighted reflection vector, refraction occurs for transparent objects.
+  \caption{ Taking reflective and transparent objects into consideration.
+In essence, instead of always using a pseudorandom cosine-weighted reflection vector (e.g. scattering), refraction occurs for transparent objects.
 Note that reflection caustics are created by reflective surfaces.
-In the case where the surface is both transparent and reflective, a pseudorandom number should be generated to see which path to take.
 }
 \end{figure}
 
