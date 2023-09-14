@@ -227,12 +227,13 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 				vec3 o_transparent = vec3(0.0);
 				vec3 d_transparent = vec3(0.0);
 
+				// Incoming
 				if(dot(d, rayPayload.normal) <= 0.0)
 				{
 					o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 					d_transparent = refract(d, rayPayload.normal, eta);
 				}
-				else
+				else // Outgoing
 				{
 					vec3 temp_dir = refract(d, -rayPayload.normal, 1.0 / eta);
 
@@ -527,7 +528,7 @@ float get_ray0(const float hue, const float eta)
 
 							//generate new ray segment
 							rays[current_buffer_index].origin.xyz = hitPos.xyz - rayPayload.normal * 0.01f;
-							rays[current_buffer_index].direction.xyz = reflect(rays[i].direction.xyz, -rayPayload.normal);;
+							rays[current_buffer_index].direction.xyz = reflect(rays[i].direction.xyz, -rayPayload.normal);
 							rays[current_buffer_index].in_use = true;
 							rays[current_buffer_index].level = rays[i].level + 1;
 							rays[current_buffer_index].external_reflection_ray = false;
