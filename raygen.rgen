@@ -207,19 +207,22 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 		}
 		else
 		{
-			vec3 temp_o = hitPos + normalize(rayPayload.normal)*0.01;
-			vec3 temp_d = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
+			vec3 o_reflect = hitPos + normalize(rayPayload.normal)*0.01;
+			vec3 d_reflect = reflect(d, rayPayload.normal);
 
-			if(stepAndOutputRNGFloat(prng_state) < rayPayload.reflector)
+			vec3 temp_o = o_reflect;
+			vec3 temp_d = d_reflect;
+
+			if(rayPayload.reflector < 1.0) // if less than fully reflective, do scattering
 			{
-				vec3 o_reflect = hitPos + normalize(rayPayload.normal)*0.01;
-				vec3 d_reflect = reflect(d, rayPayload.normal);
+				vec3 o_scatter = hitPos + normalize(rayPayload.normal)*0.01;
+				vec3 d_scatter = cosWeightedRandomHemisphereDirection(normalize(rayPayload.normal), prng_state);
 
-				temp_o = o_reflect;
-				temp_d = d_reflect;
+				temp_o = mix(temp_o, o_scatter, 1.0 - rayPayload.reflector);
+				temp_d = mix(temp_d, d_scatter, 1.0 - rayPayload.reflector);
 			}
 
-			if(stepAndOutputRNGFloat(prng_state) > rayPayload.opacity)
+			if(rayPayload.opacity < 1.0) // if partially transparent, do refraction
 			{
 				vec3 o_transparent = vec3(0.0);
 				vec3 d_transparent = vec3(0.0);
@@ -245,12 +248,14 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 					}
 				}
 
-				temp_o = o_transparent;
-				temp_d = d_transparent;
+				temp_o = mix(temp_o, o_transparent, 1.0 - rayPayload.opacity);
+				temp_d = mix(temp_d, d_transparent, 1.0 - rayPayload.opacity);
 			}
-
+			
 			o = temp_o;
 			d = temp_d;
+			
+		
 		}
 	}
 
