@@ -264,7 +264,9 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 	final_pos = hitPos;
 	rayPayload = r;
-	return mix(ret_colour / total, caustic_ret / total, 0.5);
+
+	caustic_ret /= total;
+	return ret_colour / total;//mix(ret_colour / total, caustic_ret / total, 0.5);
 }
 
 
@@ -664,7 +666,7 @@ void main()
 
 	color /= total;
 
-	//color = pow(color, vec3(2.2));
+	color = pow(color, vec3(2.2));
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
