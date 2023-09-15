@@ -201,9 +201,10 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 		hitPos = o + d * rayPayload.distance;
 
-		if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
+		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
 		{
 			ret_colour += local_colour;
+			break;
 		}
 		else
 		{
