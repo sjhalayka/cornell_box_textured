@@ -177,6 +177,8 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 	int count = 0;
 
 	float local_colour = 100.0;
+	float caustic_colour = 100.0;
+	float caustic_ret = 0;
 
 	float total = 0;
 
@@ -194,11 +196,9 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 		total += mask.g;
 		total += mask.b;
 
-//		local_colour += rayPayload.color.r*mask.r;
-//		local_colour += rayPayload.color.g*mask.g;
-//		local_colour += rayPayload.color.b*mask.b;
 
 		local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		caustic_colour += (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
 		if(rayPayload.distance == -1)
 			break;
@@ -207,7 +207,8 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 		if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 		{
-			ret_colour += local_colour;	
+			ret_colour += local_colour;
+			caustic_ret += caustic_colour;
 		}
 
 			vec3 o_reflect = hitPos + rayPayload.normal * 0.01;
@@ -263,7 +264,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 	final_pos = hitPos;
 	rayPayload = r;
-	return ret_colour / total;
+	return mix(ret_colour / total, caustic_ret / total, 0.5);
 }
 
 
