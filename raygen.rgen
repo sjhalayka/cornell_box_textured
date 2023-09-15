@@ -664,7 +664,7 @@ void main()
 
 	color /= total;
 
-	color = pow(color, vec3(2.2));
+	//color = pow(color, vec3(2.2));
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
