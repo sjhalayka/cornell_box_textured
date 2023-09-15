@@ -176,9 +176,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 	int count = 0;
 
-	float energy = 100.0;
-
-	float local_colour = energy;
+	float local_colour = 100.0;
 
 	float total = 0;
 
@@ -202,19 +200,16 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 		local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
-
 		if(rayPayload.distance == -1)
 			break;
 
 		hitPos = o + d * rayPayload.distance;
 
-
-		if(ret_colour == 0.0 && rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
+		if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 		{
-			ret_colour = local_colour;
+			ret_colour += local_colour;	
 		}
-		else
-		{
+
 			vec3 o_reflect = hitPos + rayPayload.normal * 0.01;
 			vec3 d_reflect = reflect(d, rayPayload.normal);
 
@@ -263,7 +258,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 			
 			o = temp_o;
 			d = temp_d;
-		}
+
 	}
 
 	final_pos = hitPos;
