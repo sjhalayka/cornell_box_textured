@@ -100,12 +100,14 @@ void main()
 
 	// Make the transparent sphere partially reflective
 	if(rayPayload.opacity == 0.0)
+	{
 		rayPayload.reflector = 0.5;
+	}
 
 	vec3 color = texture(baseColorSampler, uv).rgb;
 	
-//	if(color.r == 1.0 && color.g == 1.0 && color.b == 1.0)
-//		color = vec3(30.0, 30.0, 30.0);
+	if(color.r == 1.0 && color.g == 1.0 && color.b == 1.0)
+		color = vec3(2.0, 2.0, 2.0);
 
 	rayPayload.pure_color = color;
 		
