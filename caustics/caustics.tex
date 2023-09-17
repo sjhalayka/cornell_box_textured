@@ -136,12 +136,22 @@ Global illumination is not taken into account.
 \end{figure}
 
 
+
+
+\begin{figure} 
+\centering
+  \includegraphics[width = 6 in]{old_code.png}
+  \caption{ Old code, always using a pseudorandom cosine-weighted direction vector (e.g. scattering).
+Note that reflection caustics are created by reflective surfaces.
+}
+\end{figure}
+
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{code.png}
-  \caption{ Taking reflective and transparent objects into consideration.
-In essence, instead of always using a pseudorandom cosine-weighted reflection vector (e.g. scattering), refraction occurs for transparent objects.
-Note that reflection caustics are created by reflective surfaces.
+  \caption{ New code, taking reflective and transparent objects into consideration.
+In essence, instead of always using a pseudorandom cosine-weighted direction vector, refraction occurs for transparent objects.
+Note that reflection caustics are created by reflective surfaces by default.
 }
 \end{figure}
 
