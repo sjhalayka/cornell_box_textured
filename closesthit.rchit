@@ -107,7 +107,7 @@ void main()
 	vec3 color = texture(baseColorSampler, uv).rgb;
 	
 	if(color.r == 1.0 && color.g == 1.0 && color.b == 1.0)
-		color = vec3(2.0, 2.0, 2.0);
+		color = vec3(1.0, 1.0, 1.0);
 
 	rayPayload.pure_color = color;
 		
