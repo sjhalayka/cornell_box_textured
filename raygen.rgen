@@ -253,6 +253,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 					}
 					else
 					{
+						// total internal reflection
 						o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 						d_transparent = reflect(d, -rayPayload.normal);
 					}
@@ -263,7 +264,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 			}
 			
 			o = temp_o;
-			d = temp_d;
+			d = normalize(temp_d);
 		}
 	}
 
@@ -408,7 +409,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
@@ -461,7 +462,15 @@ float get_ray0(const float hue, const float eta)
 							dist_opacity += colour*trans;
 						}
 					}
+
+					const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
+					dist_color *= (fog_colour.r*mask.r + fog_colour.g*mask.g + fog_colour.b*mask.b);
 				}
+
+						
+		
+
+
 
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
@@ -641,7 +650,7 @@ void main()
 	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x; // violet
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x; // red
 
-	const float max_eta = 0.95;
+	const float max_eta = 0.9999;
 	const float min_eta = 0.7;
 
 	const float hue_diff = max_hue - min_hue;
