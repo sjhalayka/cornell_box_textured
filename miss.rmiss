@@ -3,7 +3,7 @@
 
 struct RayPayload {
 	vec3 color;
-	float distance;
+	float dist;
 	vec3 normal;
 	float reflector;
 	float opacity;
@@ -23,7 +23,7 @@ void main()
 	float t = 0.5 * (unitDir.y + 1.0);
 
 	rayPayload.color = (1.0 - t) * gradientStart + t * gradientEnd;
-	rayPayload.distance = -1.0;
+	rayPayload.dist = -1.0;
 	rayPayload.normal = vec3(0.0);
 	rayPayload.reflector = 0.0;
 	rayPayload.opacity = 0.0;

@@ -5,7 +5,7 @@
 
 struct RayPayload {
 	vec3 color;
-	float distance;
+	float dist;
 	vec3 normal;
 	float reflector;
 	float opacity;
@@ -80,7 +80,7 @@ void main()
 	vec4 n = normalize(ubo.transformation_matrix*vec4(normal, 0.0));
 
 	rayPayload.color = texture(baseColorSampler, uv).rgb;
-	rayPayload.distance = gl_RayTmaxEXT;
+	rayPayload.dist = gl_RayTmaxEXT;
 	rayPayload.normal = normalize(n.xyz);
 	rayPayload.reflector = texture(normalSampler, uv).a;
 	rayPayload.opacity = texture(baseColorSampler, uv).a;

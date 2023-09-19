@@ -71,7 +71,7 @@ layout(binding = 2, set = 0) uniform UBO
 
 struct RayPayload {
 	vec3 color;
-	float distance;
+	float dist;
 	vec3 normal;
 	float reflector;
 	float opacity;
@@ -183,10 +183,10 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 		local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
-		if(rayPayload.distance == -1)
+		if(rayPayload.dist == -1)
 			break;
 
-		hitPos = o + d * rayPayload.distance;
+		hitPos = o + d * rayPayload.dist;
 
 		if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 			ret_colour += local_colour;
@@ -372,7 +372,7 @@ float get_ray0(const float hue, const float eta)
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 
-				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
+				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.dist;
 
 				// Do some experimental fog in an AABB
 				float dist_color = 0.0;
@@ -406,7 +406,7 @@ float get_ray0(const float hue, const float eta)
 						}
 					}
 
-					if(rayPayload.distance != -1.0)
+					if(rayPayload.dist != -1.0)
 					{
 						if(distance(rays[i].origin.xyz, start) > distance(rays[i].origin.xyz, hitPos.xyz))
 							start = hitPos.xyz;
@@ -435,7 +435,7 @@ float get_ray0(const float hue, const float eta)
 					const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
 					dist_color *= (fog_colour.r*mask.r + fog_colour.g*mask.g + fog_colour.b*mask.b);
 				}
-
+				
 						
 		
 
@@ -445,7 +445,7 @@ float get_ray0(const float hue, const float eta)
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
 
 				// this particular ray missed everything, or got too deep
-				if(rayPayload.distance == -1.0 || rays[i].level >= MAX_RECURSION)
+				if(rayPayload.dist == -1.0 || rays[i].level >= MAX_RECURSION)
 				{
 					rays[i].in_use = false;
 					continue;
