@@ -85,7 +85,7 @@ layout(location = 2) rayPayloadEXT bool shadowed;
 
 // Max. number of recursion is passed via a specialization constant
 layout (constant_id = 0) const int MAX_RECURSION = 0;
-const int buffer_size = 32;
+const int buffer_size = 8;
 
 
 
@@ -157,7 +157,7 @@ vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
 
 
 
-float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const vec3 direction, const float hue, float eta)
+float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const vec3 direction, const float hue, const float eta)
 {
 	vec3 hitPos = vec3(0.0);
 	vec3 o = origin;
