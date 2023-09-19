@@ -71,16 +71,10 @@ layout(binding = 2, set = 0) uniform UBO
 
 struct RayPayload {
 	vec3 color;
-	vec3 pure_color;
 	float distance;
 	vec3 normal;
 	float reflector;
 	float opacity;
-	vec3 pos;
-	vec3 wro;
-	vec3 wrd;
-	float hitt;
-	int recursive;
 };
 
 layout(location = 0) rayPayloadEXT RayPayload rayPayload;
@@ -165,23 +159,13 @@ vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
 
 float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const vec3 direction, const float hue, float eta)
 {
-	const RayPayload r = rayPayload;
-
 	vec3 hitPos = vec3(0.0);
-
-	float ret_colour = 0;
-
 	vec3 o = origin;
 	vec3 d = direction;
 
-	int count = 0;
-
-	
+	float ret_colour = 0;
 	float energy = 100.0;
-
 	float local_colour = energy;
-
-
 	float total = 0;
 
 	for(int i = 0; i < steps; i++)
@@ -224,6 +208,8 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 
 		if(rayPayload.opacity < 1.0) // if partially transparent, do refraction
 		{
+			return rayPayload.opacity;
+
 			vec3 o_transparent = vec3(0.0);
 			vec3 d_transparent = vec3(0.0);
 
@@ -260,7 +246,7 @@ float trace_path2(out vec3 final_pos, const int steps, const vec3 origin, const 
 	}
 
 	final_pos = hitPos;
-	rayPayload = r;
+//	rayPayload = r;
 	return ret_colour / total;
 }
 
@@ -386,15 +372,9 @@ float get_ray0(const float hue, const float eta)
 				else
 					rays[i].base_color = get_radiance(10, 20, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 
-
-				RayPayload r = rayPayload;
-
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.distance;
-
-
-
 
 				// Do some experimental fog in an AABB
 				float dist_color = 0.0;
@@ -547,8 +527,6 @@ float get_ray0(const float hue, const float eta)
 						}
 					}
 				}
-
-				rayPayload = r;
 
 				// The processing of this ray segment is complete
 				rays[i].in_use = false;

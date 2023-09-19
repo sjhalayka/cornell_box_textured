@@ -5,16 +5,10 @@
 
 struct RayPayload {
 	vec3 color;
-	vec3 pure_color;
 	float distance;
 	vec3 normal;
 	float reflector;
 	float opacity;
-	vec3 pos;
-	vec3 wro;
-	vec3 wrd;
-	float hitt;
-	int recursive;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
@@ -76,8 +70,16 @@ Vertex unpack(uint index)
 
 
 
+float stepAndOutputRNGFloat(inout uint rngState)
+{
+  // Condensed version of pcg_output_rxs_m_xs_32_32, with simple conversion to floating-point [0,1].
+  rngState  = rngState * 747796405 + 1;
+  uint word = ((rngState >> ((rngState >> 28) + 4)) ^ rngState) * 277803737;
+  word      = (word >> 22) ^ word;
+  return float(word) / 4294967295.0f;
+}
 
-
+uint prng_state = 0;
 
 void main()
 {
@@ -106,18 +108,12 @@ void main()
 
 	vec3 color = texture(baseColorSampler, uv).rgb;
 	
-	if(color.r == 1.0 && color.g == 1.0 && color.b == 1.0)
-		color = vec3(1.0, 1.0, 1.0);
+//	if(color.r == 1.0 && color.g == 1.0 && color.b == 1.0)
+//		color = vec3(1.0, 1.0, 1.0);
 
-	rayPayload.pure_color = color;
-		
 	rayPayload.distance = gl_RayTmaxEXT;
-	rayPayload.normal = n.xyz;
+	rayPayload.normal = normalize(n.xyz);
 	
-	rayPayload.wro = gl_WorldRayOriginEXT;
-	rayPayload.wrd = gl_WorldRayDirectionEXT;
-	rayPayload.hitt = gl_HitTEXT;
-
 	rayPayload.color = color;
 }
 
