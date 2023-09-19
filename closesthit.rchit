@@ -19,9 +19,6 @@ layout(binding = 1, set = 1) uniform sampler2D normalSampler;
 
 hitAttributeEXT vec2 attribs;
 
-
-
-
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2, set = 0) uniform UBO 
 {
@@ -36,8 +33,6 @@ layout(binding = 2, set = 0) uniform UBO
 } ubo;
 layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices;
 layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices;
-
-
 
 struct Vertex
 {
@@ -68,19 +63,6 @@ Vertex unpack(uint index)
 	return v;
 }
 
-
-
-float stepAndOutputRNGFloat(inout uint rngState)
-{
-  // Condensed version of pcg_output_rxs_m_xs_32_32, with simple conversion to floating-point [0,1].
-  rngState  = rngState * 747796405 + 1;
-  uint word = ((rngState >> ((rngState >> 28) + 4)) ^ rngState) * 277803737;
-  word      = (word >> 22) ^ word;
-  return float(word) / 4294967295.0f;
-}
-
-uint prng_state = 0;
-
 void main()
 {
 	ivec3 index = ivec3(indices.i[3 * gl_PrimitiveID], indices.i[3 * gl_PrimitiveID + 1], indices.i[3 * gl_PrimitiveID + 2]);
@@ -96,7 +78,10 @@ void main()
 	const vec2 uv = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 
 	vec4 n = normalize(ubo.transformation_matrix*vec4(normal, 0.0));
-	
+
+	rayPayload.color = texture(baseColorSampler, uv).rgb;
+	rayPayload.distance = gl_RayTmaxEXT;
+	rayPayload.normal = normalize(n.xyz);
 	rayPayload.reflector = texture(normalSampler, uv).a;
 	rayPayload.opacity = texture(baseColorSampler, uv).a;
 
@@ -105,16 +90,6 @@ void main()
 	{
 		rayPayload.reflector = 0.5;
 	}
-
-	vec3 color = texture(baseColorSampler, uv).rgb;
-	
-//	if(color.r == 1.0 && color.g == 1.0 && color.b == 1.0)
-//		color = vec3(1.0, 1.0, 1.0);
-
-	rayPayload.distance = gl_RayTmaxEXT;
-	rayPayload.normal = normalize(n.xyz);
-	
-	rayPayload.color = color;
 }
 
 
