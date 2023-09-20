@@ -163,9 +163,11 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	vec3 d = direction;
 
 	float ret_colour = 0;
-	float energy = 100.0;
+	const float energy = 100.0;
 	float local_colour = energy;
 	float total = 0;
+
+	const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
 
 	for(int i = 0; i < steps; i++)
 	{
@@ -173,8 +175,6 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		const float tmax = 10000.0;
 
 		traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o, tmin, d, tmax, 0);
-
-		const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
 
 		total += mask.r;
 		total += mask.g;
