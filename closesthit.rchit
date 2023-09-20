@@ -12,7 +12,7 @@ struct RayPayload {
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
-layout(location = 2) rayPayloadEXT bool shadowed;
+//layout(location = 2) rayPayloadEXT bool shadowed;
 
 layout(binding = 0, set = 1) uniform sampler2D baseColorSampler;
 layout(binding = 1, set = 1) uniform sampler2D normalSampler;
