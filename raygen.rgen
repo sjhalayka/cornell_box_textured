@@ -181,8 +181,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		total += mask.g;
 		total += mask.b;
 
-		//local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
-		local_colour += (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		//local_colour += (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
 		if(rayPayload.dist == -1.0)
 		{
@@ -192,7 +192,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 		{
 			ret_colour += local_colour;
-			break;
+			//break;
 		}
 
 		vec3 hitPos = o + d * rayPayload.dist;
