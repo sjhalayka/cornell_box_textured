@@ -1,7 +1,8 @@
 #version 460
 #extension GL_EXT_ray_tracing : require
 
-struct RayPayload {
+struct RayPayload
+{
 	vec3 color;
 	float dist;
 	vec3 normal;

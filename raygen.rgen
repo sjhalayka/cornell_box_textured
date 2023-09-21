@@ -69,7 +69,8 @@ layout(binding = 2, set = 0) uniform UBO
 
 
 
-struct RayPayload {
+struct RayPayload
+{
 	vec3 color;
 	float dist;
 	vec3 normal;
@@ -78,14 +79,14 @@ struct RayPayload {
 };
 
 layout(location = 0) rayPayloadEXT RayPayload rayPayload;
-//layout(location = 2) rayPayloadEXT bool shadowed;
+layout(location = 2) rayPayloadEXT bool shadowed;
 
 
 
 
 // Max. number of recursion is passed via a specialization constant
 layout (constant_id = 0) const int MAX_RECURSION = 0;
-const int buffer_size = 16;
+const int buffer_size = 8;
 
 
 
@@ -183,12 +184,18 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
 		if(rayPayload.dist == -1.0)
+		{
+			ret_colour += local_colour;
 			break;
-
-		vec3 hitPos = o + d * rayPayload.dist;
+		}
 
 		if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
+		{
 			ret_colour += local_colour;
+			break;
+		}
+
+		vec3 hitPos = o + d * rayPayload.dist;
 
 		vec3 o_reflect = hitPos + rayPayload.normal * 0.01;
 		vec3 d_reflect = reflect(d, rayPayload.normal);
