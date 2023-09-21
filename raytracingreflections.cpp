@@ -211,7 +211,7 @@ public:
 		std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
 
 		VkSpecializationMapEntry specializationMapEntry = vks::initializers::specializationMapEntry(0, 0, sizeof(uint32_t));
-		uint32_t maxRecursion = 4;
+		uint32_t maxRecursion = 8;
 		VkSpecializationInfo specializationInfo = vks::initializers::specializationInfo(1, &specializationMapEntry, sizeof(maxRecursion), &maxRecursion);
 
 		// Ray generation group
@@ -651,16 +651,22 @@ public:
 		// https://drive.google.com/file/d/1BJJSC_K8NwaH8kP4tQpxlAmc6h6N3Ii1/view
 		if (do_init)
 			//	scene.loadFromFile("C:/temp/hires/fractal_500.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			scene.loadFromFile("C:/temp/rob_rau_cornell/gltf/cornell.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism/cornell_prism.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/gltf/cornell.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism2/prism2.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/bunny/bunny.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/bunny2/bunny2.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			scene.loadFromFile("C:/temp/rob_rau_cornell/prism/cornell_prism.gltf", vulkanDevice, queue, glTFLoadingFlags);
 			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring/ring.gltf", vulkanDevice, queue, glTFLoadingFlags);
 			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring2/ring2.gltf", vulkanDevice, queue, glTFLoadingFlags);
 			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring3/ring3.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/cylinder/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/small_light/small_light.gltf", vulkanDevice, queue, glTFLoadingFlags);
+			//scene.loadFromFile("C:/temp/rob_rau_cornell/sphere2/sphere2.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
-		//scene.loadFromFile("C:/temp/cyl_tex/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);
+	//scene.loadFromFile("C:/temp/cyl_tex/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
 
-		//scene.loadFromFile(getAssetPath() + "models/FlightHelmet/glTF/FlightHelmet.gltf", vulkanDevice, queue, glTFLoadingFlags);
+	//scene.loadFromFile(getAssetPath() + "models/FlightHelmet/glTF/FlightHelmet.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
 		VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress{};
 		VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress{};
