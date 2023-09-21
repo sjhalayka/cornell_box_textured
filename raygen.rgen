@@ -168,6 +168,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	float local_colour = energy;
 	float total = 0;
 
+	bool doing_caustic = false;
+
 	const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
 
 	for(int i = 0; i < steps; i++)
@@ -181,8 +183,10 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		total += mask.g;
 		total += mask.b;
 
-		//local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
-		local_colour += (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		if(doing_caustic)
+			local_colour += energy*(rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		else
+			local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
 		if(rayPayload.dist == -1.0)
 		{
@@ -192,6 +196,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 		{
 			ret_colour += local_colour;
+//			doing_caustic = false;
 			//break;
 		}
 
@@ -222,6 +227,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			{
 				o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 				d_transparent = refract(d, rayPayload.normal, eta);
+
+				doing_caustic = true;
 			}
 			else // Outgoing
 			{
@@ -237,6 +244,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 					// total internal reflection
 					o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 					d_transparent = reflect(d, -rayPayload.normal);
+
+					//doing_caustic = true;
 				}
 			}
 
@@ -360,7 +369,7 @@ float get_ray0(const float hue, const float eta)
 				if(ubo.screenshot_mode)
 					rays[i].base_color = get_radiance(250, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 				else
-					rays[i].base_color = get_radiance(10, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance(25, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 
@@ -604,13 +613,13 @@ void main()
 {
 	// Do chromatic aberration (good for making rainbows via prisms)
 
-	const int channels = 10;
+	const int channels = 20;
 
 	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x; // violet
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x; // red
 
-	const float max_eta = 0.9999;
-	const float min_eta = 0.7;
+	const float max_eta = 0.95;
+	const float min_eta = 0.65;
 
 	const float hue_diff = max_hue - min_hue;
 	const float hue_step_size = hue_diff / (channels - 1);
