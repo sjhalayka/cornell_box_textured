@@ -86,13 +86,13 @@ void main()
 	rayPayload.opacity = texture(baseColorSampler, uv).a;
 
 	// Make the transparent sphere partially reflective
-	if(rayPayload.opacity == 0.0)
-	{
-		rayPayload.reflector = 1.0;
-	}
+//	if(rayPayload.opacity == 0.0)
+//	{
+//		rayPayload.reflector = 1.0;
+//	}
 
-	if(rayPayload.reflector == 1.0)
-		rayPayload.opacity = 0.0;
+//	if(rayPayload.reflector == 1.0)
+//		rayPayload.opacity = 0.0;
 	
 }
 
