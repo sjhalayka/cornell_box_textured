@@ -181,13 +181,15 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		total += mask.g;
 		total += mask.b;
 
-		local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		//local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		local_colour += (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
-		// If missed everything, or if hit a light
-		if(	rayPayload.dist == -1.0 || 
-		  ( rayPayload.color.r == 1.0 && 
-			rayPayload.color.g == 1.0 && 
-			rayPayload.color.b == 1.0))
+		if(rayPayload.dist == -1.0)
+		{
+			break;
+		}
+
+		if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 		{
 			ret_colour += local_colour;
 			break;
