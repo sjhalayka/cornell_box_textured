@@ -90,6 +90,10 @@ void main()
 	{
 		rayPayload.reflector = 1.0;
 	}
+
+	if(rayPayload.reflector == 1.0)
+		rayPayload.opacity = 0.0;
+	
 }
 
 
