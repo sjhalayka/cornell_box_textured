@@ -88,7 +88,7 @@ void main()
 	// Make the transparent sphere partially reflective
 	if(rayPayload.opacity == 0.0)
 	{
-		rayPayload.reflector = 0.5;
+		rayPayload.reflector = 1.0;
 	}
 }
 

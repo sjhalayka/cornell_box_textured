@@ -168,6 +168,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	float local_colour = energy;
 	float total = 0;
 
+	bool doing_caustic = false;
+
 	const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
 
 	for(int i = 0; i < steps; i++)
@@ -181,8 +183,14 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		total += mask.g;
 		total += mask.b;
 
-		local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
-		//local_colour += (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		if(doing_caustic)
+		{
+			local_colour += energy*(rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+			
+		}
+		else
+			local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		
 
 		if(rayPayload.dist == -1.0)
 		{
@@ -222,6 +230,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			{
 				o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 				d_transparent = refract(d, rayPayload.normal, eta);
+
+				doing_caustic = true;
 			}
 			else // Outgoing
 			{
@@ -237,6 +247,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 					// total internal reflection
 					o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 					d_transparent = reflect(d, -rayPayload.normal);
+
+					doing_caustic = true;
 				}
 			}
 
