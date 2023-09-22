@@ -88,9 +88,9 @@ void main()
 	
 	if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 	{
-		rayPayload.color.r = 15.0;
-		rayPayload.color.g = 15.0;
-		rayPayload.color.b = 15.0;
+		rayPayload.color.r = 20.0;
+		rayPayload.color.g = 20.0;
+		rayPayload.color.b = 20.0;
 	}
 
 	// Make the transparent sphere partially reflective

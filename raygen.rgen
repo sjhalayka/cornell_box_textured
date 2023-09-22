@@ -163,12 +163,12 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	vec3 o = origin;
 	vec3 d = direction;
 
-	float ret_colour = 0;
-	const float energy = 1.0;
-	float local_colour = energy;
 
+	const float energy = 1.0;
 	const float caustic_energy = energy * 10.0;
-	
+
+	float ret_colour = 0;
+	float local_colour = energy;
 	float total = 0;
 
 	bool doing_caustic = false;
@@ -192,9 +192,12 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
 		if(rayPayload.dist == -1.0)
+		{
+			//ret_colour += local_colour;
 			break;
+		}
 
-		if(rayPayload.color.r == 15.0 && rayPayload.color.g == 15.0 && rayPayload.color.b == 15.0)
+		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
 			ret_colour += local_colour;
 
 		vec3 hitPos = o + d * rayPayload.dist;
@@ -216,6 +219,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 
 		if(rayPayload.opacity < 1.0) // if partially transparent, do refraction
 		{
+			doing_caustic = true;
+
 			vec3 o_transparent = vec3(0.0);
 			vec3 d_transparent = vec3(0.0);
 
@@ -224,8 +229,6 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			{
 				o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 				d_transparent = refract(d, rayPayload.normal, eta);
-
-				doing_caustic = true;
 			}
 			else // Outgoing
 			{
@@ -241,8 +244,6 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 					// total internal reflection
 					o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 					d_transparent = reflect(d, -rayPayload.normal);
-
-					//doing_caustic = true;
 				}
 			}
 
@@ -616,7 +617,7 @@ void main()
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x; // red
 
 	const float max_eta = 0.95;
-	const float min_eta = 0.65;
+	const float min_eta = 0.75;
 
 	const float hue_diff = max_hue - min_hue;
 	const float hue_step_size = hue_diff / (channels - 1);
