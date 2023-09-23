@@ -53,8 +53,8 @@ This depth testing algorithm does the job, but it is just simply not as programm
 The ray tracer does a similar job, insomuch that it converts triangles into pixels.
 Rather than using a depth buffer though, one generally uses a bounding volume hierarchy to determine eye ray / triangle intersection.
 
-The path tracer is identical to the ray tracer, except that it also takes global illumination into account.
-The path tracer uses the exact same bounding volume hierarchy setup as the ray tracer.
+The backward path tracer is identical to the ray tracer, except that it also takes global illumination into account.
+The backward path tracer uses the exact same bounding volume hierarchy setup as the ray tracer.
 As we will soon see, caustics occur naturally in the case of the backward path tracer in particular.
 
 Here we rate the three main visualization algorithms.
@@ -79,7 +79,10 @@ Although caustics can be produced using bidirectional or forward path tracing, t
 These issues do not plague the backward path tracer.
 
 Comparing this path tracer to photon mapping is like comparing apples and oranges.
-For one, path tracing has a future -- that is to say that, on an nvidia 3060 laptop GPU, the path tracer is at best an offline renderer.
+For one, path tracing has a future -- that is to say that, on an nvidia 3060 laptop GPU, the backward path tracer is still at best only an offline renderer.
+In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics, etc. in the backward path tracer.
+
+
 
 
 \section{Acknowledgement}
