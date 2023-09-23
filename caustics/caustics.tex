@@ -78,13 +78,18 @@ It's just that the implementation of shadows is a kludgy affair, or not naturall
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
 These issues do not plague the backward path tracer.
 
+Comparing this path tracer to photon mapping is like comparing apples and oranges.
+For one, path tracing has a future.
+
+
 
 
 \section{Acknowledgement}
 
 The code for this paper is based off of Sascha Willems' work \cite{willems1, willems2}.
 
-The various Cornell boxes used in this paper were developed by Rob Rau.
+The code and various Cornell boxes can be found at \cite{halayka}. 
+The various Cornell boxes were developed by Rob Rau.
 
 
 
@@ -99,6 +104,7 @@ The various Cornell boxes used in this paper were developed by Rob Rau.
 \bibitem{pharr} Pharr, et al. Physically Based Rendering: From Theory To Implementation.
 \bibitem{willems1} Willems. Path tracer code. \url{https://github.com/SaschaWillems/VulkanPathTracer}
 \bibitem{willems2} Willems. Vulkan demo codes. \url{https://github.com/SaschaWillems/Vulkan}
+\bibitem{halayka} Halayka. Vulkan path tracer. \url{https://github.com/sjhalayka/cornell_box_textured}
 
 
 \end{thebibliography}
