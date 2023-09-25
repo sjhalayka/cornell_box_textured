@@ -209,7 +209,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 
 
 	const float energy = 1.0;
-	const float caustic_energy = energy*5.0;
+	const float caustic_energy = energy*1.0;
 
 	float ret_colour = 0;
 	float local_colour = energy;
@@ -235,18 +235,21 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		else
 			local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
+		// If hit the sky
 		if(rayPayload.dist == -1.0)
 		{
 			ret_colour += local_colour;
 			break;
 		}
 
+		// If hit a light
 		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
 		{	
 			ret_colour += local_colour;
 			break;
 		}
 
+		// If this is simply the final step
 		if(i == steps - 1)
 		{
 			ret_colour += local_colour;
@@ -418,7 +421,7 @@ float get_ray0(const float hue, const float eta)
 				used_count++;
 
 				if(ubo.screenshot_mode)
-					rays[i].base_color = get_radiance(250, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance(25, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 				else
 					rays[i].base_color = get_radiance(25, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 
@@ -684,7 +687,7 @@ void main()
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x; // red
 
 	const float max_eta = 0.95;
-	const float min_eta = 0.95;
+	const float min_eta = 0.75;
 
 	const float hue_diff = max_hue - min_hue;
 	const float hue_step_size = hue_diff / (channels - 1);
