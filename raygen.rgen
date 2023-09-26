@@ -226,24 +226,22 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 
 		traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o, tmin, d, tmax, 0);
 
+
 		total += mask.r;
 		total += mask.g;
 		total += mask.b;
 
 		if(doing_caustic)
+		{
 			local_colour += caustic_energy*(rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		}
 		else
+		{
 			local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+		}
 
 		// If hit the sky
 		if(rayPayload.dist == -1.0)
-		{
-			ret_colour += local_colour;
-			break;
-		}
-
-		// If this is simply the final step
-		if(i == steps - 1)
 		{
 			ret_colour += local_colour;
 			break;
@@ -256,6 +254,12 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			break;
 		}
 
+		// If this is simply the final step
+		if(i == steps - 1)
+		{
+			ret_colour += local_colour;
+			break;
+		}
 
 
 		vec3 hitPos = o + d * rayPayload.dist;
@@ -431,11 +435,17 @@ float get_ray0(const float hue, const float eta)
 
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.dist;
 
+
+
+
+
+
+
 				// Do some experimental fog in an AABB
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(false)//i == 0)// && rays[i].external_reflection_ray)// || rays[i].external_refraction_ray)
+				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
@@ -477,8 +487,6 @@ float get_ray0(const float hue, const float eta)
 						}
 					}
 
-
-
 					const int num_steps = int(floor((distance(start, end) / target_step_length)));
 
 					if(num_steps >= 2)
@@ -501,7 +509,7 @@ float get_ray0(const float hue, const float eta)
 
 							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 							dist_color += colour*trans;
-							dist_opacity += 0.05*colour*trans;
+							dist_opacity += 0.001*colour*trans;
 						}
 					}
 
@@ -509,11 +517,16 @@ float get_ray0(const float hue, const float eta)
 					dist_color *= (fog_colour.r*mask.r + fog_colour.g*mask.g + fog_colour.b*mask.b);
 				}
 
-
-
-
+				dist_color = clamp(dist_color, 0.0, 1.0);
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
+
+
+
+
+
+
+
 
 				// this particular ray missed everything, or got too deep
 				if(rayPayload.dist == -1.0 || rays[i].level >= MAX_RECURSION)
