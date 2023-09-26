@@ -209,7 +209,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 
 
 	const float energy = 1.0;
-	const float caustic_energy = energy*1.0;
+	const float caustic_energy = energy*2.5;
 
 	float ret_colour = 0;
 	float local_colour = energy;
@@ -235,19 +235,12 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		else
 			local_colour *= (rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
 
+		
+
+
 		// If hit the sky
 		if(rayPayload.dist == -1.0)
-		{
-			ret_colour += local_colour;
 			break;
-		}
-
-		// If hit a light
-		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
-		{	
-			ret_colour += local_colour;
-			break;
-		}
 
 		// If this is simply the final step
 		if(i == steps - 1)
@@ -255,6 +248,10 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			ret_colour += local_colour;
 			break;
 		}
+
+		// If hit a light
+		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
+			ret_colour += local_colour;
 
 		vec3 hitPos = o + d * rayPayload.dist;
 
@@ -423,7 +420,7 @@ float get_ray0(const float hue, const float eta)
 				if(ubo.screenshot_mode)
 					rays[i].base_color = get_radiance(25, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 				else
-					rays[i].base_color = get_radiance(25, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance(1, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 
@@ -433,7 +430,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(false)//rays[i].external_reflection_ray)// || rays[i].external_refraction_ray)
+				if(rays[i].external_reflection_ray)// || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
@@ -495,7 +492,7 @@ float get_ray0(const float hue, const float eta)
 
 							noise *= Noise3D(curr_step, 1.0/10.0);
 
-							colour *= noise;
+							colour *= 0.5*noise;
 
 							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 							dist_color += colour*trans;

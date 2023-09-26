@@ -93,6 +93,12 @@ void main()
 		rayPayload.color.b = 20.0;
 	}
 
+	else if(rayPayload.color.r == 0.0 && rayPayload.color.g == 0.0 && rayPayload.color.b == 0.0)
+	{
+		rayPayload.opacity = 0.0;
+		rayPayload.reflector = 1.0;
+	}
+
 	// Make the transparent sphere reflective
 	if(rayPayload.opacity == 0.0)
 	{
