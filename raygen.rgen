@@ -242,6 +242,13 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			break;
 		}
 
+		// If this is simply the final step
+		if(i == steps - 1)
+		{
+			ret_colour += local_colour;
+			break;
+		}
+
 		// If hit a light
 		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
 		{	
@@ -249,12 +256,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			break;
 		}
 
-		// If this is simply the final step
-		if(i == steps - 1)
-		{
-			ret_colour += local_colour;
-			break;
-		}
+
 
 		vec3 hitPos = o + d * rayPayload.dist;
 
@@ -433,7 +435,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(false)//rays[i].external_reflection_ray)// || rays[i].external_refraction_ray)
+				if(false)//i == 0)// && rays[i].external_reflection_ray)// || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
