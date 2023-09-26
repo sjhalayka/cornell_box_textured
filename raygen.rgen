@@ -208,7 +208,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	vec3 d = direction;
 
 
-	const float energy = 1.0;
+	const float energy = 5.0;
 	const float caustic_energy = energy*1.0;
 
 	float ret_colour = 0;
@@ -248,7 +248,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		}
 
 		// If hit a light
-		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
+		if(rayPayload.color.r == 10.0 && rayPayload.color.g == 10.0 && rayPayload.color.b == 10.0)
 		{	
 			ret_colour += local_colour;
 			break;
