@@ -208,7 +208,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	vec3 d = direction;
 
 
-	const float energy = 5.0;
+	const float energy = 1.0;
 	const float caustic_energy = energy*1.0;
 
 	float ret_colour = 0;
@@ -248,7 +248,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		}
 
 		// If hit a light
-		if(rayPayload.color.r == 10.0 && rayPayload.color.g == 10.0 && rayPayload.color.b == 10.0)
+		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
 		{	
 			ret_colour += local_colour;
 			break;
@@ -445,7 +445,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
@@ -509,7 +509,7 @@ float get_ray0(const float hue, const float eta)
 
 							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 							dist_color += colour*trans;
-							dist_opacity += 0.001*colour*trans;
+							dist_opacity += 0.05*colour*trans;
 						}
 					}
 
