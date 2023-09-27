@@ -29,53 +29,36 @@ struct ray
 };
 
 
-float rand3D(in vec3 co){
-    return fract(sin(dot(co.xyz ,vec3(12.9898,78.233,144.7272))) * 43758.5453);
+// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
+
+float noise3(vec3 p, float wavelength){
+
+	p /= wavelength;
+
+    vec3 a = floor(p);
+    vec3 d = p - a;
+    d = d * d * (3.0 - 2.0 * d);
+
+    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
+    vec4 k1 = perm(b.xyxy);
+    vec4 k2 = perm(k1.xyxy + b.zzww);
+
+    vec4 c = k2 + a.zzzz;
+    vec4 k3 = perm(c);
+    vec4 k4 = perm(c + 1.0);
+
+    vec4 o1 = fract(k3 * (1.0 / 41.0));
+    vec4 o2 = fract(k4 * (1.0 / 41.0));
+
+    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
+    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
+
+    return o4.y * d.y + o4.x * (1.0 - d.y);
 }
 
-float simple_interpolate(in float a, in float b, in float x)
-{
-   return a + smoothstep(0.0,1.0,x) * (b-a);
-}
-
-
-// http://www.science-and-fiction.org/rendering/noise.html#perlin_noise
-float interpolatedNoise3D(in float x, in float y, in float z)
-{
-    float integer_x = x - fract(x);
-    float fractional_x = x - integer_x;
-
-    float integer_y = y - fract(y);
-    float fractional_y = y - integer_y;
-
-    float integer_z = z - fract(z);
-    float fractional_z = z - integer_z;
-
-    float v1 = rand3D(vec3(integer_x, integer_y, integer_z));
-    float v2 = rand3D(vec3(integer_x+1.0, integer_y, integer_z));
-    float v3 = rand3D(vec3(integer_x, integer_y+1.0, integer_z));
-    float v4 = rand3D(vec3(integer_x+1.0, integer_y +1.0, integer_z));
-
-    float v5 = rand3D(vec3(integer_x, integer_y, integer_z+1.0));
-    float v6 = rand3D(vec3(integer_x+1.0, integer_y, integer_z+1.0));
-    float v7 = rand3D(vec3(integer_x, integer_y+1.0, integer_z+1.0));
-    float v8 = rand3D(vec3(integer_x+1.0, integer_y +1.0, integer_z+1.0));
-
-    float i1 = simple_interpolate(v1,v5, fractional_z);
-    float i2 = simple_interpolate(v2,v6, fractional_z);
-    float i3 = simple_interpolate(v3,v7, fractional_z);
-    float i4 = simple_interpolate(v4,v8, fractional_z);
-
-    float ii1 = simple_interpolate(i1,i2,fractional_x);
-    float ii2 = simple_interpolate(i3,i4,fractional_x);
-
-    return simple_interpolate(ii1 , ii2 , fractional_y);
-}
-
-float Noise3D(in vec3 coord, in float wavelength)
-{
-   return interpolatedNoise3D(coord.x/wavelength, coord.y/wavelength, coord.z/wavelength);
-}
 
 
 ivec2 pixel_pos = ivec2(gl_LaunchIDEXT.xy);
@@ -88,7 +71,7 @@ vec3 aabb_max = vec3(2.5, 2.5, 2.5);
 
 const float opacity_factor = 0.01;
 
-vec3 fog_colour = vec3(0.5, 1.0, 0.5);
+vec3 fog_colour = vec3(1.0, 0.5, 0.0);
 
 
 
@@ -178,10 +161,6 @@ vec3 RandomUnitVector(inout uint state)
     return normalize(vec3(x, y, z));
 }
 
-
-
-
-
 // I forget where this came from
 vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
 {
@@ -226,7 +205,6 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 
 		traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, o, tmin, d, tmax, 0);
 
-
 		total += mask.r;
 		total += mask.g;
 		total += mask.b;
@@ -234,6 +212,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		if(doing_caustic)
 		{
 			local_colour += caustic_energy*(rayPayload.color.r*mask.r + rayPayload.color.g*mask.g + rayPayload.color.b*mask.b);
+			doing_caustic = false;
 		}
 		else
 		{
@@ -247,6 +226,13 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			break;
 		}
 
+		// If this is simply the final step
+		if(i == steps - 1)
+		{
+			ret_colour += local_colour;
+			break;
+		}
+
 		// If hit a light
 		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
 		{	
@@ -254,12 +240,11 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 			break;
 		}
 
-		// If this is simply the final step
-		if(i == steps - 1)
-		{
-			ret_colour += local_colour;
-			break;
-		}
+
+
+
+
+
 
 
 		vec3 hitPos = o + d * rayPayload.dist;
@@ -427,9 +412,9 @@ float get_ray0(const float hue, const float eta)
 				used_count++;
 
 				if(ubo.screenshot_mode)
-					rays[i].base_color = get_radiance(25, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 				else
-					rays[i].base_color = get_radiance(25, 10, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 
@@ -445,7 +430,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
@@ -499,17 +484,15 @@ float get_ray0(const float hue, const float eta)
 						{
 							float colour = get_omni_radiance(10, 5, curr_step, hue, eta);
 
-							float noise = Noise3D(curr_step, 1.0);
+							float noise = noise3(curr_step, 1.0);
 
-							//noise *= Noise3D(curr_step, 1.0/50.0);
-
-							noise *= Noise3D(curr_step, 1.0/10.0);
+							noise *= noise3(curr_step, 1.0/10.0);
 
 							colour *= noise;
 
 							const float trans = 1.0 - clamp(dist_opacity, 0.0, 1.0);
 							dist_color += colour*trans;
-							dist_opacity += 0.05*colour*trans;
+							dist_opacity += 0.1*colour*trans;
 						}
 					}
 

@@ -91,8 +91,9 @@ void main()
 		rayPayload.color.r = 20.0;
 		rayPayload.color.g = 20.0;
 		rayPayload.color.b = 20.0;
-		rayPayload.reflector = 1.0;
-		rayPayload.opacity = 1.0;
+
+		//if(ubo.fog_mode)
+			//rayPayload.reflector = 1.0;
 	}
 
 	// Make the transparent sphere reflective
@@ -101,8 +102,8 @@ void main()
 		rayPayload.reflector = 1.0;
 	}
 
-//	if(rayPayload.reflector == 1.0)
-//		rayPayload.opacity = 0.0;
+	//if(rayPayload.reflector == 1.0)
+		//rayPayload.opacity = 0.0;
 	
 }
 
