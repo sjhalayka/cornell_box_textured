@@ -44,16 +44,16 @@ We use the standard Cornell box for testing the backward path tracer.
 
 \section{Rasterizer versus ray tracer versus backward path tracer}
 
-The three main visualization algorithms in contemporary graphics programming are the rasterizer \cite{noll}, ray tracing \cite{appel}, and path tracing \cite{kajiya}.
+The three main visualization algorithms in contemporary graphics programming are the rasterizer \cite{noll, wikipedia1}, ray tracing \cite{appel, wikipedia2}, and path tracing \cite{kajiya, wikipedia3}.
 
-The rasterizer literally converts vector graphics (generally, triangles) into raster graphics (pixels).
-Generally, a depth buffer is used to discern which triangles to draw, and which to discard, depending on distance to the eye.
+The rasterizer  literally converts vector graphics (generally, triangles) into raster graphics (pixels).
+Generally, a depth buffer (Z-buffer) \cite{wikipedia4} is used to discern which triangles to draw, and which to discard, depending on distance to the eye.
 This depth testing algorithm does the job, but it is just simply not as programmable as a ray tracer or path tracer.
 
 The ray tracer does a similar job, insomuch that it converts triangles into pixels.
-Rather than using a depth buffer though, one generally uses a bounding volume hierarchy to determine eye ray / triangle intersection.
+Rather than using a depth buffer though, one generally uses a bounding volume hierarchy (BVH) \cite{wikipedia5} to determine eye ray / triangle intersection.
 
-The backward path tracer is identical to the ray tracer, except that it also takes global illumination into account.
+The backward path tracer  is identical to the ray tracer, except that it also takes global illumination into account.
 The backward path tracer uses the exact same bounding volume hierarchy setup as the ray tracer.
 As we will soon see, caustics occur naturally in the case of the backward path tracer in particular.
 
@@ -79,7 +79,7 @@ Although caustics can be produced using bidirectional or forward path tracing, t
 These issues do not plague the backward path tracer.
 
 Comparing this path tracer to photon mapping is like comparing apples and oranges.
-For one, path tracing has a future -- that is to say that, on an nvidia 3060 laptop GPU, the backward path tracer is still at best only an offline renderer.
+For one, path tracing has a future -- that is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer.
 In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics, etc. in the backward path tracer.
 
 
@@ -100,12 +100,21 @@ The various Cornell boxes were developed by Rob Rau.
 \begin{thebibliography}{9}
 
 \bibitem{noll} Noll. Scanned-display computer graphics.
+\bibitem{wikipedia1} Wikipedia. Rasterisation.
+
 \bibitem{appel} Appel. Some techniques for shading machine renderings of solids.
+\bibitem{wikipedia2} Wikipedia. Ray tracing.
+
 \bibitem{kajiya} Kajiya. The rendering equation.
-\bibitem{pharr} Pharr, et al. Physically Based Rendering: From Theory To Implementation.
-\bibitem{willems1} Willems. Path tracer code. \url{https://github.com/SaschaWillems/VulkanPathTracer}
-\bibitem{willems2} Willems. Vulkan demo codes. \url{https://github.com/SaschaWillems/Vulkan}
-\bibitem{halayka} Halayka. Vulkan path tracer. \url{https://github.com/sjhalayka/cornell_box_textured}
+\bibitem{wikipedia3} Wikipedia. Path tracing.
+
+\bibitem{wikipedia4} Wikipedia. Depth buffering (Z-buffering).
+\bibitem{wikipedia5} Wikipedia. Bounding volume hierarchy.
+
+\bibitem{willems1} Willems. Path tracer. \url{https://github.com/SaschaWillems/VulkanPathTracer}
+\bibitem{willems2} Willems. Vulkan demos. \url{https://github.com/SaschaWillems/Vulkan}
+
+\bibitem{halayka} Halayka. Path tracer. \url{https://github.com/sjhalayka/cornell_box_textured}
 
 
 \end{thebibliography}
@@ -124,7 +133,7 @@ The surface is lit using Phong shading and omnidirectional shadow maps.
 The reflections are faked -- the camera is flipped upside down, and reflected things masked and drawn.
 In other words, reflections and shadows are not naturally occurring.
 Global illumination is not taken into account.
-This knight model, as well as MagicaVoxel, were made by the Twitter user @ephtracy.
+This knight model was made by the Twitter user @ephtracy.
 }
 
 \end{figure}
@@ -143,6 +152,7 @@ Global illumination is not taken into account.
 \end{figure}
 
 
+\pagebreak
 
 
 \begin{figure} 
@@ -151,6 +161,12 @@ Global illumination is not taken into account.
   \caption{ Old code, always using a pseudorandom cosine-weighted direction vector (e.g. scattering).
 }
 \end{figure}
+
+
+\pagebreak
+
+
+
 
 \begin{figure} 
 \centering
@@ -199,7 +215,7 @@ Note that caustic sharpness is related to the size of the light -- smaller light
 \centering
   \includegraphics[width = 6 in]{fog4.png}
   \caption{ Note that the experimental fog lights up because of the caustic.
-Images like these are an homage to Canadian 3D companies from the 1990s, such as Alias, ATI, Matrox, and Softimage (especially the German mental ray renderer).
+These images are an homage to Canadian 3-D graphics companies from earlier days, such as Alias, ATI, Matrox, and Softimage.
 }
 \end{figure}
 
