@@ -42,6 +42,12 @@ As such, these caustics allow for as many light sources as one would care for; t
 We use the standard Cornell box for testing the backward path tracer.
 \end{abstract}
 
+
+
+
+
+
+
 \section{Rasterizer versus ray tracer versus backward path tracer}
 
 The three main visualization algorithms in contemporary graphics programming are the rasterizer \cite{noll, wikipedia1}, ray tracing \cite{appel, wikipedia2}, and path tracing \cite{kajiya, wikipedia3}.
@@ -78,7 +84,7 @@ It's just that the implementation of shadows is a kludgy affair, or not naturall
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
 These issues do not plague the backward path tracer.
 
-Comparing this path tracer to photon mapping is like comparing apples and oranges.
+Comparing this path tracer to photon mapping \cite{john} is like comparing apples and oranges.
 For one, path tracing has a future -- that is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer.
 In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics, etc. in the backward path tracer.
 
@@ -114,6 +120,8 @@ The code and various Cornell boxes can be found at:
 
 \bibitem{wikipedia4} Wikipedia. Depth buffering (Z-buffering).
 \bibitem{wikipedia5} Wikipedia. Bounding volume hierarchy.
+
+\bibitem{john} John. Focus on photon mapping.
 
 \bibitem{willems1} Willems. Vulkan path tracer.
 \bibitem{willems2} Willems. Vulkan examples and demos.
@@ -221,7 +229,6 @@ Note that caustic sharpness is related to the size of the light -- smaller light
   \includegraphics[width = 6 in]{fog4.png}
   \caption{ Note that the experimental fog lights up because of the caustic.
 These images are an homage to Canadian 3-D graphics companies from earlier days, such as Alias, ATI, Matrox, and Softimage.
-It's great that, now, the software to achieve such effects is free and open-source.
 }
 \end{figure}
 
