@@ -227,6 +227,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		}
 
 		// If this is simply the final step
+		// then don't throw away perfectly 
+		// good data
 		if(i == steps - 1)
 		{
 			ret_colour += local_colour;
