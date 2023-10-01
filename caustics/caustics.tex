@@ -52,15 +52,15 @@ We use the standard Cornell box for testing the backward path tracer.
 
 The three main visualization algorithms in contemporary graphics programming are the rasterizer \cite{noll, wikipedia1}, ray tracing \cite{appel, wikipedia2}, and path tracing \cite{kajiya, wikipedia3}.
 
-The rasterizer  literally converts vector graphics (generally, triangles, lines, and points) into raster graphics (pixels, also known as fragments).
+The rasterizer  literally converts vector graphics (generally: triangles, lines, and points) into raster graphics (pixels, also known as fragments).
 Generally, a depth buffer (Z-buffer) \cite{wikipedia4} is used to discern which simplices to draw, and which to discard, depending on distance to the eye.
 This depth testing algorithm does the job, but it is just simply not as programmable as a ray tracer or backward path tracer.
 
 The ray tracer does a similar job, insomuch that it converts triangles into pixels.
-Rather than using a depth buffer though, one generally uses a bounding volume hierarchy (BVH) \cite{wikipedia5} to determine eye ray / triangle intersection.
+Rather than using a depth buffer though, one often uses a bounding volume hierarchy (BVH) \cite{wikipedia5} to determine eye ray / triangle intersection.
 
-The backward path tracer  is identical to the ray tracer, except that it also takes global illumination into account.
-The backward path tracer uses the exact same BVH setup as the ray tracer.
+The backward path tracer is identical to the ray tracer, except that it also takes global illumination into account.
+The backward path tracer often uses the exact same BVH setup as the ray tracer.
 It's worth noting that the construction of the BVH is handled for you by the Vulkan / Direct3D driver, which adds to the naturalness of the caustics discussed in this paper.
 
 Here we rate the three main visualization algorithms.
