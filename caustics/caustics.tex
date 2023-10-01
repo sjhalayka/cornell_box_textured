@@ -169,7 +169,7 @@ Global illumination is not taken into account.
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{old_code.png}
-  \caption{ Old code, always using a pseudorandom cosine-weighted direction vector (e.g. scattering).
+  \caption{ Old backward path tracer code, always using a pseudorandom cosine-weighted direction vector (e.g. scattering).
 Here the o variable is the ray origin, and d is the ray direction.
 }
 \end{figure}
@@ -182,7 +182,7 @@ Here the o variable is the ray origin, and d is the ray direction.
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{code.png}
-  \caption{ New code, taking reflective and transparent objects into consideration.
+  \caption{ New backwdard path tracer code, taking reflective and transparent objects into consideration.
 This solution for caustics performs well on modern graphics provessing units -- disabling caustics causes a practically imperceptible gain in frame rate.
 }
 \end{figure}
