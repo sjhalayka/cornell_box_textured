@@ -54,15 +54,14 @@ The three main visualization algorithms in contemporary graphics programming are
 
 The rasterizer  literally converts vector graphics (generally, triangles, lines, and points) into raster graphics (pixels, also known as fragments).
 Generally, a depth buffer (Z-buffer) \cite{wikipedia4} is used to discern which simplices to draw, and which to discard, depending on distance to the eye.
-This depth testing algorithm does the job, but it is just simply not as programmable as a ray tracer or path tracer.
+This depth testing algorithm does the job, but it is just simply not as programmable as a ray tracer or backward path tracer.
 
 The ray tracer does a similar job, insomuch that it converts triangles into pixels.
 Rather than using a depth buffer though, one generally uses a bounding volume hierarchy (BVH) \cite{wikipedia5} to determine eye ray / triangle intersection.
-It's worth noting that the construction of the BVH is handled for you by the Vulkan / Direct 3D driver.
 
 The backward path tracer  is identical to the ray tracer, except that it also takes global illumination into account.
 The backward path tracer uses the exact same BVH setup as the ray tracer.
-As we will soon see, caustics occur naturally in the case of the backward path tracer in particular.
+It's worth noting that the construction of the BVH is handled for you by the Vulkan / Direct3D driver, which adds to the naturalness of the caustics discussed in this paper.
 
 Here we rate the three main visualization algorithms.
 We rate them in terms of what is relatively easy, or naturally occurring, in each of the visualization algorithms.
@@ -85,7 +84,7 @@ It's just that the implementation of shadows is a kludgy affair, or not naturall
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
 These issues do not plague the backward path tracer.
 
-Comparing this path tracer to photon mapping \cite{john} is like comparing apples and oranges.
+Comparing this backward path tracer to photon mapping \cite{john} is like comparing apples and oranges.
 For one, path tracing has a future -- that is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer.
 In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics, etc. in the backward path tracer.
 
