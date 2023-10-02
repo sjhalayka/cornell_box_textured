@@ -137,6 +137,9 @@ The code and various Cornell boxes can be found at:
 
 
 
+
+
+
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{rasterizer.png}
@@ -149,6 +152,8 @@ This knight model was made by the Twitter user @ephtracy.
 }
 
 \end{figure}
+
+
 
 
 
@@ -183,7 +188,7 @@ Works great for opaque diffuse surfaces.
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{code.png}
-  \caption{ New backward path tracer code, taking reflective and transparent objects into consideration.
+  \caption{ New backward path tracer code, taking reflective and transparent surfaces into consideration.
 This solution for caustics performs well on modern graphics provessing units -- disabling caustics causes a practically imperceptible gain in frame rate.
 While not as simple as the old backward path tracer code, it is still not very computationally expensive -- just the right amount of complexity leads to much better results.
 }
@@ -192,7 +197,7 @@ While not as simple as the old backward path tracer code, it is still not very c
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{v_rt_reflect_no_chromatic_aberration_low_res.png}
-  \caption{  Backward path tracer, taking transparent objects into consideration. 
+  \caption{  Backward path tracer, taking transparent surfaces into consideration. 
 Note the naturally occurring refraction caustic.
 Note the soft shadows.
 Global illumination (e.g. colour bleeding / indirect lighting) is taken into account.
