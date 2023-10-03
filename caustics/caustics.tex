@@ -84,7 +84,7 @@ It's just that the implementation of shadows is a kludgy affair, or not naturall
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
 These issues do not plague the backward path tracer.
 
-Comparing this backward path tracer to photon mapping \cite{john} is like comparing apples and oranges.
+Comparing this backward path tracer to photon mapping \cite{jensen, john} is like comparing apples and oranges.
 For one, path tracing has a future -- that is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer.
 In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics, etc. in the backward path tracer.
 It should be noted that photon mapping also suffers from its own inherent convergence problems.
@@ -121,6 +121,8 @@ The code and various Cornell boxes can be found at:
 \bibitem{wikipedia4} Wikipedia. Depth buffering (Z-buffering).
 \bibitem{wikipedia5} Wikipedia. Bounding volume hierarchy.
 
+
+\bibitem{jensen} Jensen. Realistic image synthesis using photon mapping.
 \bibitem{john} John. Focus on photon mapping.
 
 \bibitem{willems1} Willems. Vulkan path tracer.
