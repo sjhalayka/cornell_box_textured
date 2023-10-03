@@ -1,4 +1,4 @@
-\documentclass[10pt]{article}
+\documentclass[12pt]{article}
 
 \title{Natural caustics in backward path tracing}
 \author{
@@ -52,7 +52,7 @@ We use the standard Cornell box for testing the backward path tracer.
 
 The three main visualization algorithms in contemporary graphics programming are the rasterizer \cite{noll, wikipedia1}, ray tracing \cite{appel, wikipedia2}, and path tracing \cite{kajiya, wikipedia3}.
 
-The rasterizer  literally converts vector graphics (generally: triangles, lines, and points) into raster graphics (pixels, also known as fragments).
+The rasterizer  literally converts vector graphics (generally: triangles, lines, and points, all collectively known as simplices) into raster graphics (pixels, also known as fragments).
 Generally, a depth buffer (Z-buffer) \cite{wikipedia4} is used to discern which fragments for each simplex to draw, or which to discard, depending on distance to the eye and also what fragments that have been previously drawn.
 This depth testing algorithm is super simple, and it does the job, but it is just simply not as programmable as a ray tracer or backward path tracer.
 
@@ -104,7 +104,7 @@ The code and various Cornell boxes can be found at:
 
 
 
-
+\pagebreak
 
 
 \begin{thebibliography}{9}
