@@ -188,7 +188,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 
 
 	const float energy = 1.0;
-	const float caustic_energy = energy*1.0;
+	const float caustic_energy = energy*2.0;
 
 	float ret_colour = 0;
 	float local_colour = energy;
@@ -305,7 +305,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		
 	}
 
-	return ret_colour / total;
+	return ret_colour / total;//(mask.r + mask.g + mask.b);
 }
 
 
@@ -432,7 +432,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
@@ -488,7 +488,7 @@ float get_ray0(const float hue, const float eta)
 
 							float noise = noise3(curr_step, 1.0);
 
-							noise *= noise3(curr_step, 1.0/10.0);
+							//noise *= noise3(curr_step, 1.0/10.0);
 
 							colour *= noise;
 
