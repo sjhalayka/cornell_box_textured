@@ -144,7 +144,7 @@ The code and various Cornell boxes can be found at:
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{rasterizer.png}
+  \includegraphics[width = 6 in]{fig1.png}
   \caption{ Rasterizer.
 The surface is lit using Phong shading and omnidirectional shadow maps.
 The reflections are faked -- the camera is flipped upside down, and reflected things masked and drawn.
@@ -162,7 +162,7 @@ This knight model was made by the Twitter user @ephtracy.
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{v_rt_reflect.png}
+  \includegraphics[width = 6 in]{fig2.png}
   \caption{ Ray tracer, taking into account transparency.
 The surface is lit using Phong shading and sharp shadows.
 In other words, reflections and shadows are naturally occurring.
@@ -175,7 +175,7 @@ Global illumination is not taken into account.
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{old_code.png}
+  \includegraphics[width = 6 in]{fig3.png}
   \caption{ Old backward path tracer code, always using a pseudorandom cosine-weighted direction vector (e.g. scattering).
 Here the o variable is the ray origin, and d is the ray direction.
 Works great for opaque diffuse surfaces.
@@ -189,7 +189,7 @@ Works great for opaque diffuse surfaces.
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{code.png}
+  \includegraphics[width = 6 in]{fig4.png}
   \caption{ New backward path tracer code, taking reflective and transparent surfaces into consideration.
 This solution for caustics performs well on modern graphics provessing units -- disabling caustics causes a practically imperceptible gain in frame rate.
 While not as simple as the old backward path tracer code, it is still not very computationally expensive -- just the right amount of complexity leads to much better results.
@@ -198,7 +198,7 @@ While not as simple as the old backward path tracer code, it is still not very c
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{v_rt_reflect_no_chromatic_aberration_low_res.png}
+  \includegraphics[width = 6 in]{fig5.png}
   \caption{  Backward path tracer, taking transparent surfaces into consideration. 
 Note the naturally occurring refraction caustic.
 Note the soft shadows.
@@ -209,14 +209,14 @@ Global illumination (e.g. colour bleeding / indirect lighting) is taken into acc
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{v_rt_reflect_chromatic_aberration_low_res.png}
+  \includegraphics[width = 6 in]{fig6.png}
   \caption{ Note the refraction caustic, with 20-channel chromatic aberration.
 }
 \end{figure}
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{v_rt_reflect_prism3.png}
+  \includegraphics[width = 6 in]{fig7.png}
   \caption{ Note the refraction caustic, with 20-channel chromatic aberration.
 }
 \end{figure}
@@ -224,7 +224,7 @@ Global illumination (e.g. colour bleeding / indirect lighting) is taken into acc
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{sharp_caustic.png}
+  \includegraphics[width = 6 in]{fig8.png}
   \caption{ Note the nephroid reflection caustic at the bottom of a hollow cylinder.
 }
 \end{figure}
@@ -232,7 +232,7 @@ Global illumination (e.g. colour bleeding / indirect lighting) is taken into acc
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{fog4.png}
+  \includegraphics[width = 6 in]{fig9.png}
   \caption{ Note that the experimental fog lights up because of the caustic.
 %These images are an homage to Canadian 3-D graphics companies from earlier days, such as Alias, ATI, Matrox, and Softimage.
 }
@@ -241,7 +241,7 @@ Global illumination (e.g. colour bleeding / indirect lighting) is taken into acc
 
 \begin{figure} 
 \centering
-  \includegraphics[width = 6 in]{bunny.png}
+  \includegraphics[width = 6 in]{fig10.png}
   \caption{ Stanford bunny light.
 }
 \end{figure}
