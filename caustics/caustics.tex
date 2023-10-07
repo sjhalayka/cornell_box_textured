@@ -96,7 +96,7 @@ Each eye ray is sent out $s$ times, each referred to as a sample.
 
 Essentially, each eye ray sample is bounced around pseudorandomly as it hits surfaces within the scene.
 The bounce count is finite, and bouncing stops after $n$ bounces, or if a light is hit, or if the sky is hit.
-At each bounce, one takes into account the properties of the surface that are responsible for the bouncing, such as colour.
+At each bounce, one takes into account the properties of the surface, such as colour.
 
 In the end, the eye ray's final colour is divided by the sample count.
 
