@@ -131,17 +131,29 @@ The full size images are available upon request.
 
 
 
-\section{On photon mapping}
+\section{Photon mapping versus the backward path tracer}
 
 Comparing this backward path tracer to photon mapping \cite{jensen, john} is like comparing apples and oranges.
-For one, path tracing has a future -- that is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer.
-In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics, etc. in the backward path tracer.
-It should be noted that photon mapping also suffers from its own inherent convergence problems.
+
+For one, photon mapping uses a kd tree for storing photon data, and the backward path tracer does not.
+It takes time and space to store and retrieve data to and from the photon map.
+
+For another, path tracing has a future -- this is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer at 4K resolution.
+Its day will come.
+
+Finally, it must be noted that the backward path tracer is strictly a view space effect.
+This is unlike photon mapping and its 2-pass solution, insomuch that the caustics and other lighting effects are all accomplished in one pass when using the backward path tracer.
+
+It should be noted that photon mapping also suffers from its own inherent convergence problems (e.g. low photon count).
 These particular issues do not plague the backward path tracer.
 
+In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics in the backward path tracer.
 
 
-\section{Acknowledgement}
+
+
+
+\section{Acknowledgements}
 
 The code for this paper is based off of Sascha Willems' and NVIDIA's work \cite{willems1, willems2, nvidia}.
 
@@ -153,7 +165,7 @@ The code and various Cornell boxes can be found at:
 
 
 
-
+\pagebreak
 
 
 
