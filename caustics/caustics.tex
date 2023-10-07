@@ -83,7 +83,7 @@ Clearly, the most suitable visualization algorithm for now (and in the future) i
 This is not to say that, for instance in the case of the rasterizer, there is no such thing as shadows.
 It's just that shadows are not naturally occurring.
 
-Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
+Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence problems (e.g. low photon count).
 These particular issues do not plague the backward path tracer.
 
 
@@ -135,9 +135,9 @@ The full size images are available upon request.
 
 Given that photon mapping \cite{jensen, john} is the \textit{de facto}	standard method for producing global illumination, we must give it some consideration.
 
-Comparing this backward path tracer to photon mapping is like comparing apples and oranges.
+Comparing photon mapping to this backward path tracer is like comparing apples and oranges.
 
-For one, photon mapping uses a kd tree for storing photon data, and the backward path tracer does not.
+For one, photon mapping generally uses a kd tree for storing photon data, and the backward path tracer does not.
 It takes time and space to store and retrieve data to and from the photon map.
 
 For another, path tracing has a future -- this is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer at 4K resolution.
