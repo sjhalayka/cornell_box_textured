@@ -116,7 +116,7 @@ See Fig. 3 for the old code, in GLSL.
 Other than diffuse, opaque surfaces, there are reflective and transparent surfaces to consider.
 One can generalize the old algorithm by adding in code to handle reflective and transparent surfaces.
 
-Everything is the same as the old special backward path tracer, except that now each bounce accounts for the extended properties such as transparency and reflectivity.
+Everything is the same as the old special backward path tracer, except that now each bounce accounts for the extended properties such as reflectivity and transparency.
 That is, rather than always pseudorandomly bouncing the eye ray around, one will also be able to reflect the eye ray if the surface is reflective, and one will refract the eye ray if the surface is transparent.
 
 See Fig. 4 for the new code, in GLSL.
