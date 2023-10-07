@@ -83,8 +83,16 @@ Clearly, the most suitable visualization algorithm for now (and in the future) i
 This is not to say that, for instance in the case of the rasterizer, there is no such thing as shadows.
 It's just that shadows are not naturally occurring.
 
+
+
+
+
+
+\section{On bidirectional or forward path tracing}
+
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence problems (e.g. low photon count).
 These particular issues do not plague the backward path tracer.
+
 
 
 
@@ -140,7 +148,7 @@ Comparing photon mapping to this backward path tracer is like comparing apples a
 For one, photon mapping generally uses a kd tree for storing photon data, and the backward path tracer does not.
 It takes time and space to store and retrieve data to and from the photon map.
 
-For another, path tracing has a future -- this is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer at 4K resolution.
+For another, backward path tracing has a future -- this is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer at 4K resolution.
 Its day will come.
 
 As well, it must be noted that the backward path tracer is strictly a view space effect.
@@ -243,7 +251,7 @@ Global illumination is not taken into account.
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{fig3.png}
-  \caption{ Old backward path tracer code, always using a pseudorandom cosine-weighted direction vector (e.g. scattering).
+  \caption{ Old special backward path tracer code, always using a pseudorandom cosine-weighted direction vector (e.g. scattering).
 Here the o variable is the ray origin, and d is the ray direction.
 Works great for opaque diffuse surfaces.
 }
@@ -257,7 +265,7 @@ Works great for opaque diffuse surfaces.
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{fig4.png}
-  \caption{ New backward path tracer code, taking reflective and transparent surfaces into consideration.
+  \caption{ New general backward path tracer code, taking reflective and transparent surfaces into consideration.
 This solution for caustics performs well on modern graphics provessing units -- disabling caustics causes a practically imperceptible gain in frame rate.
 While not as simple as the old backward path tracer code, it is still not very computationally expensive -- just the right amount of complexity leads to much better results.
 }
