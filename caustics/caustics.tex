@@ -81,7 +81,7 @@ Backward path tracer & Yes & Sharp / soft & Yes & Yes \\
 \end{center}
 Clearly, the most suitable visualization algorithm for now (and in the future) is the backward path tracer.
 This is not to say that, for instance in the case of the rasterizer, there is no such thing as shadows.
-It's just that the implementation of shadows is a kludgy affair, or not naturally occurring.
+It's just that shadows are not naturally occurring.
 
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
 These particular issues do not plague the backward path tracer.
@@ -149,7 +149,7 @@ This is unlike photon mapping and its 2-pass solution, insomuch that the caustic
 Finally, it should be noted that photon mapping also suffers from its own inherent convergence problems (e.g. low photon count).
 These particular issues do not plague the backward path tracer.
 
-In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics in the backward path tracer.
+In essence, photon mapping is not natural when compared to the ease and naturalness of the caustics in the backward path tracer.
 
 
 
