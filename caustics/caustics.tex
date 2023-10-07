@@ -52,16 +52,20 @@ We use the standard Cornell box for testing the backward path tracer.
 
 The three main visualization algorithms in contemporary graphics programming are the rasterizer \cite{noll, wikipedia1}, ray tracing \cite{appel, wikipedia2}, and path tracing \cite{kajiya, wikipedia3}.
 
-The rasterizer  literally converts vector graphics (generally: triangles, lines, and points, all collectively known as simplices) into raster graphics (pixels, also known as fragments).
+The rasterizer literally converts vector graphics (generally: triangles, lines, and points, all collectively known as simplices) into raster graphics (pixels, also known as fragments).
 Generally, a depth buffer (Z-buffer) \cite{wikipedia4} is used to discern which fragments for each simplex to draw, or which to discard, depending on distance to the eye and also what fragments that have been previously drawn.
 This depth testing algorithm is super simple, and it does the job, but it is just simply not as programmable as a ray tracer or backward path tracer.
+See Fig. 1 for an example render performed by the rasterizer.
+
 
 The ray tracer does a similar job, insomuch that it converts triangles into pixels.
 Rather than using a depth buffer though, one often uses a more complicated acceleration structure, such a bounding volume hierarchy (BVH) \cite{wikipedia5}, to determine eye ray / triangle intersection.
+See Fig. 2 for an example render performed by ray tracing.
 
 The backward path tracer is identical to the ray tracer, except that it also takes global illumination into account.
 The backward path tracer often uses the exact same acceleration structure setup as the ray tracer.
 It's worth noting that the construction of the acceleration structure is handled for you by the Vulkan / Direct3D 12 driver, which adds to the naturalness of the caustics discussed in this paper.
+
 
 Here we rate the three main visualization algorithms.
 We rate them in terms of what is relatively easy, or naturally occurring, in each of the visualization algorithms.
@@ -82,13 +86,56 @@ This is not to say that, for instance in the case of the rasterizer, there is no
 It's just that the implementation of shadows is a kludgy affair, or not naturally occurring.
 
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
-These issues do not plague the backward path tracer.
+These particular issues do not plague the backward path tracer.
+
+
+
+\section{The old special backward path tracing algorithm}
+
+Each eye ray is sent out $s$ times, each referred to as a sample.
+
+Essentially, each eye ray sample is bounced around pseudorandomly as it hits surfaces within the scene.
+The bounce count is finite, and bouncing stops after $n$ bounces, or if a light is hit, or if the sky is hit.
+At each bounce, one takes into account the properties of the surface that is responsible for the bouncing, such as colour.
+
+In the end, the eye ray's final colour is divided by the sample count.
+
+This works great for diffuse, opaque surfaces.
+
+If there is a so-called convergence problem with regard to the backward path tracer's output, it's because there are not enough samples being taken.
+Samples take time, but they produce beautiful results.
+
+See Fig. 3 for the old code, in GLSL.
+
+
+
+
+
+\section{The new general backward path tracing algorithm}
+
+Other than diffuse, opaque surfaces, there are reflective and transparent surfaces to consider.
+One can generalize the old algorithm by adding in code to handle reflective and transparent surfaces.
+
+Everything is the same as the old special backward path tracer, except that now each bounce accounts for the extended properties such as transparency and reflectivity.
+
+See Fig. 4 for the new code, in GLSL.
+
+See Figs. 5 - 10 for the results of the new code.
+Each image is rendered at a size of 7680 x 4204, at 25 samples per eye ray, then cropped and downsized to to like 1000 x 1000.
+The full size images are available upon request.
+
+
+
+
+
+
+\section{On photon mapping}
 
 Comparing this backward path tracer to photon mapping \cite{jensen, john} is like comparing apples and oranges.
 For one, path tracing has a future -- that is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer.
 In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics, etc. in the backward path tracer.
 It should be noted that photon mapping also suffers from its own inherent convergence problems.
-These issues do not plague the backward path tracer.
+These particular issues do not plague the backward path tracer.
 
 
 
@@ -104,7 +151,9 @@ The code and various Cornell boxes can be found at:
 
 
 
-\pagebreak
+
+
+
 
 
 \begin{thebibliography}{9}
