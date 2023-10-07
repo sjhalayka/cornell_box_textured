@@ -143,10 +143,10 @@ It takes time and space to store and retrieve data to and from the photon map.
 For another, path tracing has a future -- this is to say that, on an NVIDIA 3060 laptop GPU, the backward path tracer is still at best only an offline renderer at 4K resolution.
 Its day will come.
 
-Finally, it must be noted that the backward path tracer is strictly a view space effect.
+As well, it must be noted that the backward path tracer is strictly a view space effect.
 This is unlike photon mapping and its 2-pass solution, insomuch that the caustics and other lighting effects are all accomplished in one pass when using the backward path tracer.
 
-It should be noted that photon mapping also suffers from its own inherent convergence problems (e.g. low photon count).
+Finally, it should be noted that photon mapping also suffers from its own inherent convergence problems (e.g. low photon count).
 These particular issues do not plague the backward path tracer.
 
 In essence, photon mapping is a kludge when compared to the ease and naturalness of the caustics in the backward path tracer.
