@@ -133,7 +133,9 @@ The full size images are available upon request.
 
 \section{Photon mapping versus the backward path tracer}
 
-Comparing this backward path tracer to photon mapping \cite{jensen, john} is like comparing apples and oranges.
+Given that photon mapping \cite{jensen, john} is the \textit{de facto}	standard method for producing global illumination, we must give it some consideration.
+
+Comparing this backward path tracer to photon mapping is like comparing apples and oranges.
 
 For one, photon mapping uses a kd tree for storing photon data, and the backward path tracer does not.
 It takes time and space to store and retrieve data to and from the photon map.
