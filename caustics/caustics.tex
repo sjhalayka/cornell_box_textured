@@ -57,7 +57,6 @@ Generally, a depth buffer (Z-buffer) \cite{wikipedia4} is used to discern which 
 This depth testing algorithm is super simple, and it does the job, but it is just simply not as programmable as a ray tracer or backward path tracer.
 See Fig. 1 for an example render performed by the rasterizer.
 
-
 The ray tracer does a similar job, insomuch that it converts triangles into pixels.
 Rather than using a depth buffer though, one often uses a more complicated acceleration structure, such a bounding volume hierarchy (BVH) \cite{wikipedia5}, to determine eye ray / triangle intersection.
 See Fig. 2 for an example render performed by ray tracing.
@@ -65,7 +64,6 @@ See Fig. 2 for an example render performed by ray tracing.
 The backward path tracer is identical to the ray tracer, except that it also takes global illumination into account.
 The backward path tracer often uses the exact same acceleration structure setup as the ray tracer.
 It's worth noting that the construction of the acceleration structure is handled for you by the Vulkan / Direct3D 12 driver, which adds to the naturalness of the caustics discussed in this paper.
-
 
 Here we rate the three main visualization algorithms.
 We rate them in terms of what is relatively easy, or naturally occurring, in each of the visualization algorithms.
@@ -87,6 +85,9 @@ It's just that the implementation of shadows is a kludgy affair, or not naturall
 
 Although caustics can be produced using bidirectional or forward path tracing, they suffer from convergence (or lack thereof) problems.
 These particular issues do not plague the backward path tracer.
+
+
+
 
 
 
@@ -122,7 +123,7 @@ That is, rather than always pseudorandomly bouncing the eye ray around, one will
 See Fig. 4 for the new code, in GLSL.
 
 See Figs. 5 - 10 for the results of the new code.
-Each image is rendered at a size of 7680 x 4204, at $25$ samples per eye ray with maximum $n = 5$ bounces, then cropped and downsized to to like 1000 x 1000.
+Each image is rendered at a size of 7680 x 4204, at $s = 25$ samples per eye ray with maximum $n = 5$ bounces, then cropped and downsized to like 1000 x 1000.
 The full size images are available upon request.
 
 
