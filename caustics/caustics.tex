@@ -132,11 +132,18 @@ See Fig. 4 for the new code, in GLSL.
 
 
 
-\section{Results}
+
+
+
+
+
+\section{Results of the new code}
 
 See Figs. 5 - 10 for the results of the new code.
 Each image is rendered at a size of 7680 x 4204, at $s = 25$ samples per eye ray with maximum $n = 5$ bounces, then cropped and downsized to like 1000 x 1000.
 The full size images are available upon request.
+
+
 
 
 
@@ -162,6 +169,13 @@ Finally, it should be noted that photon mapping also suffers from its own inhere
 These particular issues do not plague the backward path tracer.
 
 In essence, photon mapping is not natural, especially when compared to the ease and naturalness of the caustics in the backward path tracer.
+
+It is stated in \cite{jensen} that $s = 1000$ samples per eye ray are necessary to get caustics that are not noisy.
+Here we only used $s = 25$ samples.
+This likely means that the path tracer used in \cite{jensen} was not a backward path tracer.
+It's no wonder why it could be stated with a straight face in \cite{jensen} that photon mapping is hundreds of times faster than the path tracer.
+
+
 
 
 
