@@ -317,6 +317,9 @@ Global illumination (e.g. colour bleeding / indirect lighting) is taken into acc
 \centering
   \includegraphics[width = 6 in]{fig8.png}
   \caption{ Note the nephroid reflection caustic at the bottom of a hollow cylinder.
+Also note that the smaller the light source, the sharper the caustic.
+Finally, it should be noted that the backward path tracer fails when the light source has zero volume.
+The solution to this problem is to model one's lights according to reality -- having non-zero volume -- and so to abandon the simplification used in the shell theorem as applied to point lights.
 }
 \end{figure}
 
