@@ -150,13 +150,13 @@ The full size images are available upon request.
 
 
 
-\section{Photon mapping versus the backward path tracer}
+\section{Global illumination: photon mapping versus the backward path tracer}
 
 Given that photon mapping \cite{jensen, john} is the \textit{de facto}	standard method for producing global illumination, we must give it some consideration.
 
 Comparing photon mapping to this backward path tracer is like comparing apples and oranges.
 
-For one, photon mapping generally uses a kd tree for storing photon data, and the backward path tracer does not.
+For one, photon mapping generally uses a k-d tree for storing photon data, and the backward path tracer does not.
 It takes time and space to store and retrieve data to and from the photon map.
 
 For another, backward path tracing has a future -- this is to say that, on an NVIDIA 3060 laptop graphics processing unit, the backward path tracer is still at best only an offline renderer at 4K resolution.
@@ -174,6 +174,26 @@ This likely means that the path tracer used in \cite{jensen} was not a backward 
 This is obviously no longer the case, because 1) we use a {\textit{bona fide}} backward path tracer, 2) we use a sample count $s$ that is orders-of-magnitude smaller than what is used in \cite{jensen}, and 3) the backward path tracer is now accelerated by the graphics processing unit in Vulkan / Direct3D 12.
 
 In essence, photon mapping is not natural, especially when compared to the ease and naturalness of the caustics in the backward path tracer.
+
+
+
+
+\section{Review}
+
+In this paper we have introduced a method that accounts for colour bleeding, indirect lighting, and most importantly, caustics -- collectively known as the phenomena of global illumination.
+This method runs on modern graphics processing units, although 4K output is still produced using offline rendering.
+This method is in direct competition with photon mapping, given that they produce the same phenomena.
+
+
+
+
+
+\section{Discussion}
+
+For a review of modern graphics programming techniques, please see the ageless \cite{pharr}.
+
+
+
 
 
 
@@ -215,6 +235,10 @@ The code and various Cornell boxes can be found at:
 
 \bibitem{jensen} Jensen. Realistic image synthesis using photon mapping.
 \bibitem{john} John. Focus on photon mapping.
+
+
+\bibitem{pharr} Pharr, et al. Physically based rendering: from theory to implementation
+
 
 \bibitem{willems1} Willems. Vulkan path tracer.
 \bibitem{willems2} Willems. Vulkan examples and demos.
