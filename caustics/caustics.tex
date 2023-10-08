@@ -174,7 +174,7 @@ It is stated in \cite{jensen} that $s = 1000$ samples per eye ray are necessary 
 Here we only used $s = 25$ samples.
 This likely means that the path tracer used in \cite{jensen} was not a backward path tracer.
 It's no wonder why it could be stated with a straight face in \cite{jensen} that photon mapping is hundreds of times faster than the path tracer.
-
+This is obviously no longer the case, especially since the backward path tracing is now accelerated by the graphics processing unit in Vulkan / Direct3D 12.
 
 
 
@@ -284,7 +284,7 @@ Works great for opaque diffuse surfaces.
 \centering
   \includegraphics[width = 6 in]{fig4.png}
   \caption{ New general backward path tracer code, taking reflective and transparent surfaces into consideration.
-This solution for caustics performs well on modern graphics provessing units -- disabling caustics causes a practically imperceptible gain in frame rate.
+This solution for caustics performs well on modern graphics processing units -- disabling caustics causes a practically imperceptible gain in frame rate.
 While not as simple as the old backward path tracer code, it is still not very computationally expensive -- just the right amount of complexity leads to much better results.
 }
 \end{figure}
