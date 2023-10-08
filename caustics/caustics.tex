@@ -191,7 +191,10 @@ This method is in direct competition with photon mapping, given that they produc
 
 \section{Discussion of the state of modern graphics}
 
-For a review of modern graphics programming techniques, please see the ageless \cite{pharr}.
+See \cite{moreau, komarov}, which are completely different approaches to the problem.
+Our paper is out of left field compared to these other modern approaches to global illumination.
+
+For a review of tried and true graphics programming techniques, please see the ageless \cite{pharr}.
 
 
 
@@ -202,6 +205,9 @@ For a review of modern graphics programming techniques, please see the ageless \
 
 \section{Acknowledgements}
 
+Many thanks to those who gave me feedback, and to those who replied to my emails.
+Much appreciated.
+
 The code for this paper is based off of Sascha Willems' and NVIDIA's work \cite{willems1, willems2, nvidia}.
 
 The various Cornell boxes were developed by Rob Rau.
@@ -210,11 +216,7 @@ The code and various Cornell boxes can be found at:
 
 \url{https://github.com/sjhalayka/cornell_box_textured}
 
-This paper is in honour of Canadian tech companies like Softimage.
-It was my impossible dream to own Softimage -- with mental ray -- and so now I've tried my best to emulate it.
 
-Many thanks to those who gave me feedback, and to those who replied to my emails.
-Much appreciated.
 
 
 
@@ -239,6 +241,8 @@ Much appreciated.
 \bibitem{john} John. Focus on photon mapping.
 
 
+\bibitem{moreau} Moreau, et al. Real-time rendering of indirectly visible caustics.
+\bibitem{komarov} Komarov, et al. Rendering the real-time caustics with DirectX raytracing.
 \bibitem{pharr} Pharr, et al. Physically based rendering: from theory to implementation.
 
 
@@ -354,7 +358,6 @@ The solution to this problem is to model one's lights according to reality -- ha
 \centering
   \includegraphics[width = 6 in]{fig9.png}
   \caption{ Note that the experimental fog lights up because of the caustic.
-%These images are an homage to Canadian 3-D graphics companies from earlier days, such as Alias, ATI, Matrox, and Softimage.
 }
 \end{figure}
 
