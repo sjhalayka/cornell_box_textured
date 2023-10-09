@@ -197,7 +197,7 @@ In this paper we have introduced a method that accounts for colour bleeding, ind
 This method runs on modern graphics processing units, although 4K output is still produced using offline rendering.
 
 It should be noted that the GLSL code to enable caustics is only around $30$ lines longer than the code without caustics -- again, see Fig. 3 versus Fig. 4.
-The C++ codes for the ray tracer and for the backward path tracer are identical -- the code is literally zero lines longer.
+The C++ codes for the old special backward path tracer and the new general backward path tracer are identical -- the code is literally zero lines longer.
 This low line count is a testament to the naturalness of the solution.
 
 
