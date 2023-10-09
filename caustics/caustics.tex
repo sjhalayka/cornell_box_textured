@@ -178,26 +178,26 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 
 
 
+
+
+\section{Global illumination II: discussion of the state of modern graphics}
+
+See \cite{moreau, komarov, gruen, yang}, which are all completely different modern approaches to solving the problem of global illumination.
+Our paper stands apart from these others because the method that it introduces is 1) simple, 2) fast, and 3) free of the traditional convergence problems.
+
+For a review of tried and true graphics programming techniques, see the ageless \cite{pharr}.
+
+
+
+
+
 \section{Review}
 
 In this paper we have introduced a method that accounts for colour bleeding, indirect lighting, and most importantly, caustics -- collectively known as the phenomena of global illumination.
 This method runs on modern graphics processing units, although 4K output is still produced using offline rendering.
 
-It should be noted that the GLSL code to enable caustics is only $30$ or so lines longer than the code without caustics.
+It should be noted that the GLSL code to enable caustics is only $30$ or so lines longer than the code without caustics -- again, see Fig. 4.
 This low line count is a testament to the naturalness of the solution.
-
-
-
-
-
-\section{Discussion of the state of modern graphics}
-
-See \cite{moreau, komarov, gruen, yang}, which are completely different modern approaches to solving the problem.
-Our paper is out of left field compared to these other modern approaches to global illumination -- it is both simple and fast.
-
-For a review of tried and true graphics programming techniques, please see the ageless \cite{pharr}.
-
-
 
 
 
@@ -364,7 +364,7 @@ The solution to this problem is to model one's lights according to reality -- ha
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{fig9.png}
-  \caption{ Note that the experimental fog lights up because of the caustic.
+  \caption{ Note that the {\textit{experimental}} fog lights up because of the caustic.
 }
 \end{figure}
 
