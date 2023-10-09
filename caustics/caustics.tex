@@ -49,7 +49,7 @@ We use the standard Cornell box for testing the backward path tracer.
 In this paper we discuss the following:
 \begin{itemize}
 \item The difference between the rasterizer, ray tracer, and backward path tracer
-\item Bidirectional or forward path tracers
+\item Bidirectional or forward path tracers, and convergence problems
 \item The old special backward path tracer algorithm (without caustics)
 \item The new general backward path tracer algorithm (with caustics)
 \item Various imagery produced by the new general backward path tracer algorithm
@@ -194,9 +194,9 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 
 
 
-\section{Global illumination II: discussion of the state of modern graphics}
+\section{Global illumination II: discussion of the state of modern graphics with regard to caustics}
 
-See \cite{moreau, komarov, gruen, yang}, which are all completely different modern approaches to solving the problem of global illumination.
+See \cite{moreau, komarov, gruen, yang}, which are all completely different modern approaches to solving the problem of caustics.
 Our paper stands apart from these others because the method that it introduces is 1) simple, 2) fast, and 3) free of the traditional convergence problems.
 
 For a review of tried and true graphics programming techniques, see the ageless \cite{pharr}.
