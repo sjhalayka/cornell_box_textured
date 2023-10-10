@@ -48,15 +48,15 @@ We use the standard Cornell box for testing the backward path tracer.
 
 In this paper we discuss the following:
 \begin{itemize}
-\item The difference between the rasterizer, ray tracer, and backward path tracer
-\item Bidirectional or forward path tracers, and convergence problems
-\item The old special backward path tracer algorithm (without caustics)
-\item The new general backward path tracer algorithm (with caustics)
-\item Various imagery produced by the new general backward path tracer algorithm
-\item Photon mapping versus the new general backward path tracer
-\item Contemporary graphics research with regard to caustics
-\item A review of the discussion
-\item Some acknowledgements
+\item Section 2: The difference between the rasterizer, ray tracer, and backward path tracer
+\item Section 3: Bidirectional or forward path tracers, and convergence problems
+\item Section 4: The old special backward path tracer algorithm (without caustics)
+\item Section 5: The new general backward path tracer algorithm (with caustics)
+\item Section 6: Various imagery produced by the new general backward path tracer
+\item Section 7: A review of the discussion
+\item Section 8: Some acknowledgements
+\item Appendix A: contemporary graphics research with regard to caustics
+\item Appendix B: photon mapping versus the new general backward path tracer
 \end{itemize}
 
 
@@ -164,7 +164,63 @@ The full size images are available upon request.
 
 
 
-\section{Global illumination: photon mapping versus backward path tracer}
+
+\section{Review}
+
+In this paper we have introduced a rendering method that accounts for colour bleeding, indirect lighting, and most importantly, caustics -- collectively known as the phenomena of global illumination.
+This method runs on modern graphics processing units, although 4K output is still produced using offline rendering.
+
+It should be noted that the GLSL code to enable caustics is only around $30$ lines longer than the code without caustics -- again, see Fig. 3 versus Fig. 4.
+The C++ codes for the old special backward path tracer and the new general backward path tracer are identical -- the C++ code is literally zero lines longer.
+This low line count is a testament to the naturalness of the solution.
+
+
+
+
+
+\section{Acknowledgements}
+
+Many thanks to those who gave me feedback, and to those who replied to my emails.
+Much appreciated.
+
+The code for this paper is based off of Sascha Willems' and NVIDIA's work \cite{willems1, willems2, nvidia}.
+
+The various Cornell boxes were developed by Rob Rau.
+
+The code and various Cornell boxes can be found at:
+
+\url{https://github.com/sjhalayka/cornell_box_textured}
+
+
+
+
+
+
+
+\begin{appendix}
+
+
+
+
+
+
+
+\section{Caustics especially: multiple modern approaches versus backward path tracer}
+
+We should also consider the work of others, in regard to caustics.
+
+See \cite{moreau, komarov, gruen, yang}, which are all completely different modern approaches to solving the problem of caustics.
+Our paper stands apart from these others because the rendering method that it introduces is 1) simple, 2) fast, and 3) free of the traditional convergence problems.
+That is, we do not use buffers or maps or all kinds of convoluted programmatic incantations.
+
+In essence, these other approaches are not natural, especially when compared to the ease and naturalness of the caustics in the backward path tracer.
+
+For a review of tried and true graphics programming techniques, see the ageless \cite{pharr}.
+
+
+
+
+\section{Global illumination in general: photon mapping versus backward path tracer}
 
 Given that photon mapping \cite{jensen, john} is the \textit{de facto}	standard method for producing global illumination, we must give it some consideration.
 
@@ -192,52 +248,7 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 
 
 
-
-
-\section{Caustics: multiple modern approaches versus backward path tracer}
-
-We should also consider the work of others, in regard to caustics.
-
-See \cite{moreau, komarov, gruen, yang}, which are all completely different modern approaches to solving the problem of caustics.
-Our paper stands apart from these others because the rendering method that it introduces is 1) simple, 2) fast, and 3) free of the traditional convergence problems.
-That is, we do not use buffers or maps or all kinds of convoluted programmatic incantations.
-
-In essence, these other approaches are not natural, especially when compared to the ease and naturalness of the caustics in the backward path tracer.
-
-For a review of tried and true graphics programming techniques, see the ageless \cite{pharr}.
-
-
-
-
-
-\section{Review}
-
-In this paper we have introduced a rendering method that accounts for colour bleeding, indirect lighting, and most importantly, caustics -- collectively known as the phenomena of global illumination.
-This method runs on modern graphics processing units, although 4K output is still produced using offline rendering.
-
-It should be noted that the GLSL code to enable caustics is only around $30$ lines longer than the code without caustics -- again, see Fig. 3 versus Fig. 4.
-The C++ codes for the old special backward path tracer and the new general backward path tracer are identical -- the C++ code is literally zero lines longer.
-This low line count is a testament to the naturalness of the solution.
-
-
-
-
-
-
-\section{Acknowledgements}
-
-Many thanks to those who gave me feedback, and to those who replied to my emails.
-Much appreciated.
-
-The code for this paper is based off of Sascha Willems' and NVIDIA's work \cite{willems1, willems2, nvidia}.
-
-The various Cornell boxes were developed by Rob Rau.
-
-The code and various Cornell boxes can be found at:
-
-\url{https://github.com/sjhalayka/cornell_box_textured}
-
-
+\end{appendix}
 
 
 
