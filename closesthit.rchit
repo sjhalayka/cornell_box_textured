@@ -99,9 +99,13 @@ void main()
 	// Make the transparent sphere reflective
 	if(rayPayload.opacity == 0.0)
 	{
+		
+		
 		rayPayload.opacity = 0.5;
-
 		rayPayload.reflector = 0.5;
+
+
+
 	}
 
 	//if(rayPayload.reflector == 1.0)

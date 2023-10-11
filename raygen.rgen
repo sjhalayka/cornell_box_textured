@@ -256,16 +256,13 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		vec3 temp_o = o_reflect;
 		vec3 temp_d = d_reflect;
 
-		if(rayPayload.reflector < 1.0) // if less than fully reflective, do scattering
+		if(rayPayload.reflector != 1.0) // if less than fully reflective, do scattering
 		{
-			vec3 o_scatter = hitPos + rayPayload.normal * 0.01;
-			vec3 d_scatter = cosWeightedRandomHemisphereDirection(rayPayload.normal, prng_state);
-
-			temp_o = mix(temp_o, o_scatter, 1.0 - rayPayload.reflector);
-			temp_d = mix(temp_d, d_scatter, 1.0 - rayPayload.reflector);
+			temp_o = hitPos + rayPayload.normal * 0.01;
+			temp_d = cosWeightedRandomHemisphereDirection(rayPayload.normal, prng_state);
 		}
 
-		if(rayPayload.opacity < 1.0) // if partially transparent, do refraction
+		if(rayPayload.opacity != 1.0) // if transparent, do refraction
 		{
 			doing_caustic = true;
 
@@ -295,8 +292,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 				}
 			}
 
-			temp_o = mix(temp_o, o_transparent, 1.0 - rayPayload.opacity);
-			temp_d = mix(temp_d, d_transparent, 1.0 - rayPayload.opacity);
+			temp_o = o_transparent;
+			temp_d = d_transparent;
 		}
 			
 		o = temp_o;
