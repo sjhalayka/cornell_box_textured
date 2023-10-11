@@ -117,7 +117,7 @@ These particular issues do not plague the backward path tracer.
 
 Each eye ray is sent out $s$ times, each referred to as a sample.
 
-Essentially, each eye ray sample is bounced around (e.g. scattered) pseudorandomly as it hits surfaces within the scene.
+Essentially, each eye ray sample is scattered (e.g. bounced) around pseudorandomly as it hits surfaces within the scene.
 The bounce count is finite, and bouncing stops after $n$ bounces, or if a light is hit, or if the sky is hit.
 At each bounce, one takes into account the properties of the surface, such as colour.
 
@@ -140,7 +140,7 @@ Other than diffuse, opaque surfaces, there are reflective and transparent surfac
 One can generalize the old algorithm by adding in code to handle reflective and transparent surfaces.
 
 Everything is the same as the old special backward path tracer, except that now each bounce accounts for the extended properties such as reflectivity and transparency.
-That is, rather than always pseudorandomly bouncing the eye ray around, one will also be able to reflect the eye ray if the surface is reflective, and one will refract the eye ray if the surface is transparent.
+That is, rather than always pseudorandomly scattering the eye ray around, one will also be able to reflect the eye ray if the surface is reflective, and one will refract the eye ray if the surface is transparent.
 
 See Fig. 4 for the new code, in GLSL.
 
