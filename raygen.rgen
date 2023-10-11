@@ -186,9 +186,8 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 	vec3 o = origin;
 	vec3 d = direction;
 
-
 	const float energy = 1.0;
-	const float caustic_energy = energy*2.0;
+	const float caustic_energy = energy*10.0;
 
 	float ret_colour = 0;
 	float local_colour = energy;
@@ -432,7 +431,7 @@ float get_ray0(const float hue, const float eta)
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
-				if(rays[i].external_reflection_ray || rays[i].external_refraction_ray)
+				if(false)//rays[i].external_reflection_ray || rays[i].external_refraction_ray)
 				{
 					vec3 start = rays[i].origin.xyz;
 					vec3 end = rays[i].origin.xyz;
