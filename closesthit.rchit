@@ -101,7 +101,7 @@ void main()
 	{
 		
 		
-		rayPayload.opacity = 0.0;
+		rayPayload.opacity = 1.0;
 		rayPayload.reflector = 1.0;
 
 
