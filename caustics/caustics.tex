@@ -71,7 +71,7 @@ Generally, a depth buffer (Z-buffer) \cite{wikipedia4} is used to discern which 
 This depth testing algorithm is super simple, and it does the job, but it is just simply not as programmable as a ray tracer or backward path tracer.
 See Fig. 1 for an example render performed by the rasterizer.
 
-The ray tracer does a similar job, insomuch that it converts triangles into pixels.
+The ray tracer does a similar job, insofar that it converts triangles into pixels.
 Rather than using a depth buffer though, one often uses a more complicated acceleration structure, such a bounding volume hierarchy (BVH) \cite{wikipedia5}, to determine eye ray / triangle intersection.
 See Fig. 2 for an example render performed by ray tracing.
 
@@ -233,7 +233,7 @@ For another, backward path tracing has a future -- this is to say that, on an NV
 Its day will come.
 
 As well, it must be noted that the backward path tracer is strictly a view space effect.
-This is unlike photon mapping and its 2-pass solution, insomuch that the caustics and other lighting effects are all accomplished in one pass when using the backward path tracer.
+This is unlike photon mapping and its 2-pass solution, insofar that the caustics and other lighting effects are all accomplished in one pass when using the backward path tracer.
 
 Of course, it should be noted that photon mapping also suffers from its own inherent convergence problems (e.g. low photon count).
 These particular issues do not plague the backward path tracer.
@@ -395,7 +395,8 @@ The solution to this problem is to model one's lights according to reality -- ha
 \begin{figure} 
 \centering
   \includegraphics[width = 6 in]{fig9.png}
-  \caption{ Note that the fog lights up because of the caustics.
+  \caption{ Here, both spheres are transparent. 
+Note that the fog lights up because of the caustics.
 }
 \end{figure}
 
