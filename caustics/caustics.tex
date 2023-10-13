@@ -337,6 +337,7 @@ Global illumination is not taken into account.
   \caption{ Old special backward path tracer code, always using a pseudorandom cosine-weighted direction vector (e.g. scattering).
 Here the o variable is the ray origin, and d is the ray direction.
 Works great for diffuse, opaque surfaces.
+The cosWeightedRandomHemisphereDirection function returns a pseudorandomly-generated direction vector in the same hemisphere as the surface normal.
 }
 \end{figure}
 
@@ -352,6 +353,7 @@ Works great for diffuse, opaque surfaces.
 This solution for caustics performs well on modern graphics processing units -- disabling caustics causes a practically imperceptible gain in frame rate.
 While not as simple as the old backward path tracer code, it is still not very computationally expensive -- just the right amount of complexity leads to much better results.
 It's not perfect, but it's a good start.
+The stepAndOutputRNGFloat function returns a float in the range of 0.0 to 1.0.
 }
 \end{figure}
 
