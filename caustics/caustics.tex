@@ -144,8 +144,8 @@ Everything is the same as the old special backward path tracer, except that now 
 That is, rather than always pseudorandomly scattering the eye ray around, one will also be able to reflect the eye ray if the surface is reflective, and one will refract the eye ray if the surface is transparent.
 
 It should be noted that this solution for caustics relies on pseudorandomly deciding whether to take the refracted path versus the reflected path.
-Say that $s = 25$, or some other large number, and where opacity equals $0.25$, then the probability of taking the refracted path is like $1 - 0.25 = 0.75$.
-Reducing the opacity causes an increase in refracted light and a decrease in the reflected/scattered light, as intuited.
+Say that the sample count is $s = 25$, or some other large number, and where opacity equals $0.333$, then the probability of taking the refracted path is like $1 - 0.333 = 0.667$.
+Reducing the opacity further causes an increase in refracted light and a decrease in reflected/scattered light, as intuited.
 It's a matter of statistics.
 
 See Fig. 4 for the new code, in GLSL.
