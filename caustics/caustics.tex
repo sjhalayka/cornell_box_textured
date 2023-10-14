@@ -145,7 +145,7 @@ That is, rather than always pseudorandomly scattering the eye ray around, one wi
 
 It should be noted that this solution for caustics relies on pseudorandomly deciding whether to take the refracted path versus the reflected path.
 Say that $s = 25$, or some other large number, and where opacity equals $0.25$, then the probability of taking the refracted path is like $1 - 0.25 = 0.75$.
-As the opacity is reduced, then the amount of refracted light reduces as well.
+Reducing the opacity causes an increase in refracted light, as intuited.
 It's a matter of statistics.
 
 See Fig. 4 for the new code, in GLSL.
