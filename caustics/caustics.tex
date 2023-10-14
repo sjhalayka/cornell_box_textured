@@ -145,6 +145,7 @@ That is, rather than always pseudorandomly scattering the eye ray around, one wi
 
 It should be noted that this solution for caustics relies on pseudorandomly deciding whether to take the refracted path versus the reflected path.
 Say that $s = 25$, or some other large number, and where opacity equals $0.25$, then the probability of taking the refracted path is like $1 - 0.25 = 0.75$.
+As the opacity is reduced, then the amount of refracted light reduces as well.
 It's a matter of statistics.
 
 See Fig. 4 for the new code, in GLSL.
@@ -172,7 +173,7 @@ In this paper we have introduced a rendering method that accounts for colour ble
 This method runs on modern graphics processing units, although 4K output is still produced using offline rendering.
 
 It should be noted that the GLSL code to enable caustics is only around $30$ lines longer than the code without caustics -- again, see Fig. 3 versus Fig. 4.
-The C++ codes for the old special backward path tracer and the new general backward path tracer are identical -- the C++ code is literally zero lines longer.
+%The C++ codes for the old special backward path tracer and the new general backward path tracer are identical -- the C++ code is literally zero lines longer.
 This low line count is a testament to the naturalness of the solution.
 
 
