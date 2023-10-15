@@ -49,14 +49,14 @@ We use the standard Cornell box for testing the backward path tracer.
 In this paper we discuss the following:
 \begin{itemize}
 \item Section 2: The difference between the rasterizer, ray tracer, and backward path tracer
-\item Section 3: Bidirectional or forward path tracers, and convergence problems
-\item Section 4: The old special backward path tracer algorithm (without caustics)
-\item Section 5: The new general backward path tracer algorithm (with caustics)
-\item Section 6: Various imagery produced by the new general backward path tracer
-\item Section 7: A review of the discussion
-\item Section 8: Some acknowledgements
-\item Appendix A: contemporary graphics research on caustics
-\item Appendix B: classical photon mapping
+\item Section 3: The old special backward path tracer algorithm (without caustics)
+\item Section 4: The new general backward path tracer algorithm (with caustics)
+\item Section 5: Various imagery produced by the new general backward path tracer
+\item Section 6: A review of the discussion
+\item Section 7: Some acknowledgements
+\item Appendix A: Bidirectional or forward path tracers, and complications
+\item Appendix B: Contemporary graphics research on caustics
+\item Appendix C: Classical photon mapping
 \end{itemize}
 
 
@@ -99,14 +99,6 @@ It's just that shadows are not naturally occurring.
 
 
 
-
-
-
-\section{On bidirectional or forward path tracing}
-
-Caustics can be produced using bidirectional or forward path tracing, thanks to the Helmholtz reciprocity.
-However, these caustics often suffer from convergence problems (e.g. low photon count).
-These particular issues do not plague the backward path tracer.
 
 
 
@@ -205,6 +197,19 @@ The code and various Cornell boxes can be found at:
 
 
 
+\section{On bidirectional or forward path tracing}
+
+Caustics can be produced using bidirectional or forward path tracing, thanks to the Helmholtz reciprocity.
+However, these caustics often suffer from convergence problems (e.g. low photon count).
+These particular issues do not plague the backward path tracer.
+
+Also, the geometry (triangles) of the light surface must be fully known in the case of bidirectional or forward path tracing.
+This is different than in the case of the backward path tracer, where only the light colour needs to be known.
+
+In essence, bidirectional and forward path tracing are not natural, especially when compared to the ease and naturalness of the global illumination in the backward path tracer.
+
+
+
 
 
 \section{Caustics especially: contemporary approaches versus the backward path tracer}
@@ -252,6 +257,10 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 
 \end{appendix}
 
+
+
+
+\pagebreak
 
 
 
