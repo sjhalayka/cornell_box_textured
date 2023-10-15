@@ -268,6 +268,7 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 \section{Failures of the backward path tracer}
 To be fair, there is at least one lighting setup that cannot be modeled by using backward path tracing.
 For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is hard to get to when it comes to tracing a path from the eye.
+See Fig. 11.
 This particular issue does not plague the bidirectional or forward path tracer, or photon mapping.
 In backward path tracing we avoid this particular issue by simply refraining from using barrel lights to begin with -- the lighting can be indirect, but not 
 too indirect.
@@ -439,6 +440,16 @@ Note no chromatic aberration.
 \centering
   \includegraphics[width = 6 in]{fig10.png}
   \caption{ Stanford bunny light, with 20-channel chromatic aberration.
+}
+\end{figure}
+
+
+\begin{figure} 
+\centering
+  \includegraphics[width = 6 in]{fig11.png}
+  \caption{ Barrel light using the backward path tracer.
+Here $s = 1000$ in order to work with the barrel light, which is not really a desirable number of samples.
+It seems likely that a bidirectional or forward path tracer would not suffer from this problem of having to use super large values for $s$.
 }
 \end{figure}
 
