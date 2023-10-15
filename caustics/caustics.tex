@@ -205,10 +205,7 @@ The code and various Cornell boxes can be found at:
 \section{On bidirectional and forward path tracing}
 
 Caustics can be produced using both bidirectional and forward path tracing, thanks to the Helmholtz reciprocity.
-However, these caustics often suffer from convergence problems (e.g. low photon count).
-These particular issues do not plague the backward path tracer.
-
-Also, the geometry (triangles) of the light surface must be fully known in the case of bidirectional or forward path tracing.
+Note that the geometry (triangles) of the light surface must be fully known in the case of bidirectional or forward path tracing.
 This is different than in the case of the backward path tracer, where only the light colour needs to be known -- if one even specifies a light source at all.
 
 In essence, bidirectional and forward path tracing are not natural, especially when compared to the ease and naturalness of the caustics in the backward path tracer.
@@ -270,10 +267,10 @@ To be fair, there is at least one lighting setup that cannot be efficiently mode
 For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is hard to get to when it comes to tracing a path from the eye.
 See Fig. 11.
 This particular issue does not plague the bidirectional or forward path tracer, or photon mapping.
-In backward path tracing we avoid this particular issue by simply refraining from using barrel lights to begin with -- the lighting can be indirect, but not 
-too indirect.
+In backward path tracing we avoid this particular issue by simply refraining from using barrel lights to begin with -- the lighting can be indirect, but not too indirect.
 A more permanent solution to this particular issue would be to integrate the view space caustics into either the bidirectional or the forward path tracer.
 Let this paper act as a stepping stone toward that goal.
+
 
 
 
@@ -455,7 +452,7 @@ $s = 25$.
   \includegraphics[width = 6 in]{fig11.png}
   \caption{ Barrel light using the backward path tracer, with 20-channel chromatic aberration.
 White light travels down the barrel, and is diffracted by the triangular prism, forming a rainbow on the floor.
-Here $s = 1000$ in order to work with the barrel light, which is not really a desirable number of samples.
+Here $s = 1000$, in order to work with the barrel light, which is not really a desirable number of samples.
 We consider this to be a failure of the backward path tracer.
 It seems likely that a bidirectional or forward path tracer would not suffer from this problem of having to use super large values for $s$.
 }
