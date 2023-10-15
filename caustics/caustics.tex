@@ -55,10 +55,11 @@ In this paper we discuss the following:
 \item Section 6: A review of the discussion
 \item Section 7: Some acknowledgements
 \item Appendix A: Bidirectional or forward path tracers, and complications
-\item Appendix B: Barrel light failure
-\item Appendix C: Contemporary graphics research on caustics
-\item Appendix D: Classical photon mapping
+\item Appendix B: Contemporary graphics research on caustics
+\item Appendix C: Classical photon mapping
+\item Appendix D: Failures of the backward path tracer
 \end{itemize}
+
 
 
 
@@ -216,13 +217,6 @@ In essence, bidirectional and forward path tracing are not natural, especially w
 
 
 
-\section{Barrel light failure}
-To be fair, there is at least one lighting setup that cannot be modeled by using backward path tracing.
-For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is hard to get to when it comes to tracing a path from the eye.
-This particular issue does not plague the bidirectional or forward path tracers.
-In backward path tracing we avoid this particular issue by simply refraining from using barrel lights to begin with.
-
-
 
 
 
@@ -266,6 +260,18 @@ This likely means that the path tracer used in \cite{jensen} was not a backward 
 This is obviously no longer the case, because 1) we use a {\textit{bona fide}} backward path tracer, 2) we use a sample count $s$ that is orders-of-magnitude smaller than what is used in \cite{jensen}, and 3) the backward path tracer is now accelerated by the graphics processing unit in Vulkan / DXR.
 
 In essence, photon mapping is not natural, especially when compared to the ease and naturalness of the global illumination in the backward path tracer.
+
+
+
+
+
+\section{Failures of the backward path tracer}
+To be fair, there is at least one lighting setup that cannot be modeled by using backward path tracing.
+For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is hard to get to when it comes to tracing a path from the eye.
+This particular issue does not plague the bidirectional or forward path tracer, or photon mapping.
+In backward path tracing we avoid this particular issue by simply refraining from using barrel lights to begin with -- the lighting can be indirect, but not too indirect.
+A more permanent solution to this particular issue would be to integrate the view space caustics into either the bidirectional or the forward path tracer.
+
 
 
 
