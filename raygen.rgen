@@ -278,7 +278,7 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 				}
 				else
 				{
-					// total internal reflection
+					// Total internal reflection
 					o_transparent = hitPos.xyz - rayPayload.normal * 0.01f;
 					d_transparent = reflect(d, -rayPayload.normal);
 				}
