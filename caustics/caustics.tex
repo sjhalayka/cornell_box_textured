@@ -264,7 +264,7 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 
 \section{Failures of the backward path tracer, and the way ahead}
 To be fair, no one algorithm is perfect: there is at least one lighting setup that cannot be efficiently modeled by using backward path tracing.
-For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is hard to get to when it comes to tracing a path from the eye.
+For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is generally hard to get to when it comes to tracing a path from the eye.
 See Fig. 11.
 This particular issue does not plague the bidirectional or forward path tracer, or photon mapping.
 In backward path tracing we avoid this particular issue by simply refraining from using barrel lights to begin with -- the lighting can be indirect, but not too indirect.
