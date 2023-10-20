@@ -263,18 +263,11 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 
 
 \section{Failures of the backward path tracer, and the way ahead}
-To be fair, no one algorithm is perfect: there is at least one lighting setup that cannot be efficiently modeled by using backward path tracing.
+To be fair, no one algorithm is perfect: there is at least one lighting setup that cannot be efficiently modeled by using backward path tracing on its own.
 For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is generally hard to get to when it comes to tracing a path from the eye.
 See Fig. 11.
-This particular issue does not plague the bidirectional or forward path tracer, or photon mapping.
-In backward path tracing we avoid this particular issue by simply refraining from using barrel lights to begin with -- the lighting can be indirect, but not too indirect.
-A more permanent solution to this particular issue would be to integrate the view space caustics into either the bidirectional or forward path tracer, or photon mapping -- the goal being to get the most flexible algorithm for the least amount of complexity.
-Let this paper act as a stepping stone toward that goal.
+We shall work at implementing importance sampling with the backward path tracer, which is likely the easiest -- the most natural -- solution to the barrel light setup.
 
-Note that the backward path tracer is the peak of naturalness.
-It works generally well, except for some special lighting scenarios.
-However, in order to add functionality to take these fringe scenarios into account, naturalness must be sacrificed.
-A solution to this would be to standardize the photon mapping, and deal with it in the driver, thus making the use of it more natural -- if you can't beat them, join them!
 
 
 
