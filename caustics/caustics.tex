@@ -266,7 +266,8 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 To be fair, no one algorithm is perfect: there is at least one lighting setup that cannot be efficiently modeled by using backward path tracing on its own.
 For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is generally hard to get to when it comes to tracing a path from the eye.
 See Fig. 11.
-We shall work at implementing importance sampling with the backward path tracer, which is likely the easiest -- the most natural -- solution to the barrel light setup.
+We shall work at implementing importance sampling with the backward path tracer, which is likely the easiest -- and the most natural -- solution to the barrel light setup.
+Let this paper serve as a stepping stone toward that goal.
 
 
 
@@ -450,8 +451,7 @@ $s = 25$.
   \caption{ Barrel light using the backward path tracer, with 20-channel chromatic aberration.
 White light travels down the barrel, and is diffracted by the triangular prism, forming a rainbow on the floor.
 Here $s = 1000$, in order to work with the barrel light, which is not really a desirable number of samples.
-We consider this to be a failure of the backward path tracer.
-It seems likely that a bidirectional or forward path tracer would not suffer from this problem of having to use super large values for $s$.
+We consider this to be a failure of the backward path tracer on its own.
 }
 \end{figure}
 
