@@ -211,6 +211,33 @@ namespace vkglTF
 	enum class VertexComponent { Position, Normal, UV, Color, Tangent, Joint0, Weight0 };
 
 	struct Vertex {
+
+
+		inline bool operator<(const Vertex& right) const
+		{
+			if (right.pos.x > pos.x)
+				return true;
+			else if (right.pos.x < pos.x)
+				return false;
+
+			if (right.pos.y > pos.y)
+				return true;
+			else if (right.pos.y < pos.y)
+				return false;
+
+			if (right.pos.z > pos.z)
+				return true;
+			else if (right.pos.z < pos.z)
+				return false;
+
+			return false;
+		}
+
+
+
+
+
+
 		glm::vec3 pos;
 		glm::vec3 normal;
 		glm::vec2 uv;

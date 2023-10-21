@@ -4,6 +4,10 @@
 #include <vector>
 using std::vector;
 
+#include <set>
+using std::set;
+
+
 #include <fstream>
 using std::ofstream;
 
@@ -79,6 +83,35 @@ public:
 
 
 
+class triangle
+{
+public:
+	vkglTF::Vertex vertices[3];
+
+	inline bool operator<(const triangle& right) const
+	{
+		if (vertices[0] < right.vertices[0])
+			return true;
+		else if (right.vertices[0] < vertices[0])
+			return false;
+
+		if (vertices[1] < right.vertices[1])
+			return true;
+		else if (right.vertices[1] < vertices[1])
+			return false;
+
+		if (vertices[2] < right.vertices[2])
+			return true;
+		else if (right.vertices[2] < vertices[2])
+			return false;
+
+		return false;
+	}
+};
+
+
+
+vector<triangle> tris;
 
 
 
@@ -669,72 +702,85 @@ public:
 		// https://drive.google.com/file/d/1BJJSC_K8NwaH8kP4tQpxlAmc6h6N3Ii1/view
 		if (do_init)
 		{
-
-
 			scene.loadFromFile(
 				indexBuffer,
 				vertexBuffer,
 				gltfimages,
-				"C:/temp/rob_rau_cornell/gltf/cornell.gltf", vulkanDevice, queue, glTFLoadingFlags);
+				//"C:/temp/rob_rau_cornell/gltf/cornell.gltf", 
+				"C:/temp/rob_rau_cornell/bunny2/bunny2.gltf",
+				vulkanDevice, 
+				queue, 
+				glTFLoadingFlags);
 
+			tris.clear();
 
-			ostringstream oss;
-
-
-			size_t image_index = 1;
-
-			for (size_t i = 0; i < indexBuffer.size(); i += 3)
+			for (size_t image_index = 0; image_index < gltfimages.size(); image_index++)
 			{
-				vkglTF::Vertex a = vertexBuffer[indexBuffer[i + 0]];
-				vkglTF::Vertex b = vertexBuffer[indexBuffer[i + 1]];
-				vkglTF::Vertex c = vertexBuffer[indexBuffer[i + 2]];
+				if (gltfimages[image_index].name != "ColorMapWithOpacityAlpha512")
+					continue;
 
-				size_t a_x = a.uv.s * (gltfimages[image_index].width - 1);
-				size_t a_y = a.uv.t * (gltfimages[image_index].height - 1);
-				size_t a_index = 4*(a_y * gltfimages[image_index].width + a_x);
-
-				unsigned char colour_a_0 = gltfimages[image_index].image[a_index + 0];
-				unsigned char colour_a_1 = gltfimages[image_index].image[a_index + 1];
-				unsigned char colour_a_2 = gltfimages[image_index].image[a_index + 2];
-				unsigned char colour_a_3 = gltfimages[image_index].image[a_index + 3];
-
-				size_t b_x = b.uv.s * (gltfimages[image_index].width - 1);
-				size_t b_y = b.uv.t * (gltfimages[image_index].height - 1);
-				size_t b_index = 4 * (b_y * gltfimages[image_index].width + b_x);
-
-				unsigned char colour_b_0 = gltfimages[image_index].image[b_index + 0];
-				unsigned char colour_b_1 = gltfimages[image_index].image[b_index + 1];
-				unsigned char colour_b_2 = gltfimages[image_index].image[b_index + 2];
-				unsigned char colour_b_3 = gltfimages[image_index].image[b_index + 3];
-
-				size_t c_x = c.uv.s * (gltfimages[image_index].width - 1);
-				size_t c_y = c.uv.t * (gltfimages[image_index].height - 1);
-				size_t c_index = 4 * (c_y * gltfimages[image_index].width + c_x);
-
-				unsigned char colour_c_0 = gltfimages[image_index].image[c_index + 0];
-				unsigned char colour_c_1 = gltfimages[image_index].image[c_index + 1];
-				unsigned char colour_c_2 = gltfimages[image_index].image[c_index + 2];
-				unsigned char colour_c_3 = gltfimages[image_index].image[c_index + 3];
-
-				/*if (colour_a_0 == 255 &&
-					colour_a_1 == 255 && 
-					colour_a_2 == 255 &&
-					colour_b_0 == 255 &&
-					colour_b_1 == 255 &&
-					colour_b_2 == 255 &&
-					colour_c_0 == 255 &&
-					colour_c_1 == 255 &&
-					colour_c_2 == 255)
+				for (size_t i = 0; i < indexBuffer.size(); i += 3)
 				{
-					MessageBox(NULL, "test", "triangle found", MB_OK);
+					vkglTF::Vertex a = vertexBuffer[indexBuffer[i + 0]];
+					vkglTF::Vertex b = vertexBuffer[indexBuffer[i + 1]];
+					vkglTF::Vertex c = vertexBuffer[indexBuffer[i + 2]];
 
-				}*/
+					size_t a_x = a.uv.s * (gltfimages[image_index].width - 1);
+					size_t a_y = a.uv.t * (gltfimages[image_index].height - 1);
+					size_t a_index = 4 * (a_y * gltfimages[image_index].width + a_x);
 
+					unsigned char colour_a_0 = gltfimages[image_index].image[a_index + 0];
+					unsigned char colour_a_1 = gltfimages[image_index].image[a_index + 1];
+					unsigned char colour_a_2 = gltfimages[image_index].image[a_index + 2];
+					unsigned char colour_a_3 = gltfimages[image_index].image[a_index + 3];
 
+					size_t b_x = b.uv.s * (gltfimages[image_index].width - 1);
+					size_t b_y = b.uv.t * (gltfimages[image_index].height - 1);
+					size_t b_index = 4 * (b_y * gltfimages[image_index].width + b_x);
+
+					unsigned char colour_b_0 = gltfimages[image_index].image[b_index + 0];
+					unsigned char colour_b_1 = gltfimages[image_index].image[b_index + 1];
+					unsigned char colour_b_2 = gltfimages[image_index].image[b_index + 2];
+					unsigned char colour_b_3 = gltfimages[image_index].image[b_index + 3];
+
+					size_t c_x = c.uv.s * (gltfimages[image_index].width - 1);
+					size_t c_y = c.uv.t * (gltfimages[image_index].height - 1);
+					size_t c_index = 4 * (c_y * gltfimages[image_index].width + c_x);
+
+					unsigned char colour_c_0 = gltfimages[image_index].image[c_index + 0];
+					unsigned char colour_c_1 = gltfimages[image_index].image[c_index + 1];
+					unsigned char colour_c_2 = gltfimages[image_index].image[c_index + 2];
+					unsigned char colour_c_3 = gltfimages[image_index].image[c_index + 3];
+
+					if (colour_a_0 == 255 &&
+						colour_a_1 == 255 &&
+						colour_a_2 == 255 &&
+						colour_a_3 == 255 &&
+						colour_b_0 == 255 &&
+						colour_b_1 == 255 &&
+						colour_b_2 == 255 &&
+						colour_b_3 == 255 &&
+						colour_c_0 == 255 &&
+						colour_c_1 == 255 &&
+						colour_c_2 == 255 &&
+						colour_c_3 == 255)
+					{
+						triangle t;
+
+						t.vertices[0] = a;
+						t.vertices[1] = b;
+						t.vertices[2] = c;
+
+						tris.push_back(t);
+					}
+				}
+
+				//MessageBox(NULL, gltfimages[image_index].name.c_str(), "test", MB_OK);
 			}
 
+			//ostringstream oss;
 
-			//oss << gltfimages[0].component;// indexBuffer.size() << " " << vertexBuffer.size();
+			//oss << tris.size();// indexBuffer.size() << " " << vertexBuffer.size();
 
 			//MessageBox(NULL, "test", oss.str().c_str(), MB_OK);
 		}
