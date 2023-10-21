@@ -612,8 +612,6 @@ public:
 	} shaderBindingTables;
 
 
-	static const int max_lights = 2;
-
 	VkTransformMatrixKHR transformMatrix = {
 				0.025f, 0.0f, 0.0f, 0.0f,
 				0.0f, 0.025f, 0.0f, 0.0f,
@@ -626,9 +624,14 @@ public:
 		glm::mat4 viewInverse;
 		glm::mat4 projInverse;
 		glm::mat4 transformation_matrix;
-		//glm::vec4 light_positions[max_lights];
-		//glm::vec4 light_colors[max_lights];
+		
+		//int32_t light_tri_count;
+		//
+		//glm::vec3 tris_a_vertices[100000];
+		//glm::vec3 tris_b_vertices[100000];
+		//glm::vec3 tris_c_vertices[100000];
 
+	
 		glm::vec3 camera_pos;
 
 		int32_t vertexSize;
@@ -778,11 +781,14 @@ public:
 				//MessageBox(NULL, gltfimages[image_index].name.c_str(), "test", MB_OK);
 			}
 
-			//ostringstream oss;
 
-			//oss << tris.size();// indexBuffer.size() << " " << vertexBuffer.size();
+//			uniformData.light_tri_count = tris.size();
 
-			//MessageBox(NULL, "test", oss.str().c_str(), MB_OK);
+			ostringstream oss;
+
+			oss << tris.size();// indexBuffer.size() << " " << vertexBuffer.size();
+
+			MessageBox(NULL, "test", oss.str().c_str(), MB_OK);
 		}
 
 
@@ -1169,6 +1175,10 @@ public:
 				uniformData.transformation_matrix[j][i] = transformMatrix.matrix[i][j];
 
 		uniformData.camera_pos = camera.position;
+
+
+	//	uniformData.light_tri_count = 2;// tris.size();
+
 
 		// Pass the vertex size to the shader for unpacking vertices
 		uniformData.vertexSize = sizeof(vkglTF::Vertex);
