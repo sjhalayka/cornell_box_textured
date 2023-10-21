@@ -235,7 +235,9 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		}
 
 		// If hit a light
-		if(rayPayload.color.r == 20.0 && rayPayload.color.g == 20.0 && rayPayload.color.b == 20.0)
+		if(	rayPayload.color.r == 20.0 && 
+			rayPayload.color.g == 20.0 && 
+			rayPayload.color.b == 20.0)
 		{	
 			ret_colour += local_colour;
 			break;
@@ -452,7 +454,7 @@ float get_ray0(const float hue, const float eta)
 						if(distance(rays[i].origin.xyz, end) > distance(rays[i].origin.xyz, hitPos.xyz))
 							end = hitPos.xyz + rayPayload.normal * 0.01f;
 
-						if(rayPayload.opacity == 0.5) // big hack
+						if(rayPayload.opacity == 0.0) // big hack
 						{
 							start = end;
 						}
@@ -670,7 +672,7 @@ void main()
 	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x; // violet
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x; // red
 
-	const float max_eta = 0.75;
+	const float max_eta = 0.95;
 	const float min_eta = 0.75;
 
 	const float hue_diff = max_hue - min_hue;
