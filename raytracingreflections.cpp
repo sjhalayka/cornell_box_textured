@@ -684,7 +684,7 @@ public:
 
 			oss << gltfimages.size();// indexBuffer.size() << " " << vertexBuffer.size();
 
-			MessageBox(NULL, "test", oss.str().c_str(), MB_OK);
+			//MessageBox(NULL, "test", oss.str().c_str(), MB_OK);
 		}
 
 
