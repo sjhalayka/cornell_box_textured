@@ -681,8 +681,60 @@ public:
 			ostringstream oss;
 
 
+			size_t image_index = 1;
 
-			oss << gltfimages[0].component;// indexBuffer.size() << " " << vertexBuffer.size();
+			for (size_t i = 0; i < indexBuffer.size(); i += 3)
+			{
+				vkglTF::Vertex a = vertexBuffer[indexBuffer[i + 0]];
+				vkglTF::Vertex b = vertexBuffer[indexBuffer[i + 1]];
+				vkglTF::Vertex c = vertexBuffer[indexBuffer[i + 2]];
+
+				size_t a_x = a.uv.s * (gltfimages[image_index].width - 1);
+				size_t a_y = a.uv.t * (gltfimages[image_index].height - 1);
+				size_t a_index = 4*(a_y * gltfimages[image_index].width + a_x);
+
+				unsigned char colour_a_0 = gltfimages[image_index].image[a_index + 0];
+				unsigned char colour_a_1 = gltfimages[image_index].image[a_index + 1];
+				unsigned char colour_a_2 = gltfimages[image_index].image[a_index + 2];
+				unsigned char colour_a_3 = gltfimages[image_index].image[a_index + 3];
+
+				size_t b_x = b.uv.s * (gltfimages[image_index].width - 1);
+				size_t b_y = b.uv.t * (gltfimages[image_index].height - 1);
+				size_t b_index = 4 * (b_y * gltfimages[image_index].width + b_x);
+
+				unsigned char colour_b_0 = gltfimages[image_index].image[b_index + 0];
+				unsigned char colour_b_1 = gltfimages[image_index].image[b_index + 1];
+				unsigned char colour_b_2 = gltfimages[image_index].image[b_index + 2];
+				unsigned char colour_b_3 = gltfimages[image_index].image[b_index + 3];
+
+				size_t c_x = c.uv.s * (gltfimages[image_index].width - 1);
+				size_t c_y = c.uv.t * (gltfimages[image_index].height - 1);
+				size_t c_index = 4 * (c_y * gltfimages[image_index].width + c_x);
+
+				unsigned char colour_c_0 = gltfimages[image_index].image[c_index + 0];
+				unsigned char colour_c_1 = gltfimages[image_index].image[c_index + 1];
+				unsigned char colour_c_2 = gltfimages[image_index].image[c_index + 2];
+				unsigned char colour_c_3 = gltfimages[image_index].image[c_index + 3];
+
+				/*if (colour_a_0 == 255 &&
+					colour_a_1 == 255 && 
+					colour_a_2 == 255 &&
+					colour_b_0 == 255 &&
+					colour_b_1 == 255 &&
+					colour_b_2 == 255 &&
+					colour_c_0 == 255 &&
+					colour_c_1 == 255 &&
+					colour_c_2 == 255)
+				{
+					MessageBox(NULL, "test", "triangle found", MB_OK);
+
+				}*/
+
+
+			}
+
+
+			//oss << gltfimages[0].component;// indexBuffer.size() << " " << vertexBuffer.size();
 
 			//MessageBox(NULL, "test", oss.str().c_str(), MB_OK);
 		}
