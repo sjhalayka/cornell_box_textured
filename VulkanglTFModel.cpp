@@ -1237,8 +1237,9 @@ void vkglTF::Model::loadFromFile(
 			loadNode(nullptr, node, scene.nodes[i], gltfModel, indexBuffer, vertexBuffer, scale);
 		}
 
+		std::vector<uint32_t> light_indices;
+		std::vector<uint32_t> temp_indices;
 
-		std::vector<uint32_t> new_indices;
 
 		for (size_t image_index = 0; image_index < gltfimages.size(); image_index++)
 		{
@@ -1292,40 +1293,32 @@ void vkglTF::Model::loadFromFile(
 					colour_c_2 == 255 &&
 					colour_c_3 == 255)
 				{
-//					triangle t;
-
-					//t.vertices[0] = a;
-					//t.vertices[1] = b;
-					//t.vertices[2] = c;
-
-					//tris.push_back(t);
-
 					num_light_triangles++;
 					num_triangles++;
 
-					new_indices.push_back(indexBuffer[i + 0]);
-					new_indices.push_back(indexBuffer[i + 1]);
-					new_indices.push_back(indexBuffer[i + 2]);
+					light_indices.push_back(indexBuffer[i + 0]);
+					light_indices.push_back(indexBuffer[i + 1]);
+					light_indices.push_back(indexBuffer[i + 2]);
 				}
 				else
 				{
 					num_triangles++;
+
+					temp_indices.push_back(indexBuffer[i + 0]);
+					temp_indices.push_back(indexBuffer[i + 1]);
+					temp_indices.push_back(indexBuffer[i + 2]);
 				}
 			}
 
+			for (size_t i = 0; i < light_indices.size(); i++)
+				temp_indices.push_back(light_indices[i]);
 
-			for (size_t i = 0; i < new_indices.size(); i++)
-				indexBuffer.push_back(new_indices[i]);
-
-
-
-
-			//			uniformData.light_tri_count = tris.size();
+			indexBuffer = temp_indices;
 
 	//		std::ostringstream oss;
-//			oss << tris.size();// indexBuffer.size() << " " << vertexBuffer.size();
+	//		oss << num_triangles << " " << num_light_triangles;
 
-//			MessageBox(NULL, oss.str().c_str(), "test", MB_OK);
+	//		MessageBox(NULL, oss.str().c_str(), "test", MB_OK);
 		}
 
 

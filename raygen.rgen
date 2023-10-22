@@ -98,7 +98,8 @@ layout(binding = 2, set = 0) uniform UBO
 
 } ubo;
 
-
+layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices;
+layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices;
 
 struct RayPayload
 {
@@ -665,6 +666,34 @@ float get_ray0(const float hue, const float eta)
 
 
  
+struct Vertex
+{
+  vec3 pos;
+  vec3 normal;
+  vec2 uv;
+  vec4 color;
+  vec4 _pad0; 
+  vec4 _pad1;
+};
+
+Vertex unpack(uint index)
+{
+	// Unpack the vertices from the SSBO using the glTF vertex structure
+	// The multiplier is the size of the vertex divided by four float components (=16 bytes)
+	const int m = ubo.vertexSize / 16;
+
+	vec4 d0 = vertices.v[m * index + 0];
+	vec4 d1 = vertices.v[m * index + 1];
+	vec4 d2 = vertices.v[m * index + 2];
+
+	Vertex v;
+	v.pos = d0.xyz;
+	v.normal = vec3(d0.w, d1.x, d1.y);
+	v.uv = vec2(d1.z, d1.w);
+	v.color = vec4(d2.x, d2.y, d2.z, 1.0);
+
+	return v;
+}
 
 
 void main() 
@@ -706,6 +735,22 @@ void main()
 	color /= total;
 
 	//color = pow(color, vec3(2.2));
+	
+	int first_index = 3*ubo.tri_count - 3*ubo.light_tri_count;
+	int num_indices = 3*ubo.tri_count;
+
+	for(int i = first_index; i < num_indices; i += 3)
+	{
+		uint index_0 = indices.i[i + 0];
+		uint index_1 = indices.i[i + 1];
+		uint index_2 = indices.i[i + 2];
+		
+		Vertex v0 = unpack(index_0);
+		Vertex v1 = unpack(index_1);
+		Vertex v2 = unpack(index_2);
+	}
+
+
 
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }

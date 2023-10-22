@@ -1071,18 +1071,13 @@ public:
 
 		uniformData.camera_pos = camera.position;
 
-
-		//	uniformData.light_tri_count = 2;// tris.size();
-
-
-			// Pass the vertex size to the shader for unpacking vertices
+		// Pass the vertex size to the shader for unpacking vertices
 		uniformData.vertexSize = sizeof(vkglTF::Vertex);
 
 		uniformData.screenshot_mode = taking_screenshot;
 
 		uniformData.tri_count = tri_count;
 		uniformData.light_tri_count = light_tri_count;
-
 
 		memcpy(ubo.mapped, &uniformData, sizeof(uniformData));
 	}
