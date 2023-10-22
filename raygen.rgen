@@ -198,7 +198,7 @@ vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
 
 
 
-float trace_path2(const int steps, const vec3 origin, const vec3 direction, const float hue, const float eta)
+float trace_path_backward(const int steps, const vec3 origin, const vec3 direction, const float hue, const float eta)
 {
 	vec3 o = origin;
 	vec3 d = direction;
@@ -312,23 +312,23 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 }
 
 
-float get_radiance(const int samples, const int steps, const vec3 origin, const vec3 seed_direction, const float hue, const float eta)
+float get_radiance_backward(const int samples, const int steps, const vec3 origin, const vec3 seed_direction, const float hue, const float eta)
 {
 	float ret_colour = 0.0;
 
 	for(int s = 0; s < samples; s++)
-		ret_colour += trace_path2(steps, origin, seed_direction, hue, eta);
+		ret_colour += trace_path_backward(steps, origin, seed_direction, hue, eta);
 
 	return ret_colour / samples;
 }
 
 
-float get_omni_radiance(const int samples, const int steps, const vec3 origin, const float hue, const float eta)
+float get_omni_radiance_backward(const int samples, const int steps, const vec3 origin, const float hue, const float eta)
 {
 	float ret_colour = 0.0;
 
 	for(int s = 0; s < samples; s++)
-		ret_colour += trace_path2(steps, origin, RandomUnitVector(prng_state), hue, eta);;
+		ret_colour += trace_path_backward(steps, origin, RandomUnitVector(prng_state), hue, eta);;
 
 	return ret_colour / samples;
 }
@@ -417,9 +417,9 @@ float get_ray0(const float hue, const float eta)
 				used_count++;
 
 				if(ubo.screenshot_mode)
-					rays[i].base_color = get_radiance(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance_backward(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 				else
-					rays[i].base_color = get_radiance(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance_backward(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
 
@@ -487,7 +487,7 @@ float get_ray0(const float hue, const float eta)
 
 						for(int j = 0; j < num_steps; j++, curr_step += step)
 						{
-							float colour = get_omni_radiance(10, 5, curr_step, hue, eta);
+							float colour = get_omni_radiance_backward(10, 5, curr_step, hue, eta);
 
 							float noise = noise3(curr_step, 1.0);
 
@@ -780,6 +780,7 @@ void main()
 	int first_index = 3*ubo.tri_count - 3*ubo.light_tri_count;
 	int num_indices = 3*ubo.tri_count;
 
+	/*
 	int count = 0;
 
 	for(int i = first_index; i < num_indices; i += 3)
@@ -803,7 +804,7 @@ void main()
 			count++;
 		}
 	}
-
+	*/
 
 //	if(count == 4968)
 //		imageStore(color_image, pixel_pos, vec4(vec3(1.0), 0.0));
