@@ -775,9 +775,9 @@ void main()
 		}
 	}
 
-	if(count == 4968)
-		imageStore(color_image, pixel_pos, vec4(vec3(1.0), 0.0));
-	else
+//	if(count == 4968)
+//		imageStore(color_image, pixel_pos, vec4(vec3(1.0), 0.0));
+//	else
 		imageStore(color_image, pixel_pos, vec4(color, 0.0));
 
 }
