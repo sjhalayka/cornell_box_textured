@@ -33,7 +33,8 @@ using std::ostringstream;
 
 
 
-
+size_t tri_count = 0;
+size_t light_tri_count = 0;
 
 /*
 class Vertex
@@ -80,38 +81,6 @@ public:
 };
 
 */
-
-
-
-class triangle
-{
-public:
-	vkglTF::Vertex vertices[3];
-
-	inline bool operator<(const triangle& right) const
-	{
-		if (vertices[0] < right.vertices[0])
-			return true;
-		else if (right.vertices[0] < vertices[0])
-			return false;
-
-		if (vertices[1] < right.vertices[1])
-			return true;
-		else if (right.vertices[1] < vertices[1])
-			return false;
-
-		if (vertices[2] < right.vertices[2])
-			return true;
-		else if (right.vertices[2] < vertices[2])
-			return false;
-
-		return false;
-	}
-};
-
-
-
-vector<triangle> tris;
 
 
 
@@ -624,19 +593,15 @@ public:
 		glm::mat4 viewInverse;
 		glm::mat4 projInverse;
 		glm::mat4 transformation_matrix;
-		
-		//int32_t light_tri_count;
-		//
-		//glm::vec3 tris_a_vertices[100000];
-		//glm::vec3 tris_b_vertices[100000];
-		//glm::vec3 tris_c_vertices[100000];
 
-	
 		glm::vec3 camera_pos;
 
 		int32_t vertexSize;
 
 		bool screenshot_mode;
+
+		int32_t tri_count;
+		int32_t light_tri_count;
 
 	} uniformData;
 	vks::Buffer ubo;
@@ -705,119 +670,49 @@ public:
 		// https://drive.google.com/file/d/1BJJSC_K8NwaH8kP4tQpxlAmc6h6N3Ii1/view
 		if (do_init)
 		{
+
+
 			scene.loadFromFile(
 				indexBuffer,
 				vertexBuffer,
 				gltfimages,
 				//"C:/temp/rob_rau_cornell/gltf/cornell.gltf", 
 				"C:/temp/rob_rau_cornell/bunny2/bunny2.gltf",
-				vulkanDevice, 
-				queue, 
+				tri_count,
+				light_tri_count,
+				vulkanDevice,
+				queue,
 				glTFLoadingFlags);
 
-			tris.clear();
-
-			for (size_t image_index = 0; image_index < gltfimages.size(); image_index++)
-			{
-				if (gltfimages[image_index].name != "ColorMapWithOpacityAlpha512")
-					continue;
-
-				for (size_t i = 0; i < indexBuffer.size(); i += 3)
-				{
-					vkglTF::Vertex a = vertexBuffer[indexBuffer[i + 0]];
-					vkglTF::Vertex b = vertexBuffer[indexBuffer[i + 1]];
-					vkglTF::Vertex c = vertexBuffer[indexBuffer[i + 2]];
-
-					size_t a_x = a.uv.s * (gltfimages[image_index].width - 1);
-					size_t a_y = a.uv.t * (gltfimages[image_index].height - 1);
-					size_t a_index = 4 * (a_y * gltfimages[image_index].width + a_x);
-
-					unsigned char colour_a_0 = gltfimages[image_index].image[a_index + 0];
-					unsigned char colour_a_1 = gltfimages[image_index].image[a_index + 1];
-					unsigned char colour_a_2 = gltfimages[image_index].image[a_index + 2];
-					unsigned char colour_a_3 = gltfimages[image_index].image[a_index + 3];
-
-					size_t b_x = b.uv.s * (gltfimages[image_index].width - 1);
-					size_t b_y = b.uv.t * (gltfimages[image_index].height - 1);
-					size_t b_index = 4 * (b_y * gltfimages[image_index].width + b_x);
-
-					unsigned char colour_b_0 = gltfimages[image_index].image[b_index + 0];
-					unsigned char colour_b_1 = gltfimages[image_index].image[b_index + 1];
-					unsigned char colour_b_2 = gltfimages[image_index].image[b_index + 2];
-					unsigned char colour_b_3 = gltfimages[image_index].image[b_index + 3];
-
-					size_t c_x = c.uv.s * (gltfimages[image_index].width - 1);
-					size_t c_y = c.uv.t * (gltfimages[image_index].height - 1);
-					size_t c_index = 4 * (c_y * gltfimages[image_index].width + c_x);
-
-					unsigned char colour_c_0 = gltfimages[image_index].image[c_index + 0];
-					unsigned char colour_c_1 = gltfimages[image_index].image[c_index + 1];
-					unsigned char colour_c_2 = gltfimages[image_index].image[c_index + 2];
-					unsigned char colour_c_3 = gltfimages[image_index].image[c_index + 3];
-
-					if (colour_a_0 == 255 &&
-						colour_a_1 == 255 &&
-						colour_a_2 == 255 &&
-						colour_a_3 == 255 &&
-						colour_b_0 == 255 &&
-						colour_b_1 == 255 &&
-						colour_b_2 == 255 &&
-						colour_b_3 == 255 &&
-						colour_c_0 == 255 &&
-						colour_c_1 == 255 &&
-						colour_c_2 == 255 &&
-						colour_c_3 == 255)
-					{
-						triangle t;
-
-						t.vertices[0] = a;
-						t.vertices[1] = b;
-						t.vertices[2] = c;
-
-						tris.push_back(t);
-					}
-				}
-
-				//MessageBox(NULL, gltfimages[image_index].name.c_str(), "test", MB_OK);
-			}
-
-
-//			uniformData.light_tri_count = tris.size();
-
-			ostringstream oss;
-
-			oss << tris.size();// indexBuffer.size() << " " << vertexBuffer.size();
-
-			MessageBox(NULL, "test", oss.str().c_str(), MB_OK);
 		}
 
 
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism3/cornell_prism3.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/bunny2/bunny2.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/cylinder/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/small_light/small_light.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/barrel/barrel.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/prism3/cornell_prism3.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/bunny2/bunny2.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/cylinder/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/small_light/small_light.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/barrel/barrel.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
 
 
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism3/cornell_prism3_merged.gltf", vulkanDevice, queue, glTFLoadingFlags);			
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism_rounded/prism_rounded.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism/cornell_prism.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism2/prism2.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/prism4/cornell_prism4.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/prism3/cornell_prism3_merged.gltf", vulkanDevice, queue, glTFLoadingFlags);			
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/prism_rounded/prism_rounded.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/prism/cornell_prism.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/prism2/prism2.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/prism4/cornell_prism4.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/bunny/bunny.gltf", vulkanDevice, queue, glTFLoadingFlags);		
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/bunny3/bunny3.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring/ring.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring2/ring2.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/ring3/ring3.gltf", vulkanDevice, queue, glTFLoadingFlags);
-			//scene.loadFromFile("C:/temp/rob_rau_cornell/sphere2/sphere2.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/bunny/bunny.gltf", vulkanDevice, queue, glTFLoadingFlags);		
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/bunny3/bunny3.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
-	//scene.loadFromFile("C:/temp/cyl_tex/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/ring/ring.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/ring2/ring2.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/ring3/ring3.gltf", vulkanDevice, queue, glTFLoadingFlags);
+		//scene.loadFromFile("C:/temp/rob_rau_cornell/sphere2/sphere2.gltf", vulkanDevice, queue, glTFLoadingFlags);
+
+//scene.loadFromFile("C:/temp/cyl_tex/cylinder.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
 
-	//scene.loadFromFile(getAssetPath() + "models/FlightHelmet/glTF/FlightHelmet.gltf", vulkanDevice, queue, glTFLoadingFlags);
+//scene.loadFromFile(getAssetPath() + "models/FlightHelmet/glTF/FlightHelmet.gltf", vulkanDevice, queue, glTFLoadingFlags);
 
 
 
@@ -1177,13 +1072,17 @@ public:
 		uniformData.camera_pos = camera.position;
 
 
-	//	uniformData.light_tri_count = 2;// tris.size();
+		//	uniformData.light_tri_count = 2;// tris.size();
 
 
-		// Pass the vertex size to the shader for unpacking vertices
+			// Pass the vertex size to the shader for unpacking vertices
 		uniformData.vertexSize = sizeof(vkglTF::Vertex);
 
 		uniformData.screenshot_mode = taking_screenshot;
+
+		uniformData.tri_count = tri_count;
+		uniformData.light_tri_count = light_tri_count;
+
 
 		memcpy(ubo.mapped, &uniformData, sizeof(uniformData));
 	}

@@ -27,16 +27,16 @@ layout(binding = 2, set = 0) uniform UBO
 
 	mat4 transformation_matrix;
 
-//	int light_tri_count;
-
-//	vec3 tris_a_vertices[2];
-//	vec3 tris_b_vertices[2];
-//	vec3 tris_c_vertices[2];
-
 	vec3 camera_pos;
 	int vertexSize;
 	bool screenshot_mode;
+
+	int tri_count;
+	int light_tri_count;
+
+
 } ubo;
+
 layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices;
 layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices;
 
