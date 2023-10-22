@@ -739,6 +739,8 @@ void main()
 	int first_index = 3*ubo.tri_count - 3*ubo.light_tri_count;
 	int num_indices = 3*ubo.tri_count;
 
+	int count = 0;
+
 	for(int i = first_index; i < num_indices; i += 3)
 	{
 		uint index_0 = indices.i[i + 0];
@@ -748,10 +750,15 @@ void main()
 		Vertex v0 = unpack(index_0);
 		Vertex v1 = unpack(index_1);
 		Vertex v2 = unpack(index_2);
+
+		count++;
 	}
 
-
-
+//	if(count == 4968)
+//	imageStore(color_image, pixel_pos, vec4(vec3(1, 1, 1), 0.0));
+//else
+	
+	
 	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
 

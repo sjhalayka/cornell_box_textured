@@ -1315,10 +1315,10 @@ void vkglTF::Model::loadFromFile(
 
 			indexBuffer = temp_indices;
 
-	//		std::ostringstream oss;
-	//		oss << num_triangles << " " << num_light_triangles;
+			//std::ostringstream oss;
+			//oss << num_triangles << " " << num_light_triangles;
 
-	//		MessageBox(NULL, oss.str().c_str(), "test", MB_OK);
+			//MessageBox(NULL, oss.str().c_str(), "test", MB_OK);
 		}
 
 
