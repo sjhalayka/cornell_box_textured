@@ -766,17 +766,17 @@ void main()
 		vec3 c0 = texture(baseColorSampler, v0.uv).rgb;
 		vec3 c1 = texture(baseColorSampler, v1.uv).rgb;
 		vec3 c2 = texture(baseColorSampler, v2.uv).rgb;
-		
-		if(	c0 == vec3(0.0, 0.0, 0.0) &&
-			c1 == vec3(0.0, 0.0, 0.0) &&
-			c2 == vec3(0.0, 0.0, 0.0))
+
+		if(	c0 == vec3(1.0, 1.0, 1.0) &&
+			c1 == vec3(1.0, 1.0, 1.0) &&
+			c2 == vec3(1.0, 1.0, 1.0))
 		{
 			count++;
 		}
 	}
 
 	if(count == 4968)
-		imageStore(color_image, pixel_pos, vec4(vec3(1, 1, 1), 0.0));
+		imageStore(color_image, pixel_pos, vec4(vec3(1.0), 0.0));
 	else
 		imageStore(color_image, pixel_pos, vec4(color, 0.0));
 
