@@ -218,6 +218,25 @@ bool is_clear_line_of_sight(const vec3 pos, const vec3 light_pos)
 
 
 
+int get_rand_light_triangle(void)
+{
+	return int(stepAndOutputRNGFloat(prng_state)*(ubo.light_tri_count - 1.0));
+}
+
+// https://stackoverflow.com/questions/19654251/random-point-inside-triangle-inside-java
+vec3 getRandomPointOnTriangle(vec3 A, vec3 B, vec3 C)
+{
+	float r1 = stepAndOutputRNGFloat(prng_state);
+	float r2 = stepAndOutputRNGFloat(prng_state);
+
+	float sqrtR1 = sqrt(r1);
+
+	//float x = (1 - sqrtR1) * A.x + (sqrtR1 * (1 - r2)) * B.x + (sqrtR1 * r2) * C.x;
+	//float y = (1 - sqrtR1) * A.y + (sqrtR1 * (1 - r2)) * B.y + (sqrtR1 * r2) * C.y;
+	//float z = (1 - sqrtR1) * A.z + (sqrtR1 * (1 - r2)) * B.z + (sqrtR1 * r2) * C.z;
+
+	return (1 - sqrtR1) * A + (sqrtR1 * (1 - r2)) * B + (sqrtR1 * r2) * C;
+}
 
 
 
@@ -227,8 +246,15 @@ bool is_clear_line_of_sight(const vec3 pos, const vec3 light_pos)
 
 float trace_path_forward(const int steps, const vec3 origin, const vec3 direction, const float hue, const float eta)
 {
-	vec3 o = origin;
-	vec3 d = direction;
+	int rand_light_index = get_rand_light_triangle();
+
+	
+
+	//vec3 rand_point = getRandomPointOnTriangle();
+
+
+	vec3 o = origin; // get random point on random triangle
+	vec3 d = direction; // get random hemispherical direction
 
 	const float energy = 1.0;
 	const float caustic_energy = energy*1.0;
@@ -903,22 +929,6 @@ Vertex unpack(uint index)
 
 
 
-
-
-// https://stackoverflow.com/questions/19654251/random-point-inside-triangle-inside-java
-vec3 getRandomPointOnTriangle(vec3 A, vec3 B, vec3 C)
-{
-	float r1 = stepAndOutputRNGFloat(prng_state);
-	float r2 = stepAndOutputRNGFloat(prng_state);
-
-	float sqrtR1 = sqrt(r1);
-
-	//float x = (1 - sqrtR1) * A.x + (sqrtR1 * (1 - r2)) * B.x + (sqrtR1 * r2) * C.x;
-	//float y = (1 - sqrtR1) * A.y + (sqrtR1 * (1 - r2)) * B.y + (sqrtR1 * r2) * C.y;
-	//float z = (1 - sqrtR1) * A.z + (sqrtR1 * (1 - r2)) * B.z + (sqrtR1 * r2) * C.z;
-
-	return (1 - sqrtR1) * A + (sqrtR1 * (1 - r2)) * B + (sqrtR1 * r2) * C;
-}
 
 
 
