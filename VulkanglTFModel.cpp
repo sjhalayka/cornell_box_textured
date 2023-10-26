@@ -13,9 +13,6 @@
 
 #include "VulkanglTFModel.h"
 
-
-
-
 VkDescriptorSetLayout vkglTF::descriptorSetLayoutImage = VK_NULL_HANDLE;
 VkDescriptorSetLayout vkglTF::descriptorSetLayoutUbo = VK_NULL_HANDLE;
 VkMemoryPropertyFlags vkglTF::memoryPropertyFlags = 0;
@@ -1177,16 +1174,11 @@ void vkglTF::Model::loadFromFile(
 	std::vector<uint32_t> &indexBuffer, 
 	std::vector<Vertex> &vertexBuffer,
 	std::vector<tinygltf::Image> &gltfimages,
-	std::string filename, 
-	size_t &num_triangles,
-	size_t &num_light_triangles, 
-	vks::VulkanDevice* device, VkQueue transferQueue, uint32_t fileLoadingFlags, float scale)
+	std::string filename, vks::VulkanDevice* device, VkQueue transferQueue, uint32_t fileLoadingFlags, float scale)
 {
 	indexBuffer.clear();
 	vertexBuffer.clear();
 	gltfimages.clear();
-
-	std::vector<triangle> tris;
 
 	tinygltf::Model gltfModel;
 	tinygltf::TinyGLTF gltfContext;
@@ -1224,9 +1216,6 @@ void vkglTF::Model::loadFromFile(
 			loadImages(gltfimages, gltfModel, device, transferQueue);
 		}
 
-
-
-
 		loadMaterials(gltfModel);
 		
 		const tinygltf::Scene& scene = gltfModel.scenes[gltfModel.defaultScene > -1 ? gltfModel.defaultScene : 0];
@@ -1236,92 +1225,6 @@ void vkglTF::Model::loadFromFile(
 			const tinygltf::Node node = gltfModel.nodes[scene.nodes[i]];
 			loadNode(nullptr, node, scene.nodes[i], gltfModel, indexBuffer, vertexBuffer, scale);
 		}
-
-		std::vector<uint32_t> light_indices;
-		std::vector<uint32_t> temp_indices;
-
-
-		for (size_t image_index = 0; image_index < gltfimages.size(); image_index++)
-		{
-			if (gltfimages[image_index].name != "ColorMapWithOpacityAlpha512")
-				continue;
-
-			for (size_t i = 0; i < indexBuffer.size(); i += 3)
-			{
-				vkglTF::Vertex a = vertexBuffer[indexBuffer[i + 0]];
-				vkglTF::Vertex b = vertexBuffer[indexBuffer[i + 1]];
-				vkglTF::Vertex c = vertexBuffer[indexBuffer[i + 2]];
-
-				size_t a_x = a.uv.s * (gltfimages[image_index].width - 1);
-				size_t a_y = a.uv.t * (gltfimages[image_index].height - 1);
-				size_t a_index = 4 * (a_y * gltfimages[image_index].width + a_x);
-
-				unsigned char colour_a_0 = gltfimages[image_index].image[a_index + 0];
-				unsigned char colour_a_1 = gltfimages[image_index].image[a_index + 1];
-				unsigned char colour_a_2 = gltfimages[image_index].image[a_index + 2];
-				unsigned char colour_a_3 = gltfimages[image_index].image[a_index + 3];
-
-				size_t b_x = b.uv.s * (gltfimages[image_index].width - 1);
-				size_t b_y = b.uv.t * (gltfimages[image_index].height - 1);
-				size_t b_index = 4 * (b_y * gltfimages[image_index].width + b_x);
-
-				unsigned char colour_b_0 = gltfimages[image_index].image[b_index + 0];
-				unsigned char colour_b_1 = gltfimages[image_index].image[b_index + 1];
-				unsigned char colour_b_2 = gltfimages[image_index].image[b_index + 2];
-				unsigned char colour_b_3 = gltfimages[image_index].image[b_index + 3];
-
-				size_t c_x = c.uv.s * (gltfimages[image_index].width - 1);
-				size_t c_y = c.uv.t * (gltfimages[image_index].height - 1);
-				size_t c_index = 4 * (c_y * gltfimages[image_index].width + c_x);
-
-				unsigned char colour_c_0 = gltfimages[image_index].image[c_index + 0];
-				unsigned char colour_c_1 = gltfimages[image_index].image[c_index + 1];
-				unsigned char colour_c_2 = gltfimages[image_index].image[c_index + 2];
-				unsigned char colour_c_3 = gltfimages[image_index].image[c_index + 3];
-
-
-				if (colour_a_0 == 255 &&
-					colour_a_1 == 255 &&
-					colour_a_2 == 255 &&
-					colour_a_3 == 255 &&
-					colour_b_0 == 255 &&
-					colour_b_1 == 255 &&
-					colour_b_2 == 255 &&
-					colour_b_3 == 255 &&
-					colour_c_0 == 255 &&
-					colour_c_1 == 255 &&
-					colour_c_2 == 255 &&
-					colour_c_3 == 255)
-				{
-					num_light_triangles++;
-					num_triangles++;
-
-					light_indices.push_back(indexBuffer[i + 0]);
-					light_indices.push_back(indexBuffer[i + 1]);
-					light_indices.push_back(indexBuffer[i + 2]);
-				}
-				else
-				{
-					num_triangles++;
-
-					temp_indices.push_back(indexBuffer[i + 0]);
-					temp_indices.push_back(indexBuffer[i + 1]);
-					temp_indices.push_back(indexBuffer[i + 2]);
-				}
-			}
-
-			for (size_t i = 0; i < light_indices.size(); i++)
-				temp_indices.push_back(light_indices[i]);
-
-			indexBuffer = temp_indices;
-
-			//std::ostringstream oss;
-			//oss << num_triangles << " " << num_light_triangles;
-
-			//MessageBox(NULL, oss.str().c_str(), "test", MB_OK);
-		}
-
-
 
 		if (gltfModel.animations.size() > 0)
 		{
@@ -1347,10 +1250,6 @@ void vkglTF::Model::loadFromFile(
 		vks::tools::exitFatal("Could not load glTF file \"" + filename + "\": " + error, -1);
 		return;
 	}
-
-
-
-
 
 	// Pre-Calculations for requested features
 	if ((fileLoadingFlags & FileLoadingFlags::PreTransformVertices) || (fileLoadingFlags & FileLoadingFlags::PreMultiplyVertexColors) || (fileLoadingFlags & FileLoadingFlags::FlipY)) {

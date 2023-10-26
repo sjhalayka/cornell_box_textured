@@ -12,7 +12,6 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <sstream>
 
 #include "vulkan/vulkan.h"
 #include "VulkanDevice.h"
@@ -35,11 +34,6 @@
 #if defined(__ANDROID__)
 #include <android/asset_manager.h>
 #endif
-
-
-
-
-
 
 namespace vkglTF
 {
@@ -217,33 +211,6 @@ namespace vkglTF
 	enum class VertexComponent { Position, Normal, UV, Color, Tangent, Joint0, Weight0 };
 
 	struct Vertex {
-
-
-		inline bool operator<(const Vertex& right) const
-		{
-			if (right.pos.x > pos.x)
-				return true;
-			else if (right.pos.x < pos.x)
-				return false;
-
-			if (right.pos.y > pos.y)
-				return true;
-			else if (right.pos.y < pos.y)
-				return false;
-
-			if (right.pos.z > pos.z)
-				return true;
-			else if (right.pos.z < pos.z)
-				return false;
-
-			return false;
-		}
-
-
-
-
-
-
 		glm::vec3 pos;
 		glm::vec3 normal;
 		glm::vec2 uv;
@@ -330,14 +297,11 @@ namespace vkglTF
 		
 		
 		void loadFromFile(
-			std::vector<uint32_t>& indexBuffer,
-			std::vector<Vertex>& vertexBuffer,
+			std::vector<uint32_t> &indexBuffer, 
+			std::vector<Vertex> &vertexBuffer,
 			std::vector<tinygltf::Image>& gltfimages,
-			std::string filename,
-			size_t& num_triangles,
-			size_t& num_light_triangles,
-			vks::VulkanDevice* device, VkQueue transferQueue, uint32_t fileLoadingFlags, float scale = 1.0);
-
+			std::string filename, vks::VulkanDevice* device, VkQueue transferQueue, uint32_t fileLoadingFlags = vkglTF::FileLoadingFlags::None, float scale = 1.0f);
+		
 		
 		void bindBuffers(VkCommandBuffer commandBuffer);
 		void drawNode(Node* node, VkCommandBuffer commandBuffer, uint32_t renderFlags = 0, VkPipelineLayout pipelineLayout = VK_NULL_HANDLE, uint32_t bindImageSet = 1);
@@ -350,39 +314,3 @@ namespace vkglTF
 		void prepareNodeDescriptor(vkglTF::Node* node, VkDescriptorSetLayout descriptorSetLayout);
 	};
 }
-
-
-
-
-
-
-class triangle
-{
-public:
-	vkglTF::Vertex vertices[3];
-
-	inline bool operator<(const triangle& right) const
-	{
-		if (vertices[0] < right.vertices[0])
-			return true;
-		else if (right.vertices[0] < vertices[0])
-			return false;
-
-		if (vertices[1] < right.vertices[1])
-			return true;
-		else if (right.vertices[1] < vertices[1])
-			return false;
-
-		if (vertices[2] < right.vertices[2])
-			return true;
-		else if (right.vertices[2] < vertices[2])
-			return false;
-
-		return false;
-	}
-};
-
-
-
-
-
