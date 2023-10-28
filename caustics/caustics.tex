@@ -57,7 +57,7 @@ In this paper we discuss the following:
 \item Appendix A: Bidirectional or forward path tracers, and complications
 \item Appendix B: Contemporary graphics research on caustics
 \item Appendix C: Classical photon mapping
-\item Appendix D: Failures of the backward path tracer, and the way ahead
+\item Appendix D: Failures of the backward path tracer
 \end{itemize}
 
 
@@ -262,11 +262,11 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 
 
 
-\section{Failures of the backward path tracer, and the way ahead}
+\section{Failures of the backward path tracer}
 To be fair, no one algorithm is perfect: there is at least one lighting setup that cannot be efficiently modeled by using backward path tracing on its own.
 For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is generally hard to get to when it comes to tracing a path from the eye.
 See Fig. 11.
-We shall work at implementing importance sampling with the backward path tracer, which is likely the easiest -- and the most natural -- solution to the barrel light setup.
+We shall work at implementing a bidirectional path tracer, which is likely the easiest -- and the most natural -- solution to the barrel light setup.
 Let this paper serve as a stepping stone toward that goal.
 
 
