@@ -27,7 +27,7 @@ Obtain the files
 
 6) Extract the model and textures subdirectories and the assorted files to C:/dev/Vulkan-master/assets/
 
-7) Download the OLD GLM library from: [https://github.com/g-truc/glm](https://github.com/g-truc/glm/tree/1ad55c5016339b83b7eec98c31007e0aee57d2bf)
+7) Download the OLD GLM library from: https://github.com/g-truc/glm/tree/1ad55c5016339b83b7eec98c31007e0aee57d2bf
 
 8) Extract the contents of glm-master/glm subdirectory to C:/dev/Vulkan-master/external/glm
 
