@@ -12,7 +12,6 @@ Based off of Sascha Willems' raytracingreflections code.
 Model by Rob Rau.
 
 To obtain and compile Sascha Willems' demo code:
-
 Obtain the files
 
 1) Download the base code from: https://github.com/SaschaWillems/Vulkan
@@ -54,6 +53,19 @@ Replacing the source files
 4) Make directory C:/temp/rob_rau_cornell/gltf/
 
 5) Copy cornell.bin, cornell.gltf, ColorMapWithOpacityAlpha512.png and GlowMapWithReflectionAlpha512.png to C:/temp/rob_rau_cornell/gltf/
+
+6) Delete all projects from the solution, except for ALL_BUILD, base, raytracingreflections and ZERO_CHECK.
+
+7) Rebuild solution
+
+8) Make a batch file rtreflect.bat in C:/dev/Vulkan-master/bin/Release/ with the following contents:
+
+glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\closesthit.rchit"  --target-env=vulkan1.2 -o "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\closesthit.rchit.spv" 
+glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\miss.rmiss" --target-env=vulkan1.2 -o "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\miss.rmiss.spv"
+glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\raygen.rgen" --target-env=vulkan1.2 -o "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\raygen.rgen.spv"
+glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\shadow.rmiss" --target-env=vulkan1.2 -o "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\shadow.rmiss.spv"
+raytracingreflections.exe
+
 
 
 ![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/9ccf47df-b711-42ac-90e5-b1bdae5c5e5f)
