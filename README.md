@@ -29,7 +29,7 @@ Obtain the files
 
 7) Download the OLD GLM library from: https://github.com/g-truc/glm/tree/1ad55c5016339b83b7eec98c31007e0aee57d2bf
 
-8) Extract the contents of glm-master/glm subdirectory to C:/dev/Vulkan-master/external/glm
+8) Extract the contents of glm-1ad55c5016339b83b7eec98c31007e0aee57d2bf/glm subdirectory to C:/dev/Vulkan-master/external/glm
 
 
 Building the executables
