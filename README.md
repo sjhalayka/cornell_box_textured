@@ -69,9 +69,10 @@ glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\shadow.rmiss"
 raytracingreflections.exe
 
 
+![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/046527b3-82d5-4034-b701-ff651bb175d4)
+
+![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/a426d2de-68ec-456e-873a-c530a560bb99)
 
 
 
-![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/9ccf47df-b711-42ac-90e5-b1bdae5c5e5f)
 
-![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/b469dd3f-715a-4906-b2f3-9d8dcd470581)
