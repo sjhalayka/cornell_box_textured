@@ -582,9 +582,9 @@ public:
 
 
 	VkTransformMatrixKHR transformMatrix = {
-				0.025f, 0.0f, 0.0f, 0.0f,
-				0.0f, 0.025f, 0.0f, 0.0f,
-				0.0f, 0.0f, 0.025f, 0.0f };
+				1, 0.0f, 0.0f, 0.0f,
+				0.0f, 1, 0.0f, 0.0f,
+				0.0f, 0.0f, 1, 0.0f };
 
 	clock_t start = std::clock();
 
