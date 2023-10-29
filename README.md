@@ -13,7 +13,7 @@ Model by Rob Rau.
 
 ![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/046527b3-82d5-4034-b701-ff651bb175d4)
 
-To obtain and compile Sascha Willems' demo code:
+To obtain and compile the demo code:
 
 Obtain the files
 
