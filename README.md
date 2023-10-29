@@ -61,9 +61,13 @@ Replacing the source files
 8) Make a batch file rtreflect.bat in C:/dev/Vulkan-master/bin/Release/ with the following contents:
 
 glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\closesthit.rchit"  --target-env=vulkan1.2 -o "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\closesthit.rchit.spv" 
+
 glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\miss.rmiss" --target-env=vulkan1.2 -o "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\miss.rmiss.spv"
+
 glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\raygen.rgen" --target-env=vulkan1.2 -o "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\raygen.rgen.spv"
+
 glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\shadow.rmiss" --target-env=vulkan1.2 -o "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\shadow.rmiss.spv"
+
 raytracingreflections.exe
 
 
