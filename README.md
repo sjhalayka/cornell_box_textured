@@ -14,3 +14,37 @@ Model by Rob Rau.
 ![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/9ccf47df-b711-42ac-90e5-b1bdae5c5e5f)
 
 ![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/b469dd3f-715a-4906-b2f3-9d8dcd470581)
+
+To obtain and compile Sascha Willems' demo code:
+
+Obtain the files
+
+1) Download the base code from: https://github.com/SaschaWillems/Vulkan
+
+2) Extract Vulkan-master directory to your hard drive (e.g. C:/dev/Vulkan-master/)
+
+3) Open command prompt, change directory to C:/dev/Vulkan-master/
+
+4) Type: cmake -G "Visual Studio 17 2022" -A x64
+
+5) Download the assets (models and textures) from: https://github.com/SaschaWillems/Vulkan-Assets
+
+6) Extract the model and textures subdirectories and the assorted files to C:/dev/Vulkan-master/assets/
+
+7) Download the GLM library from: https://github.com/g-truc/glm
+
+8) Extract the contents of glm-master/glm subdirectory to C:/dev/Vulkan-master/external/glm
+
+
+Building the executables
+
+1) Open the solution file C:/dev/Vulkan-master/vulkanExamples.sln
+
+2) Change build setting to Release mode, x64
+
+3) Select the Build -> Build Solution menu item (be patient, this takes a long time the first time)
+
+4) Run an example (e.g. C:/dev/Vulkan-master/bin/Release/raytracingreflections.exe)
+
+
+
