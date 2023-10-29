@@ -1,4 +1,4 @@
-Cornell box done in glTF format.
+Cornell box done in glTF format, with caustics.
 
 Large-format screenshots (may require a TDR time extension, if your framerate dips below 1 FPS, like on my 3060):
 
