@@ -11,10 +11,6 @@ Based off of Sascha Willems' raytracingreflections code.
 
 Model by Rob Rau.
 
-![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/9ccf47df-b711-42ac-90e5-b1bdae5c5e5f)
-
-![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/b469dd3f-715a-4906-b2f3-9d8dcd470581)
-
 To obtain and compile Sascha Willems' demo code:
 
 Obtain the files
@@ -47,4 +43,19 @@ Building the executables
 4) Run an example (e.g. C:/dev/Vulkan-master/bin/Release/raytracingreflections.exe)
 
 
+Replacing the source files
 
+1) Copy VulkanglTFModel.cpp and VulkanglTFModel.h to C:/dev/Vulkan-master/base
+
+2) Copy closesthit.rchit, miss.rmiss, raygen.rgen and shadow.rmiss to C:/dev/Vulkan-master/shaders/glsl/raytracingreflections
+
+3) Copy raytracingreflections.cpp to C:/dev/Vulkan-master/examples/raytracingreflections
+
+4) Make directory C:/temp/rob_rau_cornell/gltf/
+
+5) Copy cornell.bin, cornell.gltf, ColorMapWithOpacityAlpha512.png and GlowMapWithReflectionAlpha512.png to C:/temp/rob_rau_cornell/gltf/
+
+
+![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/9ccf47df-b711-42ac-90e5-b1bdae5c5e5f)
+
+![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/b469dd3f-715a-4906-b2f3-9d8dcd470581)
