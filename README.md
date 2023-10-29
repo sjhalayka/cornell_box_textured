@@ -11,6 +11,8 @@ Based off of Sascha Willems' raytracingreflections code.
 
 Model by Rob Rau.
 
+![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/046527b3-82d5-4034-b701-ff651bb175d4)
+
 To obtain and compile Sascha Willems' demo code:
 
 Obtain the files
@@ -68,10 +70,6 @@ glslc.exe "C:\dev\Vulkan-master\shaders\glsl\raytracingreflections\shadow.rmiss"
 
 raytracingreflections.exe
 
-
-![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/046527b3-82d5-4034-b701-ff651bb175d4)
-
-![image](https://github.com/sjhalayka/cornell_box_textured/assets/16404554/a426d2de-68ec-456e-873a-c530a560bb99)
 
 
 
