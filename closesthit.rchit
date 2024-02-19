@@ -9,6 +9,8 @@ struct RayPayload
 	vec3 normal;
 	float reflector;
 	float opacity;
+	float tint;
+	vec3 tint_colour;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
@@ -31,8 +33,9 @@ layout(binding = 2, set = 0) uniform UBO
 	int vertexSize;
 	bool screenshot_mode;
 
-	int tri_count;
-	int light_tri_count;
+	uint tri_count;
+	uint light_tri_count;
+
 } ubo;
 
 layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices;
@@ -46,6 +49,7 @@ struct Vertex
   vec4 color;
   vec4 _pad0; 
   vec4 _pad1;
+  vec4 _pad2;
 };
 
 Vertex unpack(uint index)
@@ -88,30 +92,41 @@ void main()
 	rayPayload.normal = normalize(n.xyz);
 	rayPayload.reflector = texture(normalSampler, uv).a;
 	rayPayload.opacity = texture(baseColorSampler, uv).a;
-
+	rayPayload.tint = 0;
+	rayPayload.tint_colour = vec3(0, 0, 0);
 	
-	if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
-	{
-		rayPayload.color.r = 20.0;
-		rayPayload.color.g = 20.0;
-		rayPayload.color.b = 20.0;
-
-		//if(ubo.fog_mode)
-			//rayPayload.reflector = 1.0;
-	}
 
 	// Make the transparent sphere reflective
 	if(rayPayload.opacity == 0.0)
 	{
-		rayPayload.reflector = 1.0;
+		rayPayload.opacity = 0.01;
+		rayPayload.reflector = 0.99;
+
+		rayPayload.tint = 0.9;
+		rayPayload.tint_colour = vec3(1,0,0);
+		rayPayload.color = rayPayload.tint_colour;
 	}
 
 	if(rayPayload.reflector == 1.0)
 	{
-//		rayPayload.opacity = 0.0;
-//		rayPayload.color = vec3(0, 0, 0);
+	//	rayPayload.color.r = 1.0;
+	//	rayPayload.color.g = 0.5;
+	//	rayPayload.color.b = 0.0;
+	//	rayPayload.opacity = 0.75;
+		//rayPayload.reflector = 0.25;
+
+		//rayPayload.tint = 1.0;
+		//rayPayload.tint_colour = vec3(1, 0.5, 0.0);
+		//rayPayload.color = rayPayload.tint_colour;
 	}
 	
+	vec3 light_scale = 255.0*texture(normalSampler, uv).rgb;
+
+	const float e_x = pow(2.0, light_scale.x);
+	const float e_y = pow(2.0, light_scale.y);
+	const float e_z = pow(2.0, light_scale.z);
+
+	rayPayload.color.r *= e_x;
+	rayPayload.color.g *= e_y;
+	rayPayload.color.b *= e_z;
 }
-
-
