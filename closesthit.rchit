@@ -92,9 +92,9 @@ void main()
 	
 	if(rayPayload.color.r == 1.0 && rayPayload.color.g == 1.0 && rayPayload.color.b == 1.0)
 	{
-		rayPayload.color.r = 21.0;
-		rayPayload.color.g = 21.0;
-		rayPayload.color.b = 21.0;
+		rayPayload.color.r = 20.0;
+		rayPayload.color.g = 20.0;
+		rayPayload.color.b = 20.0;
 
 		//if(ubo.fog_mode)
 			//rayPayload.reflector = 1.0;

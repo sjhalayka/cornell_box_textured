@@ -184,15 +184,15 @@ vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
 }
 
 
-	
+
 
 float trace_path2(const int steps, const vec3 origin, const vec3 direction, const float hue, const float eta)
 {
 	vec3 o = origin;
 	vec3 d = direction;
 
-	const float energy = 10.0;
-	const float caustic_energy = 1;// energy;
+	const float energy = 1.0;
+	const float caustic_energy = energy*1.0;
 
 	float ret_colour = 0;
 	float local_colour = energy;
@@ -240,9 +240,9 @@ float trace_path2(const int steps, const vec3 origin, const vec3 direction, cons
 		}
 
 		// If hit a light
-		if(	rayPayload.color.r == 21.0 && 
-			rayPayload.color.g == 21.0 && 
-			rayPayload.color.b == 21.0)
+		if(	rayPayload.color.r == 20.0 && 
+			rayPayload.color.g == 20.0 && 
+			rayPayload.color.b == 20.0)
 		{	
 			ret_colour += local_colour;
 			break;
@@ -405,7 +405,7 @@ float get_ray0(const float hue, const float eta)
 				used_count++;
 
 				if(ubo.screenshot_mode)
-					rays[i].base_color = get_radiance(100, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 				else
 					rays[i].base_color = get_radiance(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 
@@ -700,7 +700,7 @@ void main()
 {
 	// Do chromatic aberration (good for making rainbows via prisms)
 
-	const int channels = 5;
+	const int channels = 20;
 
 	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x; // violet
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x; // red
