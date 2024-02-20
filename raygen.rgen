@@ -3,16 +3,6 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 
 
-
-layout(binding = 0, set = 1) uniform sampler2D baseColorSampler;
-layout(binding = 1, set = 1) uniform sampler2D normalSampler;
-
-
-layout(location = 2) rayPayloadEXT bool shadowed;
-
-
-
-
 struct ray
 {
 	vec4 direction;
@@ -21,7 +11,6 @@ struct ray
 	bool in_use;
 
 	vec3 normal;
-	float depth;
 
 	int child_refract_id;
 	int child_reflect_id;
@@ -32,9 +21,6 @@ struct ray
 
 	float reflection_constant;
 	float refraction_constant;
-
-	float tint_constant;
-	vec3 tint_colour;
 
 	bool external_reflection_ray;
 	bool external_refraction_ray;
@@ -75,6 +61,8 @@ float noise3(vec3 p, float wavelength){
 
 
 
+ivec2 pixel_pos = ivec2(gl_LaunchIDEXT.xy);
+ivec2 res = ivec2(gl_LaunchSizeEXT.xy);
 
 const float TWO_PI = 8.0 * atan(1.0);
 
@@ -83,7 +71,7 @@ vec3 aabb_max = vec3(2.5, 2.5, 2.5);
 
 const float opacity_factor = 0.01;
 
-vec3 fog_colour = vec3(1.0, 1.0, 1.0);
+vec3 fog_colour = vec3(1.0, 0.5, 0.0);
 
 
 
@@ -96,7 +84,7 @@ layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 1, set = 0, rgba8) uniform image2D color_image;
 layout(binding = 2, set = 0) uniform UBO 
 {
-	mat4 viewInverse;	
+	mat4 viewInverse;
 	mat4 projInverse;
 
 	mat4 transformation_matrix;
@@ -105,18 +93,13 @@ layout(binding = 2, set = 0) uniform UBO
 	int vertexSize;
 	bool screenshot_mode;
 
-	uint tri_count;
-	uint light_tri_count;
+	int tri_count;
+	int light_tri_count;
 
 } ubo;
 
 layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices;
 layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices;
-
-
-
-
-
 
 struct RayPayload
 {
@@ -125,12 +108,10 @@ struct RayPayload
 	vec3 normal;
 	float reflector;
 	float opacity;
-	float tint;
-	vec3 tint_colour;
 };
 
 layout(location = 0) rayPayloadEXT RayPayload rayPayload;
-
+layout(location = 2) rayPayloadEXT bool shadowed;
 
 
 
@@ -138,6 +119,7 @@ layout(location = 0) rayPayloadEXT RayPayload rayPayload;
 // Max. number of recursion is passed via a specialization constant
 layout (constant_id = 0) const int MAX_RECURSION = 0;
 const int buffer_size = 8;
+
 
 
 
@@ -176,14 +158,12 @@ float stepAndOutputRNGFloat(inout uint rngState)
 // 
 vec3 RandomUnitVector(inout uint state)
 {
-
-float z = stepAndOutputRNGFloat(state) * 2.0f - 1.0f;
+    float z = stepAndOutputRNGFloat(state) * 2.0f - 1.0f;
     float a = stepAndOutputRNGFloat(state) * TWO_PI;
     float r = sqrt(1.0f - z * z);
     float x = r * cos(a);
     float y = r * sin(a);
     return normalize(vec3(x, y, z));
-
 }
 
 // I forget where this came from
@@ -204,18 +184,15 @@ vec3 cosWeightedRandomHemisphereDirection( const vec3 n, inout uint state )
 }
 
 
+	
 
-
-
-
-
-float trace_path_backward(const int steps, const vec3 origin, const vec3 direction, const float hue, const float eta)
+float trace_path2(const int steps, const vec3 origin, const vec3 direction, const float hue, const float eta)
 {
 	vec3 o = origin;
 	vec3 d = direction;
 
-	const float energy = 1;
-	const float caustic_energy = 1;//energy;
+	const float energy = 10.0;
+	const float caustic_energy = 1;// energy;
 
 	float ret_colour = 0;
 	float local_colour = energy;
@@ -249,7 +226,7 @@ float trace_path_backward(const int steps, const vec3 origin, const vec3 directi
 		// If hit the sky
 		if(rayPayload.dist == -1.0)
 		{
-			//ret_colour += local_colour; // this causes bugs
+			ret_colour += local_colour;
 			break;
 		}
 
@@ -263,25 +240,13 @@ float trace_path_backward(const int steps, const vec3 origin, const vec3 directi
 		}
 
 		// If hit a light
-		///if((rayPayload.color.r == 1 && 
-		//	rayPayload.color.g == 1 && 
-		//	rayPayload.color.b == 1)
-	//		||
-	//		(rayPayload.color.r == 1 && 
-	//		rayPayload.color.g == 0 && 
-	//		rayPayload.color.b == 0) 
-		//	||
-	//		(rayPayload.color.r == 0 && 
-	//		rayPayload.color.g == 78.0/255.0 && 
-	//		rayPayload.color.b == 255.0/255.0)
-//			)
-	//	{	
-			//ret_colour += local_colour;
-			//break;
-	//	}
-
-
-
+		if(	rayPayload.color.r == 21.0 && 
+			rayPayload.color.g == 21.0 && 
+			rayPayload.color.b == 21.0)
+		{	
+			ret_colour += local_colour;
+			break;
+		}
 
 		vec3 hitPos = o + d * rayPayload.dist;
 
@@ -331,41 +296,30 @@ float trace_path_backward(const int steps, const vec3 origin, const vec3 directi
 		}
 	}
 
-	return ret_colour / total;
+	return ret_colour / total;//(mask.r + mask.g + mask.b);
 }
 
 
-float get_radiance_backward(const int samples, const int steps, const vec3 origin, const vec3 seed_direction, const float hue, const float eta)
+float get_radiance(const int samples, const int steps, const vec3 origin, const vec3 seed_direction, const float hue, const float eta)
 {
-	RayPayload r = rayPayload;
-
 	float ret_colour = 0.0;
 
 	for(int s = 0; s < samples; s++)
-		ret_colour += trace_path_backward(steps, origin, seed_direction, hue, eta);
-
-	rayPayload = r;
+		ret_colour += trace_path2(steps, origin, seed_direction, hue, eta);
 
 	return ret_colour / samples;
 }
 
 
-float get_omni_radiance_backward(const int samples, const int steps, const vec3 origin, const float hue, const float eta)
+float get_omni_radiance(const int samples, const int steps, const vec3 origin, const float hue, const float eta)
 {
-	RayPayload r = rayPayload;
-
 	float ret_colour = 0.0;
 
 	for(int s = 0; s < samples; s++)
-		ret_colour += trace_path_backward(steps, origin, RandomUnitVector(prng_state), hue, eta);;
-
-	rayPayload = r;
+		ret_colour += trace_path2(steps, origin, RandomUnitVector(prng_state), hue, eta);;
 
 	return ret_colour / samples;
 }
-
-
-
 
 bool in_aabb(vec3 pos, vec3 aabb_min, vec3 aabb_max)
 {
@@ -396,21 +350,7 @@ bool BBoxIntersect(const vec3 boxMin, const vec3 boxMax, const vec3 origin, cons
 }
 
 
-void get_origin_and_direction(inout vec4 origin, inout vec4 direction, float x, float y, float image_width, float image_height)
-{
-	const vec2 pixelCenter = vec2(x, y) + vec2(0.5);
-	const vec2 inUV = pixelCenter/vec2(image_width, image_height);
-	vec2 d = inUV * 2.0 - 1.0;
-
-	origin = ubo.viewInverse * vec4(0,0,0,1);
-	vec4 target = ubo.projInverse * vec4(d.x, d.y, 1, 1);
-	direction = ubo.viewInverse*vec4(normalize(target.xyz / target.w), 0);
-}
-
-
-
-
-float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
+float get_ray0(const float hue, const float eta)
 {
 	// This algorithm stops when the buffer runs out of space,
 	// or when the rays miss everything,
@@ -418,6 +358,14 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 
 	ray rays[buffer_size];
 	int current_buffer_index = 0;
+
+	const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
+	const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
+	vec2 d = inUV * 2.0 - 1.0;
+
+	vec4 origin = ubo.viewInverse * vec4(0,0,0,1);
+	vec4 target = ubo.projInverse * vec4(d.x, d.y, 1, 1) ;
+	vec4 direction = ubo.viewInverse*vec4(normalize(target.xyz / target.w), 0);
 
 	uint rayFlags = gl_RayFlagsOpaqueEXT;
 	uint cullMask = 0xff;
@@ -434,10 +382,6 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 		rays[i].parent_id = -1;
 		rays[i].external_reflection_ray = false;
 		rays[i].external_refraction_ray = false;
-		rays[i].normal = vec3(0, 0, 0);
-		rays[i].depth = 0;
-		rays[i].tint_constant = 0;
-		rays[i].tint_colour = vec3(0, 0, 0);
 	}
 
 	rays[0].direction = direction;
@@ -461,26 +405,21 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 				used_count++;
 
 				if(ubo.screenshot_mode)
-					rays[i].base_color = get_radiance_backward(1000, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance(100, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 				else
-					rays[i].base_color = get_radiance_backward(250, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
+					rays[i].base_color = get_radiance(25, 5, rays[i].origin.xyz, rays[i].direction.xyz, hue, eta);
 
 				traceRayEXT(topLevelAS, rayFlags, cullMask, 0, 0, 0, rays[i].origin.xyz, tmin, rays[i].direction.xyz, tmax, 0);
-								
-				// this particular ray missed everything, or got too deep
-				if(rayPayload.dist == -1.0 || rays[i].level >= MAX_RECURSION)
-				{
-					rays[i].in_use = false;
-					continue;
-				}
 
 				vec4 hitPos = rays[i].origin + rays[i].direction * rayPayload.dist;
 
-				rays[i].depth = distance(hitPos, rays[i].origin);
-				rays[i].tint_constant = rayPayload.tint;
-				rays[i].tint_colour = rayPayload.tint_colour;
 
-				// Do some fog in an AABB
+
+
+
+
+
+				// Do some experimental fog in an AABB
 				float dist_color = 0.0;
 				float dist_opacity = 0.0;
 
@@ -495,11 +434,11 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 
 					if(in_aabb(rays[i].origin.xyz, aabb_min, aabb_max))
 					{
-						vec3 backout_pos = rays[i].origin.xyz - rays[i].direction.xyz*10000.0;
+						vec3 backout_pos = rays[i].origin.xyz - rays[i].direction.xyz*100.0;
 
 						if(BBoxIntersect(aabb_min, aabb_max, backout_pos, rays[i].direction.xyz, t0, t1))
 						{
-							start = rays[i].origin.xyz;//backout_pos + rays[i].direction.xyz*t0;
+							start = backout_pos + rays[i].direction.xyz*t0;
 							end = backout_pos + rays[i].direction.xyz*t1;
 						}
 					}
@@ -512,13 +451,18 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 						}
 					}
 
-					if(true)//rayPayload.dist != -1.0)
+					if(rayPayload.dist != -1.0)
 					{
 						if(distance(rays[i].origin.xyz, start) > distance(rays[i].origin.xyz, hitPos.xyz))
 							start = hitPos.xyz + rayPayload.normal * 0.01f;
 					
 						if(distance(rays[i].origin.xyz, end) > distance(rays[i].origin.xyz, hitPos.xyz))
 							end = hitPos.xyz + rayPayload.normal * 0.01f;
+
+						if(rayPayload.opacity == 0.0) // big hack
+						{
+							start = end;
+						}
 					}
 
 					const int num_steps = int(floor((distance(start, end) / target_step_length)));
@@ -531,13 +475,11 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 
 						for(int j = 0; j < num_steps; j++, curr_step += step)
 						{
-							float colour = get_omni_radiance_backward(10, 5, curr_step, hue, eta);
+							float colour = get_omni_radiance(10, 5, curr_step, hue, eta);
 
 							float noise = noise3(curr_step, 1.0);
 
-//							noise *= noise3(curr_step, 1.0/2.0);
-//							noise *= noise3(curr_step, 1.0/4.0);
-//							noise *= noise3(curr_step, 1.0/8.0);
+							//noise *= noise3(curr_step, 1.0/10.0);
 
 							colour *= noise;
 
@@ -555,7 +497,21 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 				dist_opacity = clamp(dist_opacity, 0.0, 1.0);
 				rays[i].base_color = mix(rays[i].base_color, dist_color, dist_opacity);
 
-				rays[i].normal = rayPayload.normal;				
+
+
+
+
+
+
+
+				// this particular ray missed everything, or got too deep
+				if(rayPayload.dist == -1.0 || rays[i].level >= MAX_RECURSION)
+				{
+					rays[i].in_use = false;
+					continue;
+				}
+
+				rays[i].normal = rayPayload.normal;
 				rays[i].reflection_constant = rayPayload.reflector;
 				rays[i].refraction_constant = rayPayload.opacity;
 
@@ -686,17 +642,7 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 		{
 			accum = mix(rays[i].base_color, rays[rays[i].child_reflect_id].accumulated_color, rays[i].reflection_constant);
 		}
-
-
-		// Do tinting
-		const vec3 mask = hsv2rgb(vec3(hue, 1.0, 1.0));
-		const float t = rays[i].tint_colour.r*mask.r + rays[i].tint_colour.g*mask.g + rays[i].tint_colour.b*mask.b;
-	
-		float x = accum;
-		accum = mix(x, t, rays[i].tint_constant);
-		accum = min(x, accum);
-
-
+		
 		rays[i].accumulated_color = accum;
 	}
 	
@@ -712,42 +658,54 @@ float get_ray0(vec4 origin, vec4 direction, const float hue, const float eta)
 	//float s = 1.0 - float(current_buffer_index - 1) / float(buffer_size);
 	//return s;
 
+
+
+	// Return root ray segment colour
 	return rays[0].accumulated_color;
 }
 
 
-
-
-vec3 plane_ray_intersection(vec3 planeP, vec3 planeN, vec3 rayP, vec3 rayD)
+ 
+struct Vertex
 {
-    float d = dot(planeP, -planeN);
-    float t = -(d + dot(rayP, planeN)) / dot(rayD, planeN);
-    return rayP + t * rayD;
+  vec3 pos;
+  vec3 normal;
+  vec2 uv;
+  vec4 color;
+  vec4 _pad0; 
+  vec4 _pad1;
+};
+
+Vertex unpack(uint index)
+{
+	// Unpack the vertices from the SSBO using the glTF vertex structure
+	// The multiplier is the size of the vertex divided by four float components (=16 bytes)
+	const int m = ubo.vertexSize / 16;
+
+	vec4 d0 = vertices.v[m * index + 0];
+	vec4 d1 = vertices.v[m * index + 1];
+	vec4 d2 = vertices.v[m * index + 2];
+
+	Vertex v;
+	v.pos = d0.xyz;
+	v.normal = vec3(d0.w, d1.x, d1.y);
+	v.uv = vec2(d1.z, d1.w);
+	v.color = vec4(d2.x, d2.y, d2.z, 1.0);
+
+	return v;
 }
+
 
 void main() 
 {
-	// Only seed once per pixel
-	prng_state = gl_LaunchIDEXT.y*gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x;
-
-	vec4 origin;
-	vec4 direction;
-
-	get_origin_and_direction(
-		origin,
-		direction, 
-		gl_LaunchIDEXT.x, 
-		gl_LaunchIDEXT.y,
-		gl_LaunchSizeEXT.x,
-		gl_LaunchSizeEXT.y);
-
 	// Do chromatic aberration (good for making rainbows via prisms)
-	const int channels = 3;
-	
-	const float max_hue = rgb2hsv(vec3(0.0, 0.0, 1.0)).x; // blue
+
+	const int channels = 5;
+
+	const float max_hue = rgb2hsv(vec3(1.0, 0.0, 1.0)).x; // violet
 	const float min_hue = rgb2hsv(vec3(1.0, 0.0, 0.0)).x; // red
 
-	const float max_eta = 0.75;
+	const float max_eta = 0.95;
 	const float min_eta = 0.75;
 
 	const float hue_diff = max_hue - min_hue;
@@ -756,54 +714,45 @@ void main()
 	const float eta_diff = max_eta - min_eta;
 	const float eta_step_size = eta_diff / (channels - 1);
 
-	vec3 color = vec3(0.0);
-	vec3 total = vec3(0.0);
-
-	// Do primary ray
 	float curr_hue = min_hue;
 	float curr_eta = min_eta;
 
-	for(int c = 0; c < channels; c++, curr_hue += hue_step_size, curr_eta += eta_step_size)
+	vec3 total = vec3(0.0);
+	vec3 color = vec3(0.0);
+
+	// Only seed once per pixel
+	prng_state = res.x * pixel_pos.y + pixel_pos.x;
+
+	for(int i = 0; i < channels; i++, curr_hue += hue_step_size, curr_eta += eta_step_size)
 	{
-		const float f = get_ray0(origin, direction, curr_hue, curr_eta);
+		const float f = get_ray0(curr_hue, curr_eta);
 		const vec3 mask = hsv2rgb(vec3(curr_hue, 1.0, 1.0));
 
 		total += mask;
 		color += f*mask;
 	}
 
-
-	// Do pseudorandom depth of field (DOF) rays
-	const float focal_distance = 6.0;
-	const vec4 focal_point_bootstrap = origin + normalize(direction) * focal_distance;
-	const vec4 focal_point_on_plane = vec4(plane_ray_intersection(focal_point_bootstrap.xyz, (origin - focal_point_bootstrap).xyz, origin.xyz, direction.xyz), 0.0);
-	
-	const int DOF_samples = 0;
-
-	for(int s = 0; s < DOF_samples; s++)
-	{
-		curr_hue = min_hue;
-		curr_eta = min_eta;
-
-		vec3 r = RandomUnitVector(prng_state)*0.01;
-
-		vec4 rand_origin = origin + vec4(r, 0.0);
-		vec4 rand_direction = focal_point_on_plane - rand_origin;
-
-		for(int c = 0; c < channels; c++, curr_hue += hue_step_size, curr_eta += eta_step_size)
-		{
-			const float f = get_ray0(rand_origin, rand_direction, curr_hue, curr_eta);
-			const vec3 mask = hsv2rgb(vec3(curr_hue, 1.0, 1.0));
-
-			total += mask;
-			color += f*mask;
-		}
-	}
-	
-
 	color /= total;
-	
-	//color = pow(color, vec3(1.0/2.2));
 
-	imageStore(color_image, ivec2(gl_LaunchIDEXT.xy), vec4(color, 1.0));
+	//color = pow(color, vec3(2.2));
+	
+	int first_index = 3*ubo.tri_count - 3*ubo.light_tri_count;
+	int num_indices = 3*ubo.tri_count;
+
+	for(int i = first_index; i < num_indices; i += 3)
+	{
+		uint index_0 = indices.i[i + 0];
+		uint index_1 = indices.i[i + 1];
+		uint index_2 = indices.i[i + 2];
+		
+		Vertex v0 = unpack(index_0);
+		Vertex v1 = unpack(index_1);
+		Vertex v2 = unpack(index_2);
+	}
+
+
+
+	imageStore(color_image, pixel_pos, vec4(color, 0.0));
 }
+
+
