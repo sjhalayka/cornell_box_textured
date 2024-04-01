@@ -57,7 +57,6 @@ In this paper we discuss the following:
 \item Appendix A: Bidirectional or forward path tracers, and complications
 \item Appendix B: Contemporary graphics research on caustics
 \item Appendix C: Classical photon mapping
-\item Appendix D: Failures of the backward path tracer
 \end{itemize}
 
 
@@ -186,9 +185,9 @@ The code for this paper is based off of Sascha Willems' and NVIDIA's work \cite{
 
 The various Cornell boxes were developed by Rob Rau.
 
-The code and various Cornell boxes can be found at:
+The code and some Cornell boxes can be found at:
 
-\url{https://github.com/sjhalayka/cornell_box_textured}
+\url{https://github.com/sjhalayka/bidirectional_path_tracer}
 
 
 
@@ -260,14 +259,6 @@ In essence, photon mapping is not natural, especially when compared to the ease 
 
 
 
-
-
-\section{Failures of the backward path tracer}
-To be fair, no one algorithm is perfect: there is at least one lighting setup that cannot be efficiently modeled by using backward path tracing on its own.
-For instance, a light at the base of a long, thin hollow cylinder (e.g. a barrel light) is generally hard to get to when it comes to tracing a path from the eye.
-See Fig. 11.
-We shall work at implementing a bidirectional path tracer, which is likely the easiest -- and the most natural -- solution to the barrel light setup.
-Let this paper serve as a stepping stone toward that goal.
 
 
 
@@ -450,8 +441,6 @@ $s = 25$.
   \includegraphics[width = 6 in]{fig11.png}
   \caption{ Barrel light using the backward path tracer, with 20-channel chromatic aberration.
 White light travels down the barrel, and is diffracted by the triangular prism, forming a rainbow on the floor.
-Here $s = 1000$, in order to work with the barrel light, which is not really a desirable number of samples.
-We consider this to be a failure of the backward path tracer on its own.
 }
 \end{figure}
 
